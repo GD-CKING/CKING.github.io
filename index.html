@@ -229,7 +229,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/GD-CKING/CKING.github.io.git/CKING.github.io/2019/07/24/消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ 都有什么优点和缺点？/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/GD-CKING/CKING.github.io.git/CKING.github.io/2019/07/24/消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ-都有什么优点和缺点？/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Cking">
@@ -248,7 +248,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/07/24/消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ 都有什么优点和缺点？/" itemprop="url">消息队列有什么优缺点？Kafka、ActiveMQ、RabbitMQ和RocketMQ都有什么优缺点</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2019/07/24/消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ-都有什么优点和缺点？/" itemprop="url">消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ 都有什么优点和缺点？</a></h1>
         
 
         <div class="post-meta">
@@ -260,7 +260,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-24T14:37:33+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-24T15:29:59+08:00">
                 2019-07-24
               </time>
             
@@ -303,27 +303,15 @@
             <blockquote>
 <p>本节思维导图</p>
 </blockquote>
-<div align="center">
-    <img src="image/MQ.png">
-</div>
-
+<p><img src="/CKING.github.io//github.com/GD-CKING/CKING.github.io.git/2019/07/24/消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ-都有什么优点和缺点？/MQ.png" alt="MQ"></p>
 <h2 id="消息队列的优点"><a href="#消息队列的优点" class="headerlink" title="消息队列的优点"></a>消息队列的优点</h2><p>消息队列主要有三个优点：<strong>解耦</strong>、<strong>异步</strong>和<strong>削峰</strong></p>
 <h3 id="削峰"><a href="#削峰" class="headerlink" title="削峰"></a>削峰</h3><p>假设一个业务场景如图所示，A系统分别发送信息给B C D系统，此时系统的耦合性比较高，当需求改变要求不给D系统发送消息，或者增加一个E系统也需要A系统发送数据，那么我们就不得不去修改A系统的代码。除此之外如果其他系统挂了，同样也会影响到A系统，如果引入MQ，那么A系统就只需要把数据放进MQ中，由需要这个数据的系统去订阅这个MQ，这样就可以实现系统解耦。这样A系统不仅不需关系哪个系统需要这个消息，也不需要关心消息发送失败或者超时等情况。</p>
-<div align="center">
-    <img src="image/y1.png" width="65%">
-</div>
-
+<p><img src="/CKING.github.io//github.com/GD-CKING/CKING.github.io.git/2019/07/24/消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ-都有什么优点和缺点？/y1.png" alt="y1"></p>
 <p><strong>总结</strong>：通过MQ，Pub/Sub发布订阅消息模型，A系统就跟其他系统解耦了。</p>
 <h3 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h3><p>业务场景如图所示，用户向A系统发起请求，需要在本地写数据库，还需要在B C D系统写数据库，假设本地写耗时10ms，如下图需要10+20+30+40共100ms。那么这样相对来说比较慢。</p>
-<div align="center">
-    <img src="image/yw2.png" width="65%">
-</div>
-
+<p><img src="/CKING.github.io//github.com/GD-CKING/CKING.github.io.git/2019/07/24/消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ-都有什么优点和缺点？/yw2.png" alt="yw2"></p>
 <p>但如果引入MQ，假设将消息放入MQ耗时5ms，那么总共需要15ms，极大提高了响应速度。</p>
-<div align="center">
-    <img src="image/yw3.png" width="65%">
-</div>
-
+<p><img src="/CKING.github.io//github.com/GD-CKING/CKING.github.io.git/2019/07/24/消息队列有什么优点和缺点？Kafka、ActiveMQ、RabbitMQ、RocketMQ-都有什么优点和缺点？/yw3.png" alt="yw3"></p>
 <h3 id="削峰-1"><a href="#削峰-1" class="headerlink" title="削峰"></a>削峰</h3><p>假设每天0:00-12:00系统每秒并发请求数量只有十几个，但过了12点之后，请求数量猛增到几千个，而且数据库系统是mysql，每秒最多也就执行一千多条SQL语句，这样导致mysql崩溃，但过了高峰期之后并发请求又恢复到了相对比较低的水平，对整个系统又没啥压力了。</p>
 <p>引入MQ之后，A系统每秒中只能处理一千个SQL，那就从MQ中取出一千个SQL去处理，这样即使在高峰的时候，A系统也不会崩溃，而在高峰期间MQ可能会有几百万的请求积压在MQ中，但这个短暂的高峰的积压是允许，等高峰期一过，MQ积压的数据就能够迅速被处理。</p>
 <h2 id="消息队列的缺点"><a href="#消息队列的缺点" class="headerlink" title="消息队列的缺点"></a>消息队列的缺点</h2><p>缺点有以下几个：</p>
