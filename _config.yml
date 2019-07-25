@@ -5,7 +5,7 @@
 # Site
 title: Hexo
 subtitle:
-description:
+description: 一步一步往上走
 keywords:
 author: Cking
 language: zh-Hans
@@ -81,3 +81,8 @@ deploy:
   type: git
   repository: https://github.com/GD-CKING/CKING.github.io.git
   branch: master
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000

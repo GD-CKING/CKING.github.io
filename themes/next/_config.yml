@@ -95,7 +95,7 @@ menu:
   home: / || home
   #about: /about/ || user
   #tags: /tags/ || tags
-  #categories: /categories/ || th
+  categories: /categories/ || th
   archives: /archives/ || archive
   #schedule: /schedule/ || calendar
   #sitemap: /sitemap.xml || sitemap
@@ -402,18 +402,26 @@ valine:
 # You can get your Github ID from https://api.github.com/users/<Github username>
 gitment:
   enable: false
-  mint: true # RECOMMEND, A mint on Gitment, to support count, language and proxy_gateway
-  count: true # Show comments count in post meta area
-  lazy: false # Comments lazy loading with a button
-  cleanly: false # Hide 'Powered by ...' on footer, and more
+  mint: true 
+  count: true 
+  lazy: false 
+  cleanly: false 
   language: # Force language, or auto switch by theme
-  github_user: # MUST HAVE, Your Github ID
-  github_repo: # MUST HAVE, The repo you use to store Gitment comments
-  client_id: # MUST HAVE, Github client id for the Gitment
-  client_secret: # EITHER this or proxy_gateway, Github access secret token for the Gitment
+  github_user: GD-CKING
+  github_repo: gitment-comments
+  client_id: 88b295af414c49207f46
+  client_secret: af50af237649811069f83f09664724b046f6ad22
   proxy_gateway: # Address of api proxy, See: https://github.com/aimingoo/intersect
   redirect_protocol: # Protocol of redirect_uri with force_redirect_protocol when mint enabled
-
+gitalk:
+  enable: true
+  githubID: GD-CKING
+  repo: CKING.github.io
+  ClientID: 88b295af414c49207f46
+  ClientSecret: af50af237649811069f83f09664724b046f6ad22
+  adminUser: GD-CKING
+  labels: 'gitalk'
+  distractionFreeMode: true
 # Baidu Share
 # Available value:
 #    button | slide
@@ -425,7 +433,7 @@ gitment:
 # This plugin is more useful in China, make sure you known how to use it.
 # And you can find the use guide at official webiste: http://www.jiathis.com/.
 # Warning: JiaThis does not support https.
-#jiathis:
+jiathis: true
   ##uid: Get this uid from http://www.jiathis.com/
 #add_this_id:
 
@@ -604,7 +612,7 @@ algolia_search:
 # Local search
 # Dependencies: https://github.com/flashlab/hexo-generator-search
 local_search:
-  enable: false
+  enable: true
   # if auto, trigger search by changing input
   # if manual, trigger search by pressing enter key or search button
   trigger: auto
@@ -811,3 +819,5 @@ images: images
 
 # Theme version
 version: 5.1.4
+passage_end_tag:
+  enabled: true
