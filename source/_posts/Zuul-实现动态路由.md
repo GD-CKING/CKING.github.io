@@ -2,11 +2,11 @@
 title: Zuul-实现动态路由
 date: 2019-08-13 19:46:41
 tags:
-  -[分布式]
-  -[SpringCloud]
+  - [分布式]
+  - [SpringCloud]
 categories:  
-  -[分布式]
-  -[SpringCloud]
+  - [分布式]
+  - [SpringCloud]
 ---
 
 ​		一般情况下，Zuul需要在配置文件里写好路由信息，这样zuul才可以通过这些路由信息根据连接转发到相应的服务上去。但每增加一个服务，就需要停下网关去重新编写配置文件，这样就比较麻烦了。因此，就有人提出了动态路由的方法。
@@ -41,7 +41,66 @@ INSERT INTO gateway_api_route (id, path, service_id, retryable, strip_prefix, ur
 
 ```
 
-​	接下来就开始编写动态路由的实现逻辑，其实基本逻辑就是从数据库里取出路由数据，然后封装成ZuulProperties.ZuulRoute。主要代码如下：
+​	然后编写表gateway_api_route相应的实体类：
+
+```java
+public class GatewayApiRoute {
+ 
+	private String id;
+	private String path;
+	private String serviceId;
+	private String url;
+	private boolean stripPrefix = true;
+	private Boolean retryable;
+	private Boolean enabled;
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getPath() {
+		return path;
+	}
+	public void setPath(String path) {
+		this.path = path;
+	}
+	public String getServiceId() {
+		return serviceId;
+	}
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public boolean isStripPrefix() {
+		return stripPrefix;
+	}
+	public void setStripPrefix(boolean stripPrefix) {
+		this.stripPrefix = stripPrefix;
+	}
+	public Boolean getRetryable() {
+		return retryable;
+	}
+	public void setRetryable(Boolean retryable) {
+		this.retryable = retryable;
+	}
+	public Boolean getEnabled() {
+		return enabled;
+	}
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+	
+}
+```
+
+​		接下来就开始编写动态路由的实现逻辑，其实基本逻辑就是从数据库里取出路由数据，然后封装成ZuulProperties.ZuulRoute。主要代码如下：
 
 ```java
 package com.zhss.demo.zuul.gateway;
