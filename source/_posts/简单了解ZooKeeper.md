@@ -74,6 +74,8 @@ categories:
 
 ### 分布式锁
 
+​		详情请参考这篇 [ZooKeeper的分布式锁的实现原理](https://gd-cking.github.io/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/)
+
 ### 集群管理
 
 ​		还是以三个系统A B C为例，在ZooKeeper中创建临时节点即可，
