@@ -57,3 +57,4 @@ hystrix:
 
 ​		假设在网关Zuul配置了以上参数，`MaxAutoRetriesNextServer`和`MaxAutoRetries`的意思是如果Zuul认为某个服务超时了，此时**会先重试一下该服务对应的这台机器，如果还是不行就会重试一下该服务的其他机器。**
 
+​		重试机制除了上面的参数配置的方式之外，还可以使用Spring-Retry实现。相比配置参数配置的方式，灵活性和扩展性更强。详情可以看大佬的这一篇[Spring Retry重试机制](https://juejin.im/post/5af2b2075188256720340d31)
