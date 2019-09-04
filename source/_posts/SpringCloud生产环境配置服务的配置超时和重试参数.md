@@ -25,7 +25,7 @@ ribbon:
 
 ```yaml
 zuul:
-  ignored-services: *
+  ignored-services: '*'
   ribbon:
     eager-load:
       enabled: true
