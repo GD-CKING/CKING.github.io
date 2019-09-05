@@ -94,3 +94,35 @@ redis-trib.rb add-node
 ​		任何一台机器宕机，redis的寻址都不受影响。因为key找的是hash slot，不是机器。
 
 ![hash slot](Redis集群/hash slot.png)
+
+## Redis Cluster的高可用与主备切换原理
+
+​		redis cluster的高可用的原理，几乎跟哨兵是类似的。
+
+### 判断节点宕机
+
+​		如果一个节点认为另一个节点宕机，那么就是`pfail`，**主观宕机**。如果多个节点都认为一个节点宕机了，那么就是`fail`，**客观宕机**，跟哨兵的原理几乎一样，sdown，odown。 
+
+​		 在`cluster-node-timeout`内，某个节点一直没有返回`pong`，那么就会认为`fail`。
+
+​		如果一个节点认为某个节点`fail`，那么会在`gossip ping`消息中，`ping`给其他节点，如果**超过半数**的节点都认为`pfail`了，那么就会变成`fail`.
+
+### 从节点过滤
+
+​		对宕机的master node，从其所有的slave node中，选择一个切换成master node。
+
+​		检查每个slave node与master node断开连接的时间，如果超过了`cluster-node-timeout * cluster-salve-validity-factor`，那么就**没有资格切**换成master。
+
+### 从节点选举
+
+​		每个从节点，都根据自己对master复制数据的offset，来设置一个选举时间，offset越大（复制数据越多）的从节点，选举时间越靠前，优先进行选举。
+
+​		所有的master node开始slave选举投票，给要进行选举的slave进行投票，如果大部分master node `(N / 2 + 1)`都投票给某个从节点，那么选举通过，那个从节点 可以切换成master。 
+
+​		从节点执行主备切换，从节点切换为主节点。
+
+### 与哨兵比较 
+
+​		整个流程跟哨兵相比，非常类似。所以redis cluster相当于直接集成了replication和sentinel的功能。  
+
+  
