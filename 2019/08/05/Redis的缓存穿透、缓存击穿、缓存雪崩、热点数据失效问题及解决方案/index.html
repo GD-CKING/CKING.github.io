@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Redis,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本节思维导图   ​        在我们的平常的项目中多多少少都会使用到缓存，因为一些数据我们没有必要每次查询的时候都去查询到数据库。特别是高 QPS 的系统，每次都去查询数据库，对于你的数据库来说将是灾难。但缓存使用不当，也会引起灾难。 缓存穿透什么是缓存穿透​        正常情况下，我们去查询的数据都是存在。但如果请求去查询一条数据库根本就不存在的数据，也就是缓存和数据库都查询不到这条">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案">
+<meta property="og:url" content="https://github.com/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本节思维导图   ​        在我们的平常的项目中多多少少都会使用到缓存，因为一些数据我们没有必要每次查询的时候都去查询到数据库。特别是高 QPS 的系统，每次都去查询数据库，对于你的数据库来说将是灾难。但缓存使用不当，也会引起灾难。 缓存穿透什么是缓存穿透​        正常情况下，我们去查询的数据都是存在。但如果请求去查询一条数据库根本就不存在的数据，也就是缓存和数据库都查询不到这条">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/Redis%E7%BC%93%E5%AD%98%E7%9A%84%E9%97%AE%E9%A2%98.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/Redis%E7%9A%84%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF%E3%80%81%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E3%80%81%E7%83%AD%E7%82%B9%E6%95%B0%E6%8D%AE%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%5C%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9.png">
+<meta property="og:updated_time" content="2019-09-08T07:36:47.433Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案">
+<meta name="twitter:description" content="本节思维导图   ​        在我们的平常的项目中多多少少都会使用到缓存，因为一些数据我们没有必要每次查询的时候都去查询到数据库。特别是高 QPS 的系统，每次都去查询数据库，对于你的数据库来说将是灾难。但缓存使用不当，也会引起灾难。 缓存穿透什么是缓存穿透​        正常情况下，我们去查询的数据都是存在。但如果请求去查询一条数据库根本就不存在的数据，也就是缓存和数据库都查询不到这条">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/Redis%E7%BC%93%E5%AD%98%E7%9A%84%E9%97%AE%E9%A2%98.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/">
+
+
+
+
+
+  <title>Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cking">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-05T22:01:36+08:00">
+                2019-08-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>本节思维导图</p>
+</blockquote>
+<p><img src="/CKING.github.io/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/Redis%E7%BC%93%E5%AD%98%E7%9A%84%E9%97%AE%E9%A2%98.png" alt="Redis缓存的问题"></p>
+<p>​        在我们的平常的项目中多多少少都会使用到缓存，因为一些数据我们没有必要每次查询的时候都去查询到数据库。特别是高 QPS 的系统，每次都去查询数据库，对于你的数据库来说将是灾难。但缓存使用不当，也会引起灾难。</p>
+<h2 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h2><h3 id="什么是缓存穿透"><a href="#什么是缓存穿透" class="headerlink" title="什么是缓存穿透"></a>什么是缓存穿透</h3><p>​        正常情况下，我们去查询的数据都是存在。但如果请求去查询一条数据库根本就不存在的数据，也就是缓存和数据库都查询不到这条数据，但是请求每次都会打到数据库上面去。这种查询不存在数据的现象称为<strong>缓存穿透</strong>。</p>
+<h3 id="缓存穿透带来的问题"><a href="#缓存穿透带来的问题" class="headerlink" title="缓存穿透带来的问题"></a>缓存穿透带来的问题</h3><p>​        如果有黑客对你的系统进行攻击，拿一个不存在的id 去查询数据，会产生大量的请求到数据库中，可能会导致你的数据库由于压力太大而宕机。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="1、缓存空值"><a href="#1、缓存空值" class="headerlink" title="1、缓存空值"></a>1、缓存空值</h4><p>​        之所以会穿透，是因为缓存中没有存储这些空数据的key，从而导致每次查询都到数据库去了。因此我们可以为这些key对应的值设置null丢到缓存里面去，后面再出现查询这个key的请求的时候，就直接返回null。不过要<strong>设置过期时间</strong>。</p>
+<h4 id="2、布隆过滤器"><a href="#2、布隆过滤器" class="headerlink" title="2、布隆过滤器"></a>2、布隆过滤器</h4><p>​        这种方式在大数据场景应用比较多，比如Hbase中使用它去判断数据是否在磁盘上，还有在爬虫场景判断URL是否已经被爬取。</p>
+<p>​        这种方案可以加在第一种方案中，在缓存之前再加一层布隆过滤器，在查询的时候先去布隆过滤器查询key是否存在，如果不存在就直接返回，存在再走查缓存和数据库。</p>
+<p><img src="/CKING.github.io/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8.png" alt="布隆过滤器"></p>
+<h4 id="3、用户鉴权"><a href="#3、用户鉴权" class="headerlink" title="3、用户鉴权"></a>3、用户鉴权</h4><p>​        这种情况有可能是黑客进行恶意攻击，因此我们可以在系统中增加用户鉴权校验或者在接口层增加校验，直接拦截不正常的请求。</p>
+<h3 id="方案选择"><a href="#方案选择" class="headerlink" title="方案选择"></a>方案选择</h3><p>​        对于一些恶意攻击，攻击带过来的大量的key是不存在的，那么我们采用第一种方案就会缓存大量不存在key的数据，此时第一种方案就不合适了，我们可以先使用第二种方案过滤掉这些key。即针对这种key异常多、请求重复率比较低的数据，我们没有必要进行缓存，使用第二种方案直接过滤掉。</p>
+<h2 id="缓存击穿"><a href="#缓存击穿" class="headerlink" title="缓存击穿"></a>缓存击穿</h2><h3 id="什么是缓存击穿"><a href="#什么是缓存击穿" class="headerlink" title="什么是缓存击穿"></a>什么是缓存击穿</h3><p>​        在平常高并发的系统中，大量的请求同时查询一个key时，此时这个key刚好失效了，就会导致大量的请求打到数据库上面去，这种现象我们成为<strong>缓存击穿</strong>。</p>
+<h3 id="缓存击穿带来的问题"><a href="#缓存击穿带来的问题" class="headerlink" title="缓存击穿带来的问题"></a>缓存击穿带来的问题</h3><p>​        会造成某一时刻数据库请求里过大，压力剧增。</p>
+<h3 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="1、设置热点数据永不过期"><a href="#1、设置热点数据永不过期" class="headerlink" title="1、设置热点数据永不过期"></a>1、设置热点数据永不过期</h4><h4 id="2、加互斥锁"><a href="#2、加互斥锁" class="headerlink" title="2、加互斥锁"></a>2、加互斥锁</h4><p>​        多个线程同时去查询数据库的这条数据时，我们可以在第一个查询数据的请求上使用一个互斥锁来锁住它，其他线程走到这一步拿不到锁就等着，等第一个线程查询到了数据，然后做缓存。后面的线程进来了，就可以直接走缓存了。</p>
+<h2 id="缓存雪崩"><a href="#缓存雪崩" class="headerlink" title="缓存雪崩"></a>缓存雪崩</h2><h3 id="什么是缓存雪崩"><a href="#什么是缓存雪崩" class="headerlink" title="什么是缓存雪崩"></a>什么是缓存雪崩</h3><p>​        缓存雪崩的情况是，在某一时刻发生大规模的缓存失效的情况，比如你的缓存服务宕机了，会有大量的请求进来直接打到DB上。结果就是DB撑不住宕机了。</p>
+<h3 id="解决方案-2"><a href="#解决方案-2" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="1、事前，使用集群缓存，保证缓存服务的高可用"><a href="#1、事前，使用集群缓存，保证缓存服务的高可用" class="headerlink" title="1、事前，使用集群缓存，保证缓存服务的高可用"></a>1、事前，使用集群缓存，保证缓存服务的高可用</h4><p>​        这种方案是在发生雪崩前对缓存集群实现高可用，如果是使用Redis，可以使用 主从+哨兵或者Redis Cluster来避免Redis全盘崩溃的情况。</p>
+<h4 id="2、事中：ehcache本地缓存-Hystrix限流-amp-降级，避免数据库被打死"><a href="#2、事中：ehcache本地缓存-Hystrix限流-amp-降级，避免数据库被打死" class="headerlink" title="2、事中：ehcache本地缓存 + Hystrix限流&amp;降级，避免数据库被打死"></a>2、事中：ehcache本地缓存 + Hystrix限流&amp;降级，避免数据库被打死</h4><p>​        使用ehcache本地缓存的目的也是考虑在Redis Cluster完全不可用的时候，ehcache本地缓存可以支撑一阵。</p>
+<p>​        使用Hystrix进行限流&amp;降级，例如一秒来了3000个请求，我们可以设置只能有一秒1000个请求能通过这个组件，那么其他剩余的2000请求就会走限流逻辑。然后去调用我们自己开发的降级组件，比如设置一些默认值之类的，以此来保护数据库不会被大量的请求给打死。</p>
+<h4 id="3、事后：开启Redis持久化机制，尽快恢复缓存集群"><a href="#3、事后：开启Redis持久化机制，尽快恢复缓存集群" class="headerlink" title="3、事后：开启Redis持久化机制，尽快恢复缓存集群"></a>3、事后：开启Redis持久化机制，尽快恢复缓存集群</h4><p>​        一旦重启，就能从磁盘上自动加载数据恢复内存中的数据。</p>
+<p><img src="/CKING.github.io/2019/08/05/Redis的缓存穿透、缓存击穿、缓存雪崩、热点数据失效问题及解决方案/Redis%E7%9A%84%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF%E3%80%81%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E3%80%81%E7%83%AD%E7%82%B9%E6%95%B0%E6%8D%AE%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%5C%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9.png" alt="缓存雪崩"></p>
+<h2 id="解决热点数据集中失效问题"><a href="#解决热点数据集中失效问题" class="headerlink" title="解决热点数据集中失效问题"></a>解决热点数据集中失效问题</h2><h3 id="什么是热点数据集中失效"><a href="#什么是热点数据集中失效" class="headerlink" title="什么是热点数据集中失效"></a>什么是热点数据集中失效</h3><p>​        我们在设置缓存的时候，一般会给缓存设置一个失效时间，过了这个时间，缓存就失效。对于一些热点的数据来说，当缓存失效以后会存在大量的请求过来，然后打到数据库中去，从而可能导致数据库崩溃的情况。</p>
+<h3 id="解决方案-3"><a href="#解决方案-3" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="1、设置不同的过期时间"><a href="#1、设置不同的过期时间" class="headerlink" title="1、设置不同的过期时间"></a>1、设置不同的过期时间</h4><p>​        为了避免这些热点数据集中失效，那么我们在设置缓存过期时间的时候，尽量让他们失效的时间错开。例如在一个基础的时间上加上或减去一个范围内的随机值。</p>
+<h4 id="2、互斥锁"><a href="#2、互斥锁" class="headerlink" title="2、互斥锁"></a>2、互斥锁</h4><p>​        结合上面击穿的情况，在第一个请求去查询数据库的时候加一个互斥锁，其余的查询都会被阻塞住，知道锁释放，从而保护数据库。</p>
+<p>​        但是因为它会阻塞其他线程，此时系统吞吐量会下降，需要结合实际的业务去考虑是否要这么做。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://juejin.im/post/5c9a67ac6fb9a070cb24bf34" target="_blank" rel="noopener">https://juejin.im/post/5c9a67ac6fb9a070cb24bf34</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2019/08/02/Java的IO模型/" rel="next" title="Java的IO模型">
+                <i class="fa fa-chevron-left"></i> Java的IO模型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2019/08/06/dubbo支持的通信协议、序列化协议以及hession的数据结构/" rel="prev" title="dubbo支持的通信协议、序列化协议以及hession的数据结构">
+                dubbo支持的通信协议、序列化协议以及hession的数据结构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Cking</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存穿透"><span class="nav-number">1.</span> <span class="nav-text">缓存穿透</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是缓存穿透"><span class="nav-number">1.1.</span> <span class="nav-text">什么是缓存穿透</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存穿透带来的问题"><span class="nav-number">1.2.</span> <span class="nav-text">缓存穿透带来的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案"><span class="nav-number">1.3.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、缓存空值"><span class="nav-number">1.3.1.</span> <span class="nav-text">1、缓存空值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、布隆过滤器"><span class="nav-number">1.3.2.</span> <span class="nav-text">2、布隆过滤器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、用户鉴权"><span class="nav-number">1.3.3.</span> <span class="nav-text">3、用户鉴权</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案选择"><span class="nav-number">1.4.</span> <span class="nav-text">方案选择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存击穿"><span class="nav-number">2.</span> <span class="nav-text">缓存击穿</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是缓存击穿"><span class="nav-number">2.1.</span> <span class="nav-text">什么是缓存击穿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存击穿带来的问题"><span class="nav-number">2.2.</span> <span class="nav-text">缓存击穿带来的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案-1"><span class="nav-number">2.3.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、设置热点数据永不过期"><span class="nav-number">2.3.1.</span> <span class="nav-text">1、设置热点数据永不过期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、加互斥锁"><span class="nav-number">2.3.2.</span> <span class="nav-text">2、加互斥锁</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存雪崩"><span class="nav-number">3.</span> <span class="nav-text">缓存雪崩</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是缓存雪崩"><span class="nav-number">3.1.</span> <span class="nav-text">什么是缓存雪崩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案-2"><span class="nav-number">3.2.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、事前，使用集群缓存，保证缓存服务的高可用"><span class="nav-number">3.2.1.</span> <span class="nav-text">1、事前，使用集群缓存，保证缓存服务的高可用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、事中：ehcache本地缓存-Hystrix限流-amp-降级，避免数据库被打死"><span class="nav-number">3.2.2.</span> <span class="nav-text">2、事中：ehcache本地缓存 + Hystrix限流&amp;降级，避免数据库被打死</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、事后：开启Redis持久化机制，尽快恢复缓存集群"><span class="nav-number">3.2.3.</span> <span class="nav-text">3、事后：开启Redis持久化机制，尽快恢复缓存集群</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决热点数据集中失效问题"><span class="nav-number">4.</span> <span class="nav-text">解决热点数据集中失效问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是热点数据集中失效"><span class="nav-number">4.1.</span> <span class="nav-text">什么是热点数据集中失效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案-3"><span class="nav-number">4.2.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、设置不同的过期时间"><span class="nav-number">4.2.1.</span> <span class="nav-text">1、设置不同的过期时间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、互斥锁"><span class="nav-number">4.2.2.</span> <span class="nav-text">2、互斥锁</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cking</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
