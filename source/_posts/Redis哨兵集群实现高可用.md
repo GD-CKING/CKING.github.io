@@ -109,7 +109,7 @@ min-slaves-max-lag 10
 
 ## slave配置的自动纠正
 
-​		哨兵回负责自动纠正slave的一些配置，比如slave如果要成为潜在的master候选人，哨兵会确保复制现有的master数据；如果slave连接到了一个错误的master上。比如故障转移后，那么哨兵会确保它们连接到正确的master上。
+​		哨兵会负责自动纠正slave的一些配置，比如slave如果要成为潜在的master候选人，哨兵会确保复制现有的master数据；如果slave连接到了一个错误的master上。比如故障转移后，那么哨兵会确保它们连接到正确的master上。
 
 ## slave -> master选举算法
 
