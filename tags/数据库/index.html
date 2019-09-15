@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="分布式,ZooKeeper,">
+  <meta name="keywords" content="Hexo, NexT">
 
 
 
@@ -79,30 +79,16 @@
 
 
 
-<meta name="description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
-<meta name="keywords" content="分布式,ZooKeeper">
-<meta property="og:type" content="article">
-<meta property="og:title" content="ZooKeeper分布式锁的实现原理">
-<meta property="og:url" content="https://github.com/2019/08/19/ZooKeeper分布式锁的实现原理/index.html">
+<meta name="description" content="一步一步往上走">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://github.com/tags/数据库/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
+<meta property="og:description" content="一步一步往上走">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF2.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%88.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF3.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%882.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B2.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B3.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%883.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B4.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E4%BB%A3%E7%A0%81.png">
-<meta property="og:updated_time" content="2019-09-04T15:15:43.923Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ZooKeeper分布式锁的实现原理">
-<meta name="twitter:description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png">
+<meta name="twitter:title" content="Hexo">
+<meta name="twitter:description" content="一步一步往上走">
 
 
 
@@ -132,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/2019/08/19/ZooKeeper分布式锁的实现原理/">
+  <link rel="canonical" href="https://github.com/tags/数据库/">
 
 
 
 
 
-  <title>ZooKeeper分布式锁的实现原理 | Hexo</title>
+  <title>标签: 数据库 | Hexo</title>
   
 
 
@@ -157,7 +143,7 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail">
+  <div class="container sidebar-position-left ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -273,249 +259,52 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
-    
+  
+  
+  
+  <div class="post-block tag">
 
-  
+    <div id="posts" class="posts-collapse">
+      <div class="collection-title">
+        <h1>数据库<small>标签</small>
+        </h1>
+      </div>
 
-  
-  
-  
+      
+        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/">
+    <header class="post-header">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Cking">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-
-    
-      <header class="post-header">
-
+      <h2 class="post-title">
         
+            <a class="post-title-link" href="/CKING.github.io/2019/09/10/简单讲一下分库分表/" itemprop="url">
+              
+                <span itemprop="name">简单讲一下分库分表</span>
+              
+            </a>
         
-          <h1 class="post-title" itemprop="name headline">ZooKeeper分布式锁的实现原理</h1>
-        
+      </h2>
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-19T17:36:54+08:00">
-                2019-08-19
-              </time>
-            
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated" datetime="2019-09-10T21:55:58+08:00" content="2019-09-10">
+          09-10
+        </time>
+      </div>
 
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/ZooKeeper/" itemprop="url" rel="index">
-                    <span itemprop="name">ZooKeeper</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-            <span class="post-meta-divider">|</span>
-            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
-            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
-            </span>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        <h2 id="ZooKeeper分布式锁机制"><a href="#ZooKeeper分布式锁机制" class="headerlink" title="ZooKeeper分布式锁机制"></a>ZooKeeper分布式锁机制</h2><p>​        本文将基于常用的ZooKeeper分布锁实现框架–<strong>Curator</strong>，说一下这个框架对ZooKeeper分布式锁的实现。</p>
-<p>​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png" alt="场景"></p>
-<p>​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁请求是用到了ZK的“<strong>临时顺序节点</strong>”。简答来说就是直接在“my_lock”这个锁节点下，创建一个顺序节点，这个节点有ZK内部自行维护的一个节点序号。</p>
-<p>​        例如第一个客户端来搞一个顺序节点，ZK内部会起个名字叫xxx-00001。然后第二个客户端搞一个顺序节点，ZK可能会起个名字叫xxx-00002。规律就是<strong>最后一个数字都是依次递增的</strong>，从1开始递增，ZK会维护这个顺序。</p>
-<p>​        所以这个时候，假如客户端A先发起请求，就会搞出一个顺序节点，如图所示：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF2.png" alt="场景2"></p>
-<p>​        客户端A发起一个加锁请求，先会在你要加锁的node下搞一个临时顺序节点，节点名字由Curator框架自己生成出来，但最后一个数字是“1”，因为客户端是第一个发起请求的。</p>
-<p>​        客户端A常见完一个节点后，它会查一下“my_lock”这个锁节点下的所有子节点，并且这些子节点都是按照序号排序的，这个时候他大概会拿到一个集合：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%88.png" alt="集合"></p>
-<p>​        接着客户端A会走一个关键性的判断：我创建的那个顺序节点，是不是排在第一个？如果是的话，那我就可以加锁了。因为我是第一个创建顺序节点的人，所以我是第一个尝试加分布式锁的人。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B.png" alt="流程"></p>
-<p>​        客户端A加完锁了，客户端B过来想要加锁，这时它会先在“my_lock”这个锁节点下创建一个临时顺序节点，此时名字大概会是“xxx-00002”</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF3.png" alt="场景3"></p>
-<p>​    客户端B因为是第二个来创建顺序节点的，所以ZK内部会维护序号为“2”。接着客户端B会走加锁判断逻辑，查询“my_lock”锁节点下的所有子节点，按照顺序排列，类似于：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%882.png" alt="集合2"></p>
-<p>​    同时检查自己创建的顺序节点，是不是集合中的第一个？如果不是，那就<strong>加锁失败</strong>。失败之后，客户端B就会通过ZK的API对他的顺序节点的<strong>上一个顺序节点加一个监听器</strong></p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B2.png" alt="流程2"></p>
-<p>​    接着，客户端A加锁之后，逻辑处理完后就会释放锁，释放锁实际就是把ZK里创建的顺序节点“xxx-00001”给删除掉。删除了节点之后，ZK会负责通知监听这个节点的监听器，也就是客户端B的监听器说锁释放了。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B3.png" alt="流程3"></p>
-<p>​    此时客户端B的监听器感知到了上一个顺序节点被删除，也就是排在他之前的某个客户单释放了锁，此时客户端B重新尝试去获取锁，也就是获取“my_lock”节点下的子节点集合：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%883.png" alt="集合3"></p>
-<p>​    然后客户端B判断自己是否是集合中的第一个顺序节点，如果是，直接完成加锁，运行完业务代码后，再次释放锁。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B4.png" alt="流程4"></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    总结一下多个客户端争抢一个ZK分布式锁的原理：</p>
-<ul>
-<li>客户端上来直接创建一个锁节点下的一个接一个的临时顺序节点</li>
-<li>如果自己不是第一个节点，就对自己上一个节点加监听器</li>
-<li>只要上一个节点释放锁，自己就排到前面去，相当于一个排队机制。</li>
-</ul>
-<p>​    而且用临时加节点的另一个好处就是，如果某个客户端创建临时顺序节点之后，自己宕机了也没关系，ZK感知到那个客户端宕机，会自动删除对应的临时顺序节点，相当于自动释放锁。</p>
-<p>​    最后看一下用Curator框架进行加锁和释放锁的一个过程：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E4%BB%A3%E7%A0%81.png" alt="代码"></p>
-
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/CKING.github.io/tags/分布式/" rel="tag"># 分布式</a>
-          
-            <a href="/CKING.github.io/tags/ZooKeeper/" rel="tag"># ZooKeeper</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/CKING.github.io/2019/08/19/简单了解ZooKeeper/" rel="next" title="简单了解ZooKeeper">
-                <i class="fa fa-chevron-left"></i> 简单了解ZooKeeper
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/CKING.github.io/2019/08/20/Redis分布式锁的实现原理/" rel="prev" title="Redis分布式锁的实现原理">
-                Redis分布式锁的实现原理 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
+    </header>
   </article>
 
 
-
-    <div class="post-spread">
-      
-        <!-- JiaThis Button BEGIN -->
-<div class="jiathis_style">
-<span class="jiathis_txt">分享到：</span>
-<a class="jiathis_button_fav">收藏夹</a>
-<a class="jiathis_button_copy">复制网址</a>
-<a class="jiathis_button_email">邮件</a>
-<a class="jiathis_button_weixin">微信</a>
-<a class="jiathis_button_qzone">QQ空间</a>
-<a class="jiathis_button_tqq">腾讯微博</a>
-<a class="jiathis_button_douban">豆瓣</a>
-<a class="jiathis_button_share">一键分享</a>
-
-<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
-<a class="jiathis_counter_style"></a>
-</div>
-<script type="text/javascript">
-var jiathis_config={
-  data_track_clickback:true,
-  summary:"",
-  shortUrl:false,
-  hideMore:false
-}
-</script>
-<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
-<!-- JiaThis Button END -->
       
     </div>
+
   </div>
+  
+  
+  
+
+  
 
 
           </div>
@@ -523,13 +312,6 @@ var jiathis_config={
 
 
           
-
-  
- <div id="gitalk-container"></div>
-
-  
-
-
 
         </div>
         
@@ -550,17 +332,8 @@ var jiathis_config={
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -620,22 +393,6 @@ var jiathis_config={
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ZooKeeper分布式锁机制"><span class="nav-number">1.</span> <span class="nav-text">ZooKeeper分布式锁机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
@@ -790,10 +547,6 @@ var jiathis_config={
   
 
   
-  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
-
-
 
   
 
@@ -834,22 +587,6 @@ var jiathis_config={
 
 
 
-
-  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
-  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
-   <script type="text/javascript">
-        var gitalk = new Gitalk({
-          clientID: '88b295af414c49207f46',
-          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
-          repo: 'CKING.github.io',
-          owner: 'GD-CKING',
-          admin: ['GD-CKING'],
-          id: md5(location.pathname),
-          distractionFreeMode: 'true'
-        })
-        gitalk.render('gitalk-container')           
-       </script>
 
   
 

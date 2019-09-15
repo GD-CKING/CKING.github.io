@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="分布式,ZooKeeper,">
+  <meta name="keywords" content="分布式,数据库,">
 
 
 
@@ -79,30 +79,21 @@
 
 
 
-<meta name="description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
-<meta name="keywords" content="分布式,ZooKeeper">
+<meta name="description" content="分库分表​        分库分表是两回事，可能是光分库不分表，也可能是光分表不分库，都有可能。 分表​        如果你单表都几千万数据了，单表数据量太大，会极大影响你的Sql执行的性能，到了后面sql可能就跑的很慢了。一般来说，单表到了几百万的时候，性能就会相对差一些，你就得分表了。 ​        分表，就是把一个表的数据放到多个表中，然后查询的时候你就查一个表。比如按照用户ID来分表">
+<meta name="keywords" content="分布式,数据库">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ZooKeeper分布式锁的实现原理">
-<meta property="og:url" content="https://github.com/2019/08/19/ZooKeeper分布式锁的实现原理/index.html">
+<meta property="og:title" content="简单讲一下分库分表">
+<meta property="og:url" content="https://github.com/2019/09/10/简单讲一下分库分表/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
+<meta property="og:description" content="分库分表​        分库分表是两回事，可能是光分库不分表，也可能是光分表不分库，都有可能。 分表​        如果你单表都几千万数据了，单表数据量太大，会极大影响你的Sql执行的性能，到了后面sql可能就跑的很慢了。一般来说，单表到了几百万的时候，性能就会相对差一些，你就得分表了。 ​        分表，就是把一个表的数据放到多个表中，然后查询的时候你就查一个表。比如按照用户ID来分表">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF2.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%88.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF3.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%882.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B2.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B3.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%883.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B4.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E4%BB%A3%E7%A0%81.png">
-<meta property="og:updated_time" content="2019-09-04T15:15:43.923Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/09/10/简单讲一下分库分表/%E6%B0%B4%E5%B9%B3%E6%8B%86%E5%88%86.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/09/10/简单讲一下分库分表/%E5%9E%82%E7%9B%B4%E6%8B%86%E5%88%86.png">
+<meta property="og:updated_time" content="2019-09-10T14:40:03.058Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ZooKeeper分布式锁的实现原理">
-<meta name="twitter:description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png">
+<meta name="twitter:title" content="简单讲一下分库分表">
+<meta name="twitter:description" content="分库分表​        分库分表是两回事，可能是光分库不分表，也可能是光分表不分库，都有可能。 分表​        如果你单表都几千万数据了，单表数据量太大，会极大影响你的Sql执行的性能，到了后面sql可能就跑的很慢了。一般来说，单表到了几百万的时候，性能就会相对差一些，你就得分表了。 ​        分表，就是把一个表的数据放到多个表中，然后查询的时候你就查一个表。比如按照用户ID来分表">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/09/10/简单讲一下分库分表/%E6%B0%B4%E5%B9%B3%E6%8B%86%E5%88%86.png">
 
 
 
@@ -132,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/2019/08/19/ZooKeeper分布式锁的实现原理/">
+  <link rel="canonical" href="https://github.com/2019/09/10/简单讲一下分库分表/">
 
 
 
 
 
-  <title>ZooKeeper分布式锁的实现原理 | Hexo</title>
+  <title>简单讲一下分库分表 | Hexo</title>
   
 
 
@@ -287,7 +278,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/10/简单讲一下分库分表/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Cking">
@@ -304,7 +295,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">ZooKeeper分布式锁的实现原理</h1>
+          <h1 class="post-title" itemprop="name headline">简单讲一下分库分表</h1>
         
 
         <div class="post-meta">
@@ -316,8 +307,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-19T17:36:54+08:00">
-                2019-08-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-10T21:55:58+08:00">
+                2019-09-10
               </time>
             
 
@@ -350,8 +341,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/ZooKeeper/" itemprop="url" rel="index">
-                    <span itemprop="name">ZooKeeper</span>
+                  <a href="/CKING.github.io/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
                   </a>
                 </span>
 
@@ -392,39 +383,56 @@
       
 
       
-        <h2 id="ZooKeeper分布式锁机制"><a href="#ZooKeeper分布式锁机制" class="headerlink" title="ZooKeeper分布式锁机制"></a>ZooKeeper分布式锁机制</h2><p>​        本文将基于常用的ZooKeeper分布锁实现框架–<strong>Curator</strong>，说一下这个框架对ZooKeeper分布式锁的实现。</p>
-<p>​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png" alt="场景"></p>
-<p>​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁请求是用到了ZK的“<strong>临时顺序节点</strong>”。简答来说就是直接在“my_lock”这个锁节点下，创建一个顺序节点，这个节点有ZK内部自行维护的一个节点序号。</p>
-<p>​        例如第一个客户端来搞一个顺序节点，ZK内部会起个名字叫xxx-00001。然后第二个客户端搞一个顺序节点，ZK可能会起个名字叫xxx-00002。规律就是<strong>最后一个数字都是依次递增的</strong>，从1开始递增，ZK会维护这个顺序。</p>
-<p>​        所以这个时候，假如客户端A先发起请求，就会搞出一个顺序节点，如图所示：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF2.png" alt="场景2"></p>
-<p>​        客户端A发起一个加锁请求，先会在你要加锁的node下搞一个临时顺序节点，节点名字由Curator框架自己生成出来，但最后一个数字是“1”，因为客户端是第一个发起请求的。</p>
-<p>​        客户端A常见完一个节点后，它会查一下“my_lock”这个锁节点下的所有子节点，并且这些子节点都是按照序号排序的，这个时候他大概会拿到一个集合：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%88.png" alt="集合"></p>
-<p>​        接着客户端A会走一个关键性的判断：我创建的那个顺序节点，是不是排在第一个？如果是的话，那我就可以加锁了。因为我是第一个创建顺序节点的人，所以我是第一个尝试加分布式锁的人。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B.png" alt="流程"></p>
-<p>​        客户端A加完锁了，客户端B过来想要加锁，这时它会先在“my_lock”这个锁节点下创建一个临时顺序节点，此时名字大概会是“xxx-00002”</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF3.png" alt="场景3"></p>
-<p>​    客户端B因为是第二个来创建顺序节点的，所以ZK内部会维护序号为“2”。接着客户端B会走加锁判断逻辑，查询“my_lock”锁节点下的所有子节点，按照顺序排列，类似于：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%882.png" alt="集合2"></p>
-<p>​    同时检查自己创建的顺序节点，是不是集合中的第一个？如果不是，那就<strong>加锁失败</strong>。失败之后，客户端B就会通过ZK的API对他的顺序节点的<strong>上一个顺序节点加一个监听器</strong></p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B2.png" alt="流程2"></p>
-<p>​    接着，客户端A加锁之后，逻辑处理完后就会释放锁，释放锁实际就是把ZK里创建的顺序节点“xxx-00001”给删除掉。删除了节点之后，ZK会负责通知监听这个节点的监听器，也就是客户端B的监听器说锁释放了。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B3.png" alt="流程3"></p>
-<p>​    此时客户端B的监听器感知到了上一个顺序节点被删除，也就是排在他之前的某个客户单释放了锁，此时客户端B重新尝试去获取锁，也就是获取“my_lock”节点下的子节点集合：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%883.png" alt="集合3"></p>
-<p>​    然后客户端B判断自己是否是集合中的第一个顺序节点，如果是，直接完成加锁，运行完业务代码后，再次释放锁。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B4.png" alt="流程4"></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    总结一下多个客户端争抢一个ZK分布式锁的原理：</p>
+        <h2 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h2><p>​        分库分表是两回事，可能是光分库不分表，也可能是光分表不分库，都有可能。</p>
+<h3 id="分表"><a href="#分表" class="headerlink" title="分表"></a>分表</h3><p>​        如果你单表都几千万数据了，<strong>单表数据量太大，会极大影响你的Sql执行的性能</strong>，到了后面sql可能就跑的很慢了。一般来说，单表到了几百万的时候，性能就会相对差一些，你就得分表了。</p>
+<p>​        分表，就是把一个表的数据放到多个表中，然后查询的时候你就查一个表。比如按照用户ID来分表，将一个用户的数据就放在一个表中。然后操作的时候你对一个用户就操作那个表就可以了。这样可以控制每个表的数据量在可控的方范围内，比如每个表就固定在200万以内。</p>
+<h3 id="分库"><a href="#分库" class="headerlink" title="分库"></a>分库</h3><p>​        分库，就是一般而言我们一个库，最多支撑到2000并发，就一定要扩容了，而且一个健康的单库并发值最好保持在每秒1000左右，不要太大。可以将一个库的数据拆分到多个库中，访问的时候就访问一个库好了。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>分库分表前</th>
+<th>分库分表后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>并发支撑情况</td>
+<td>MySQL单机部署，扛不住高并发</td>
+<td>MySQL从单机到多机，能承受的并发增加了多倍</td>
+</tr>
+<tr>
+<td>磁盘使用情况</td>
+<td>MySQL单机磁盘容量几乎撑满</td>
+<td>拆分为多个库，数据库服务器磁盘使用率大大降低</td>
+</tr>
+<tr>
+<td>SQL执行性能</td>
+<td>单表数据量太大，SQL越跑越慢</td>
+<td>单表数据库量减少，SQL执行效率明显提升</td>
+</tr>
+</tbody></table>
+<h3 id="分库分表的中间件"><a href="#分库分表的中间件" class="headerlink" title="分库分表的中间件"></a>分库分表的中间件</h3><p>​        比较常见的分库分表的中间件包括：</p>
+<p>Cobar</p>
+<p>TDDL</p>
+<p>Atlas</p>
+<p>Sharding-jdbc</p>
+<p>Mycat</p>
+<p>​        目前市场上比较主流的就是sharding-jdbc和Mycat，这两个都可以考虑去使用。Sharding-jdbc这种属于Client层方案，<strong>优点在于不用部署，运维成本低，不需要代理层的二次转发请求，性能很高</strong>，但是如果遇到升级啥的需要各个系统都重新升级版本再发布，各个系统都需要<strong>耦合</strong>Sharding-jdbc的依赖。Mycat属于proxy层方案，缺<strong>点在于需要部署</strong>，自己运维一套中间件，运维成本高，但是好处在于对于各个项目是透明的，如果遇到升级之类的都是自己中间间那里处理即可。</p>
+<p>​        通常来说，这两个方案其实都可以选用，但是大佬建议中小型公司选用 Sharding-jdbc，client 层方案轻便，而且维护成本低，不需要额外增派人手，而且中小型公司系统复杂度会低一些，项目也没那么多；但是中大型公司最好还是选用 Mycat 这类 proxy 层方案，因为可能大公司系统和项目非常多，团队很大，人员充足，那么最好是专门弄个人来研究和维护 Mycat，然后大量项目直接透明使用即可。</p>
+<h3 id="如何对数据库进行水平拆分和垂直拆分"><a href="#如何对数据库进行水平拆分和垂直拆分" class="headerlink" title="如何对数据库进行水平拆分和垂直拆分"></a>如何对数据库进行水平拆分和垂直拆分</h3><h4 id="水平拆分"><a href="#水平拆分" class="headerlink" title="水平拆分"></a>水平拆分</h4><p>​        水平拆分，就是把一个表的数据弄个多个库的多个表里去，但是每个库的表结构都一样，只不过每个库表放的数据是不同的，所有库表的数据加起来就是全部数据。水平拆分的意义，就是将数据均匀放更多的表里，然后用多个库来抗更高的并发，还有就是用多个库的存储容量来进行扩容。</p>
+<p><img src="/CKING.github.io/2019/09/10/简单讲一下分库分表/%E6%B0%B4%E5%B9%B3%E6%8B%86%E5%88%86.png" alt="水平拆分"></p>
+<h4 id="垂直拆分"><a href="#垂直拆分" class="headerlink" title="垂直拆分"></a>垂直拆分</h4><p>​        垂直拆分，就是<strong>把一个有很多字段的表给拆分成多个表，或者是多个库上去</strong>。每个库表的结构都不一样，每个库表都包含部分字段。一般来说，会<strong>将较少的访问频率很高的字段放到一个表里去</strong>，然后<strong>将较多的访问频率很低的字段放到另一个表里去</strong>。因为数据库是有缓存的，你访问频率高的行字段越少，就可以在缓存里缓存更多的行，性能就越好。这个一般在表层面做的较多一些。</p>
+<p><img src="/CKING.github.io/2019/09/10/简单讲一下分库分表/%E5%9E%82%E7%9B%B4%E6%8B%86%E5%88%86.png" alt="垂直拆分"></p>
+<p>​        还有<strong>表层面的拆分</strong>，就是分表，将一个表变成N个表，就是让每个表的数据量控制在一定范围内，保证SQL的性能。否则单表的数据量越大，SQL性能就越差。</p>
+<p>​        无论分库还是分表，上面说的那些数据库中间件都是可以支持的。就是基本上那些中间件可以做到你分库分表之后，<strong>中间件可以根据你指定的某个字段值</strong>，比如说 userid，<strong>自动路由到对应的库上去，然后再自动路由到对应的表里去</strong>。</p>
+<p>​        你就得考虑一下，你的项目里该如何分库分表？一般来说，垂直拆分，你可以在表层面来做，对一些字段特别多的表做一下拆分；水平拆分，你可以说是并发承载不了，或者是数据量太大，容量承载不了，你给拆了，按什么字段来拆，你自己想好；分表，你考虑一下，你如果哪怕是拆到每个库里去，并发和容量都 ok 了，但是每个库的表还是太大了，那么你就分表，将这个表分开，保证每个表的数据量并不是很大。</p>
+<p>​        有两种分库分表的方式：</p>
 <ul>
-<li>客户端上来直接创建一个锁节点下的一个接一个的临时顺序节点</li>
-<li>如果自己不是第一个节点，就对自己上一个节点加监听器</li>
-<li>只要上一个节点释放锁，自己就排到前面去，相当于一个排队机制。</li>
+<li>按照range来分，就是每个库一段连续的数据，这个一般是按照，例如时间范围来的。但是这种一般较少使用，因为很容易产生热点问题，大量的流量都打在最新的数据上了</li>
+<li>按照某个子段hash一下均匀分散，这个较为常用。</li>
 </ul>
-<p>​    而且用临时加节点的另一个好处就是，如果某个客户端创建临时顺序节点之后，自己宕机了也没关系，ZK感知到那个客户端宕机，会自动删除对应的临时顺序节点，相当于自动释放锁。</p>
-<p>​    最后看一下用Curator框架进行加锁和释放锁的一个过程：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E4%BB%A3%E7%A0%81.png" alt="代码"></p>
+<p>​        range来分，好处在于说，扩容的时候很简单，因为你只要预备好，给每个月都准备一个库就可以了，到了一个新的月份的时候，自然而然，就会写新的库了；缺点，但是大部分的请求，都是访问最新的数据。实际生产用 range，要看场景。</p>
+<p>​        hash 分发，好处在于说，可以平均分配每个库的数据量和请求压力；坏处在于说扩容起来比较麻烦，会有一个数据迁移的过程，之前的数据需要重新计算 hash 值重新分配到不同的库或表。</p>
 
       
     </div>
@@ -444,7 +452,7 @@
           
             <a href="/CKING.github.io/tags/分布式/" rel="tag"># 分布式</a>
           
-            <a href="/CKING.github.io/tags/ZooKeeper/" rel="tag"># ZooKeeper</a>
+            <a href="/CKING.github.io/tags/数据库/" rel="tag"># 数据库</a>
           
         </div>
       
@@ -457,8 +465,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/CKING.github.io/2019/08/19/简单了解ZooKeeper/" rel="next" title="简单了解ZooKeeper">
-                <i class="fa fa-chevron-left"></i> 简单了解ZooKeeper
+              <a href="/CKING.github.io/2019/09/08/保证缓存与数据库双写的一致性/" rel="next" title="保证缓存与数据库双写的一致性">
+                <i class="fa fa-chevron-left"></i> 保证缓存与数据库双写的一致性
               </a>
             
           </div>
@@ -466,10 +474,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/CKING.github.io/2019/08/20/Redis分布式锁的实现原理/" rel="prev" title="Redis分布式锁的实现原理">
-                Redis分布式锁的实现原理 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -630,7 +634,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ZooKeeper分布式锁机制"><span class="nav-number">1.</span> <span class="nav-text">ZooKeeper分布式锁机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分库分表"><span class="nav-number">1.</span> <span class="nav-text">分库分表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分表"><span class="nav-number">1.1.</span> <span class="nav-text">分表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分库"><span class="nav-number">1.2.</span> <span class="nav-text">分库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分库分表的中间件"><span class="nav-number">1.3.</span> <span class="nav-text">分库分表的中间件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何对数据库进行水平拆分和垂直拆分"><span class="nav-number">1.4.</span> <span class="nav-text">如何对数据库进行水平拆分和垂直拆分</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#水平拆分"><span class="nav-number">1.4.1.</span> <span class="nav-text">水平拆分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#垂直拆分"><span class="nav-number">1.4.2.</span> <span class="nav-text">垂直拆分</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
