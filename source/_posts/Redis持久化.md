@@ -54,3 +54,47 @@ categories: Redis
 - 也不要仅仅使用AOF，因为那样有两个问题：第一，通过AOF做冷备，没有RDB做冷备来得恢复速度更快；第二，RDB每次简单粗暴生成数据快照，更加健壮，可以避免AOF这种复杂的备份和恢复机制的bug；
 - redis支持同时开启两种持久化方式，我们可以综合使用AOF和RDB两种持久化机制，用AOF来保证数据不丢失，作为数据恢复的第一选择，用RDB来做不同程度的冷备，在AOF文件都丢失或损坏不可用的时候，还可以使用RDB来进行快速的数据恢复。
 
+## 如何配置
+
+### RDB持久化的配置
+
+​		打开redis的配置文件，搜索`save`，如图所示：
+
+![RDB配置](Redis持久化/RDB配置.png)
+
+​		`save 60 10000`表示，每隔60秒，如果有超过10000个key发生了变化，那么就生成一个新的dump.rdb文件，就是当前redis内存中完整的数据快照，这个操作也被称为snapshotting。save可以设置多个，就是多个snapshotting检查点，每到一个检查点，就会去check一下，是否有指定的key数量发生了变更，如果有，就生成一个新的dump。
+
+​		也可以手动调用`save`或者`bgsave`命令，同步或异步执行rdb快照生成。
+
+​		如果你通过`redis-cli SHUTDOWN`的方式去停掉redis，这其实是一种安全退出的模式，redis在退出的时候会将内存中的数据立即生成一份完整的快照。如果用`kill -9`粗暴杀死redis进程，则相当于redis故障异常退出，不会生成dump快照文件。
+
+### AOF持久化的配置
+
+​		AOF持久化默认是关闭的，默认是打开RDB持久化。要开启AOF持久化配置，在redis配置文件中搜索`appendonly`，如下所示，将no改为`yes`即可。打开AOF持久化机制之后，redis每收到一条写指令，就会写入日志文件中。会先写入os cache，然后每隔一定时间再`fsync`一下。
+
+![AOF配置](Redis持久化/AOF配置.png)
+
+​		AOF的fsync总共有三种策略：
+
+- **appendfsync always**：每次写入一条数据，立即将这个数据对应的写日志fsync到磁盘上去，性能很差，吞吐量很低，但确保了redis里的数据一条不丢。
+
+- **appendfsync everysec**：每秒执行一次fsync。这个最常用，生产环境一般这么配置，性能很高，QPS可以上万。
+
+- **appendfsync no**：不主动执行fsync，由操作系统自行判断。不可控。
+
+#### AOF rewrite的配置
+
+​		这里主要讲两个rewrite的配置
+
+```
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+```
+
+举个例子，比如上一次AOF rewrite之后，日志大小是128MB。此时就会接着128MB继续写AOF日志，如果发现增长的比例已经超过了之前的100%，256MB，就可能会去触发一次rewrite。但是此时还要去跟min-size， 64mb去比较，256 > 64时，才会触发rewrite。
+
+#### AOF破损文件的修复
+
+如果redis在append数据到AOF文件时，机器宕机了，可能会导致AOF文件破损
+
+用redis-check-aof --fix命令来修复破损的AOF文件
