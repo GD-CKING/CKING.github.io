@@ -79,19 +79,24 @@
 
 
 
-<meta name="description" content="本节思维导图   ​        Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。 Redis持久化的两种方式 RDB：RDB持久">
+<meta name="description" content="本节思维导图   ​        Redis持久化的意义在于数据备份和灾难恢复。Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。">
 <meta name="keywords" content="Redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis持久化">
 <meta property="og:url" content="https://github.com/2019/09/01/Redis持久化/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="本节思维导图   ​        Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。 Redis持久化的两种方式 RDB：RDB持久">
+<meta property="og:description" content="本节思维导图   ​        Redis持久化的意义在于数据备份和灾难恢复。Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/Redis%E6%8C%81%E4%B9%85%E5%8C%96.png">
-<meta property="og:updated_time" content="2019-09-05T13:07:31.854Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/RDB.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/AOF.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/rewrite.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/RDB%E9%85%8D%E7%BD%AE.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/AOF%E9%85%8D%E7%BD%AE.png">
+<meta property="og:updated_time" content="2019-09-22T14:11:41.835Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis持久化">
-<meta name="twitter:description" content="本节思维导图   ​        Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。 Redis持久化的两种方式 RDB：RDB持久">
+<meta name="twitter:description" content="本节思维导图   ​        Redis持久化的意义在于数据备份和灾难恢复。Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。">
 <meta name="twitter:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/Redis%E6%8C%81%E4%B9%85%E5%8C%96.png">
 
 
@@ -375,11 +380,15 @@
 <p>本节思维导图</p>
 </blockquote>
 <p><img src="/CKING.github.io/2019/09/01/Redis持久化/Redis%E6%8C%81%E4%B9%85%E5%8C%96.png" alt="Redis持久化"></p>
-<p>​        Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。</p>
+<p>​        Redis持久化的意义在于<strong>数据备份</strong>和<strong>灾难恢复</strong>。Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。</p>
 <h2 id="Redis持久化的两种方式"><a href="#Redis持久化的两种方式" class="headerlink" title="Redis持久化的两种方式"></a>Redis持久化的两种方式</h2><ul>
 <li>RDB：RDB持久化机制，是对Redis中的数据进行<strong>周期性</strong>的持久化。</li>
+</ul>
+<p><img src="/CKING.github.io/2019/09/01/Redis持久化/RDB.png" alt="RDB"></p>
+<ul>
 <li>AOF：AOF机制对每条写入命令作为日志，以<code>append-only</code>的模式写入一个日志文件中，在Redis重启的时候，可以通过<strong>回放</strong>AOF日志中的写入指令来重新构建整个数据集。</li>
 </ul>
+<p><img src="/CKING.github.io/2019/09/01/Redis持久化/AOF.png" alt="AOF"></p>
 <p>​        通过RDB或AOF，都可以将Redis内存中的数据持久化到磁盘上面来，然后可以将这些数据备份到别的地方去，比如阿里云等云服务等。</p>
 <p>​        如果同时使用RDB和AOF两种持久化机制，那么redis重启的时候，会使用<strong>AOF</strong>来重构新数据，因为<strong>AOF中的数据更加完整</strong>。</p>
 <h3 id="RDB优缺点"><a href="#RDB优缺点" class="headerlink" title="RDB优缺点"></a>RDB优缺点</h3><ul>
@@ -399,11 +408,34 @@
 <li>以前AOF发生过bug，就是通过AOF记录的日志，进行数据恢复的时候，没有恢复一模一样的数据。因此，类似AOF这种较为复杂的基于命令/merge/回放的方式，比基于RDB每次持久化一份完整的数据快照的方式，更加脆弱一些，容易有bug。不过AOF就是为了rewrite过程导致的bug，因此每次rewrite并不是基于旧的指令日志进行merge，而是<strong>基于当时内存中的数据进行指令的重新构建</strong>，这样健壮性好很多。</li>
 </ul>
 <p><strong>补充</strong>：rewrite类似于普通数据库管理系统日志恢复点，当AOF文件随着写命令的运行膨胀时，当文件大小触碰到临界时，rewrite会被运行。<br>        rewrite会像replication一样，fork出一个子进程，创建一个临时文件，遍历数据库，将每个key、value对输出到临时文件。输出格式就是Redis的命令，但是为了减小文件大小，会将多个key、value对集合起来用一条命令表达。在rewrite期间的写操作会保存在内存的rewrite buffer中，rewrite成功后这些操作也会复制到临时文件中，在最后临时文件会代替AOF文件。</p>
+<p><img src="/CKING.github.io/2019/09/01/Redis持久化/rewrite.png" alt="rewrite"></p>
 <h2 id="RDB和AOF到底该如何选择"><a href="#RDB和AOF到底该如何选择" class="headerlink" title="RDB和AOF到底该如何选择"></a>RDB和AOF到底该如何选择</h2><ul>
 <li>不要仅仅使用RDB，因为那样会导致你丢失很多数据。</li>
 <li>也不要仅仅使用AOF，因为那样有两个问题：第一，通过AOF做冷备，没有RDB做冷备来得恢复速度更快；第二，RDB每次简单粗暴生成数据快照，更加健壮，可以避免AOF这种复杂的备份和恢复机制的bug；</li>
 <li>redis支持同时开启两种持久化方式，我们可以综合使用AOF和RDB两种持久化机制，用AOF来保证数据不丢失，作为数据恢复的第一选择，用RDB来做不同程度的冷备，在AOF文件都丢失或损坏不可用的时候，还可以使用RDB来进行快速的数据恢复。</li>
 </ul>
+<h2 id="如何配置"><a href="#如何配置" class="headerlink" title="如何配置"></a>如何配置</h2><h3 id="RDB持久化的配置"><a href="#RDB持久化的配置" class="headerlink" title="RDB持久化的配置"></a>RDB持久化的配置</h3><p>​        打开redis的配置文件，搜索<code>save</code>，如图所示：</p>
+<p><img src="/CKING.github.io/2019/09/01/Redis持久化/RDB%E9%85%8D%E7%BD%AE.png" alt="RDB配置"></p>
+<p>​        <code>save 60 10000</code>表示，每隔60秒，如果有超过10000个key发生了变化，那么就生成一个新的dump.rdb文件，就是当前redis内存中完整的数据快照，这个操作也被称为snapshotting。save可以设置多个，就是多个snapshotting检查点，每到一个检查点，就会去check一下，是否有指定的key数量发生了变更，如果有，就生成一个新的dump。</p>
+<p>​        也可以手动调用<code>save</code>或者<code>bgsave</code>命令，同步或异步执行rdb快照生成。</p>
+<p>​        如果你通过<code>redis-cli SHUTDOWN</code>的方式去停掉redis，这其实是一种安全退出的模式，redis在退出的时候会将内存中的数据立即生成一份完整的快照。如果用<code>kill -9</code>粗暴杀死redis进程，则相当于redis故障异常退出，不会生成dump快照文件。</p>
+<h3 id="AOF持久化的配置"><a href="#AOF持久化的配置" class="headerlink" title="AOF持久化的配置"></a>AOF持久化的配置</h3><p>​        AOF持久化默认是关闭的，默认是打开RDB持久化。要开启AOF持久化配置，在redis配置文件中搜索<code>appendonly</code>，如下所示，将no改为<code>yes</code>即可。打开AOF持久化机制之后，redis每收到一条写指令，就会写入日志文件中。会先写入os cache，然后每隔一定时间再<code>fsync</code>一下。</p>
+<p><img src="/CKING.github.io/2019/09/01/Redis持久化/AOF%E9%85%8D%E7%BD%AE.png" alt="AOF配置"></p>
+<p>​        AOF的fsync总共有三种策略：</p>
+<ul>
+<li><p><strong>appendfsync always</strong>：每次写入一条数据，立即将这个数据对应的写日志fsync到磁盘上去，性能很差，吞吐量很低，但确保了redis里的数据一条不丢。</p>
+</li>
+<li><p><strong>appendfsync everysec</strong>：每秒执行一次fsync。这个最常用，生产环境一般这么配置，性能很高，QPS可以上万。</p>
+</li>
+<li><p><strong>appendfsync no</strong>：不主动执行fsync，由操作系统自行判断。不可控。</p>
+</li>
+</ul>
+<h4 id="AOF-rewrite的配置"><a href="#AOF-rewrite的配置" class="headerlink" title="AOF rewrite的配置"></a>AOF rewrite的配置</h4><p>​        这里主要讲两个rewrite的配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">auto-aof-rewrite-percentage 100</span><br><span class="line">auto-aof-rewrite-min-size 64mb</span><br></pre></td></tr></table></figure>
+
+<p>举个例子，比如上一次AOF rewrite之后，日志大小是128MB。此时就会接着128MB继续写AOF日志，如果发现增长的比例已经超过了之前的100%，256MB，就可能会去触发一次rewrite。但是此时还要去跟min-size， 64mb去比较，256 &gt; 64时，才会触发rewrite。</p>
+<h4 id="AOF破损文件的修复"><a href="#AOF破损文件的修复" class="headerlink" title="AOF破损文件的修复"></a>AOF破损文件的修复</h4><p>如果redis在append数据到AOF文件时，机器宕机了，可能会导致AOF文件破损</p>
+<p>用redis-check-aof –fix命令来修复破损的AOF文件</p>
 
       
     </div>
@@ -552,7 +584,7 @@ var jiathis_config={
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-count">34</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -563,7 +595,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -574,7 +606,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
@@ -607,7 +639,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis持久化的两种方式"><span class="nav-number">1.</span> <span class="nav-text">Redis持久化的两种方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB优缺点"><span class="nav-number">1.1.</span> <span class="nav-text">RDB优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF优缺点"><span class="nav-number">1.2.</span> <span class="nav-text">AOF优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB和AOF到底该如何选择"><span class="nav-number">2.</span> <span class="nav-text">RDB和AOF到底该如何选择</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis持久化的两种方式"><span class="nav-number">1.</span> <span class="nav-text">Redis持久化的两种方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB优缺点"><span class="nav-number">1.1.</span> <span class="nav-text">RDB优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF优缺点"><span class="nav-number">1.2.</span> <span class="nav-text">AOF优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB和AOF到底该如何选择"><span class="nav-number">2.</span> <span class="nav-text">RDB和AOF到底该如何选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何配置"><span class="nav-number">3.</span> <span class="nav-text">如何配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB持久化的配置"><span class="nav-number">3.1.</span> <span class="nav-text">RDB持久化的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF持久化的配置"><span class="nav-number">3.2.</span> <span class="nav-text">AOF持久化的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AOF-rewrite的配置"><span class="nav-number">3.2.1.</span> <span class="nav-text">AOF rewrite的配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AOF破损文件的修复"><span class="nav-number">3.2.2.</span> <span class="nav-text">AOF破损文件的修复</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
