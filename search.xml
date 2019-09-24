@@ -5,10 +5,10 @@
     <url>%2FCKING.github.io%2F2019%2F09%2F22%2F%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E4%B8%ADredis%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%92%8C%E7%81%BE%E9%9A%BE%E6%81%A2%E5%A4%8D%E7%AD%96%E7%95%A5%2F</url>
     <content type="text"><![CDATA[本节思维导图 ![生产环境中的数据 备份和灾难恢复](生产环境中redis的数据备份和灾难恢复策略/生产环境中的数据 备份和灾难恢复.png) ​ 我们生产环境中redis的数据备份和灾难恢复策略简单地说就是：开启AOF机制，并用RDB做冷备。 数据备份方案​ 具体的数据备份方案如下： 写crontab定时调度脚本去做数据备份。 每小时都备份一份rdb，可以copy到一个目录中去，并且只保留最近48小时的备份。 每天都保留一份当日的rdb备份到一个目录中去，仅仅保留最近一个月的备份。 每次copy备份的时候，把最旧的备份删掉。 每天晚上将当前服务器上所有的数据备份，发送一份到远程的云服务上去。 ​ 首先先创建一个目录，/usr/local/redis，然后在redis的目录中创建copy文件夹，用来存储复制快照文件的脚本。然后在redis目录中创建snapshotting文件夹，用来存储备份的rdb快照。 ​ 执行vi redis_rdb_copy_hourly.sh，编写每小时复制一份rdb的shell脚本。 123456789#!/bin/sh cur_date=`date +%Y%m%d%k`rm -rf /usr/local/redis/snapshotting/$cur_datemkdir /usr/local/redis/snapshotting/$cur_datecp /var/redis/6379/dump.rdb /usr/local/redis/snapshotting/$cur_datedel_date=`date -d -48hour +%Y%m%d%k`rm -rf /usr/local/redis/snapshotting/$del_date ​ 执行vi redis_rdb_copy_daily.sh，编写每天复制一份rdb的shell脚本。 123456789#!/bin/sh cur_date=`date +%Y%m%d`rm -rf /usr/local/redis/snapshotting/$cur_datemkdir /usr/local/redis/snapshotting/$cur_datecp /var/redis/6379/dump.rdb /usr/local/redis/snapshotting/$cur_datedel_date=`date -d -1month +%Y%m%d`rm -rf /usr/local/redis/snapshotting/$del_date ​ 上面cp /var/redis/6379/dump.rdb /usr/local/redis/snapshotting/$cur_date中的/var/redis/6379/dump.rdb是redis生成的快照文件的存储地址，可以根据具体情况进行修改。 ​ 最后再执行crontab -e新建调度任务，命令如下： 120 * * * * sh /usr/local/redis/copy/redis_rdb_copy_hourly.sh0 0 * * * sh /usr/local/redis/copy/redis_rdb_copy_daily.sh ​ 然后再每天一次将所有的数据上传一次到远程的云服务器上去，这样一个数据备份方案就算完成了。 数据恢复方案 如果是redis进程挂掉了，那么重启redis进程即可，直接基于AOF日志文件恢复数据。 如果是redis进程所在机器宕机了，那么重启机器后，尝试重启redis进程，尝试直接基于AOF日志文件进行数据恢复。如果AOF没有破损，那么久直接基于AOF恢复，如果AOF文件损坏，那么用redis-check-aof fix修复日志文件。 如果redis当前最新的AOF文件和RDB文件出现了丢失，那么可以尝试基于该机器上当前的某个最新的RDB数据副本进行数据恢复。具体操作步骤为：停掉redis，关闭AOF，拷贝AOF备份，重启redis，确认数据恢复，直接在命令行热修改redis配置，即在redis-cli中执行config set appendonly yes打开AOF。这个时候redis就会将内存中的数据对应的日志，写入AOF文件中，此时AOF和RDB两份数据文件的数据就同步了。用redis config set热修改配置参数，可能配置文件中的实际参数没有被持久化的修改，需要再停止redis，手动修改配置文件，打开AOF，然后再重启redis。 如果当前机器上的所有RDB文件全部损坏，那么从远程的云服务上拉取最新的RDB快照来恢复数据。 如果是发现有重大的数据错误，比如某个小时上线的程序一下子将数据全部污染了，数据全错了，那么可以选择某个更早的时间点，对数据进行恢复 举个例子，12点上线了代码，发现代码有bug，导致代码生成的所有的缓存数据，写入redis，全部错了 找到一份11点的rdb的冷备，然后按照上面的步骤，去恢复到11点的数据，就可以了。]]></content>
       <categories>
-        <category>redis</category>
+        <category>Redis</category>
       </categories>
       <tags>
-        <tag>redis</tag>
+        <tag>Redis</tag>
       </tags>
   </entry>
   <entry>
@@ -355,22 +355,22 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[Hello World]]></title>
-    <url>%2FCKING.github.io%2F2019%2F07%2F24%2Fhello-world%2F</url>
-    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
+    <title><![CDATA[消息队列优缺点]]></title>
+    <url>%2FCKING.github.io%2F2019%2F07%2F24%2F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%BC%98%E7%BC%BA%E7%82%B9%2F</url>
+    <content type="text"><![CDATA[本节思维导图 消息队列的优点消息队列主要有三个优点：解耦、异步和削峰 削峰假设一个业务场景如图所示，A系统分别发送信息给B C D系统，此时系统的耦合性比较高，当需求改变要求不给D系统发送消息，或者增加一个E系统也需要A系统发送数据，那么我们就不得不去修改A系统的代码。除此之外如果其他系统挂了，同样也会影响到A系统，如果引入MQ，那么A系统就只需要把数据放进MQ中，由需要这个数据的系统去订阅这个MQ，这样就可以实现系统解耦。这样A系统不仅不需关系哪个系统需要这个消息，也不需要关心消息发送失败或者超时等情况。 总结：通过MQ，Pub/Sub发布订阅消息模型，A系统就跟其他系统解耦了。 异步业务场景如图所示，用户向A系统发起请求，需要在本地写数据库，还需要在B C D系统写数据库，假设本地写耗时10ms，如下图需要10+20+30+40共100ms。那么这样相对来说比较慢。 但如果引入MQ，假设将消息放入MQ耗时5ms，那么总共需要15ms，极大提高了响应速度。 削峰假设每天0:00-12:00系统每秒并发请求数量只有十几个，但过了12点之后，请求数量猛增到几千个，而且数据库系统是mysql，每秒最多也就执行一千多条SQL语句，这样导致mysql崩溃，但过了高峰期之后并发请求又恢复到了相对比较低的水平，对整个系统又没啥压力了。 引入MQ之后，A系统每秒中只能处理一千个SQL，那就从MQ中取出一千个SQL去处理，这样即使在高峰的时候，A系统也不会崩溃，而在高峰期间MQ可能会有几百万的请求积压在MQ中，但这个短暂的高峰的积压是允许，等高峰期一过，MQ积压的数据就能够迅速被处理。 消息队列的缺点缺点有以下几个： 系统可用性降低引入的外部依赖越多，风险就越高。本来只是调用几个系统的接口就可以了，现在引入MQ之后，如果MQ挂了，整个系统就崩溃了。 系统复杂性提高引入MQ之后，需要考虑很多问题。例如如何保证消息传递的顺序，保证消息没有重复消费和怎么处理消息丢失的情况。 数据一致性问题A系统将数据放到MQ将返回成功了，但如果B系统数据丢失了，那就会造出数据不一致了。 ActiveMQ、RabbitMQ、RocketMQ和kafka有什么优缺点 特性 ActiveMQ RabbitMQ RocketMQ kafka 单机吞吐量 万级，比RocketMQ、kafka低一级 同ActiveMQ 10万级，支撑高吞吐 10万级，高吞吐，一般配合大数据类的系统机型实时数据计算，日志采集等场景 topic数量对吞吐量的影响 topic可以达到几百/几千的级别，这是RocketMQ的优势，在同等机器下，可以支撑大量的topic topic从几十到几百个左右的时候，吞吐量会大幅度下降，kafka尽量保证topic数量不要过多，如果要支撑大规模的topic，需要增加更多的机器资源 时效性 ms级 微秒级，这是RabbitMQ的一大特点，延迟最低 ms级 延迟在ms级以内 可用性 高，基于主从架构实现高可用 同ActiveMQ 非常高，分布式架构 非常高，分布式，一个数据多个副本，少数机器宕机，不会丢失数据，不会导致不可用 消息可靠性 有较低的概率丢失数据 基本不丢 经过参数优化配置，可以做到0丢失 同RocketMQ 功能支持 MQ领域的功能极其完备 基于erlang开发，并发能力很强，性能极好，延时很低 MQ功能较为完善，还是分布式的，扩展性好 功能较为简单，主要支持简单的MQ功能，在大数据领域的实时计算以及日志采集被大规模使用 综上，各种对比之后，有如下建议： 一般的业务系统要引入 MQ，最早大家都用 ActiveMQ，但是现在确实大家用的不多了，没经过大规模吞吐量场景的验证，社区也不是很活跃，所以大家还是算了吧，我个人不推荐用这个了； 后来大家开始用 RabbitMQ，但是确实 erlang 语言阻止了大量的 Java 工程师去深入研究和掌控它，对公司而言，几乎处于不可控的状态，但是确实人家是开源的，比较稳定的支持，活跃度也高； 不过现在确实越来越多的公司会去用 RocketMQ，确实很不错，毕竟是阿里出品，但社区可能有突然黄掉的风险（目前 RocketMQ 已捐给 Apache，但 GitHub 上的活跃度其实不算高）对自己公司技术实力有绝对自信的，推荐用 RocketMQ，否则回去老老实实用 RabbitMQ 吧，人家有活跃的开源社区，绝对不会黄。 所以中小型公司，技术实力较为一般，技术挑战不是特别高，用 RabbitMQ 是不错的选择；大型公司，基础架构研发实力较强，用 RocketMQ 是很好的选择。 如果是大数据领域的实时计算、日志采集等场景，用 Kafka 是业内标准的，绝对没问题，社区活跃度很高，绝对不会黄，何况几乎是全世界这个领域的事实性规范。]]></content>
       <categories>
-        <category>Hello</category>
+        <category>消息队列</category>
       </categories>
       <tags>
         <tag>分布式</tag>
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[消息队列优缺点]]></title>
-    <url>%2FCKING.github.io%2F2019%2F07%2F24%2F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%BC%98%E7%BC%BA%E7%82%B9%2F</url>
-    <content type="text"><![CDATA[本节思维导图 消息队列的优点消息队列主要有三个优点：解耦、异步和削峰 削峰假设一个业务场景如图所示，A系统分别发送信息给B C D系统，此时系统的耦合性比较高，当需求改变要求不给D系统发送消息，或者增加一个E系统也需要A系统发送数据，那么我们就不得不去修改A系统的代码。除此之外如果其他系统挂了，同样也会影响到A系统，如果引入MQ，那么A系统就只需要把数据放进MQ中，由需要这个数据的系统去订阅这个MQ，这样就可以实现系统解耦。这样A系统不仅不需关系哪个系统需要这个消息，也不需要关心消息发送失败或者超时等情况。 总结：通过MQ，Pub/Sub发布订阅消息模型，A系统就跟其他系统解耦了。 异步业务场景如图所示，用户向A系统发起请求，需要在本地写数据库，还需要在B C D系统写数据库，假设本地写耗时10ms，如下图需要10+20+30+40共100ms。那么这样相对来说比较慢。 但如果引入MQ，假设将消息放入MQ耗时5ms，那么总共需要15ms，极大提高了响应速度。 削峰假设每天0:00-12:00系统每秒并发请求数量只有十几个，但过了12点之后，请求数量猛增到几千个，而且数据库系统是mysql，每秒最多也就执行一千多条SQL语句，这样导致mysql崩溃，但过了高峰期之后并发请求又恢复到了相对比较低的水平，对整个系统又没啥压力了。 引入MQ之后，A系统每秒中只能处理一千个SQL，那就从MQ中取出一千个SQL去处理，这样即使在高峰的时候，A系统也不会崩溃，而在高峰期间MQ可能会有几百万的请求积压在MQ中，但这个短暂的高峰的积压是允许，等高峰期一过，MQ积压的数据就能够迅速被处理。 消息队列的缺点缺点有以下几个： 系统可用性降低引入的外部依赖越多，风险就越高。本来只是调用几个系统的接口就可以了，现在引入MQ之后，如果MQ挂了，整个系统就崩溃了。 系统复杂性提高引入MQ之后，需要考虑很多问题。例如如何保证消息传递的顺序，保证消息没有重复消费和怎么处理消息丢失的情况。 数据一致性问题A系统将数据放到MQ将返回成功了，但如果B系统数据丢失了，那就会造出数据不一致了。 ActiveMQ、RabbitMQ、RocketMQ和kafka有什么优缺点 特性 ActiveMQ RabbitMQ RocketMQ kafka 单机吞吐量 万级，比RocketMQ、kafka低一级 同ActiveMQ 10万级，支撑高吞吐 10万级，高吞吐，一般配合大数据类的系统机型实时数据计算，日志采集等场景 topic数量对吞吐量的影响 topic可以达到几百/几千的级别，这是RocketMQ的优势，在同等机器下，可以支撑大量的topic topic从几十到几百个左右的时候，吞吐量会大幅度下降，kafka尽量保证topic数量不要过多，如果要支撑大规模的topic，需要增加更多的机器资源 时效性 ms级 微秒级，这是RabbitMQ的一大特点，延迟最低 ms级 延迟在ms级以内 可用性 高，基于主从架构实现高可用 同ActiveMQ 非常高，分布式架构 非常高，分布式，一个数据多个副本，少数机器宕机，不会丢失数据，不会导致不可用 消息可靠性 有较低的概率丢失数据 基本不丢 经过参数优化配置，可以做到0丢失 同RocketMQ 功能支持 MQ领域的功能极其完备 基于erlang开发，并发能力很强，性能极好，延时很低 MQ功能较为完善，还是分布式的，扩展性好 功能较为简单，主要支持简单的MQ功能，在大数据领域的实时计算以及日志采集被大规模使用 综上，各种对比之后，有如下建议： 一般的业务系统要引入 MQ，最早大家都用 ActiveMQ，但是现在确实大家用的不多了，没经过大规模吞吐量场景的验证，社区也不是很活跃，所以大家还是算了吧，我个人不推荐用这个了； 后来大家开始用 RabbitMQ，但是确实 erlang 语言阻止了大量的 Java 工程师去深入研究和掌控它，对公司而言，几乎处于不可控的状态，但是确实人家是开源的，比较稳定的支持，活跃度也高； 不过现在确实越来越多的公司会去用 RocketMQ，确实很不错，毕竟是阿里出品，但社区可能有突然黄掉的风险（目前 RocketMQ 已捐给 Apache，但 GitHub 上的活跃度其实不算高）对自己公司技术实力有绝对自信的，推荐用 RocketMQ，否则回去老老实实用 RabbitMQ 吧，人家有活跃的开源社区，绝对不会黄。 所以中小型公司，技术实力较为一般，技术挑战不是特别高，用 RabbitMQ 是不错的选择；大型公司，基础架构研发实力较强，用 RocketMQ 是很好的选择。 如果是大数据领域的实时计算、日志采集等场景，用 Kafka 是业内标准的，绝对没问题，社区活跃度很高，绝对不会黄，何况几乎是全世界这个领域的事实性规范。]]></content>
+    <title><![CDATA[Hello World]]></title>
+    <url>%2FCKING.github.io%2F2019%2F07%2F24%2Fhello-world%2F</url>
+    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
       <categories>
-        <category>消息队列</category>
+        <category>Hello</category>
       </categories>
       <tags>
         <tag>分布式</tag>
