@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="分布式,">
+  <meta name="keywords" content="设计模式,">
 
 
 
@@ -79,20 +79,20 @@
 
 
 
-<meta name="description" content="​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看服务注册中心的选型调研这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？ ​        目">
-<meta name="keywords" content="分布式">
+<meta name="description" content="​        在软件开发中，常常会遇到这种情况：实现某个功能有多条途径，每一条途径对应一种算法，此时可以使用一种设计模式来实现灵活地选择解决途径，也能够方便地增加新的解决途径。那就是策略模式。 ​        在策略模式中，可以定义一些独立的类来封装不同的算法，每一个类封装一种具体的算法。在这里，每一个封装算法的类都可以称之为一种策略，为了保证这些策略在使用时具有一致性，一般会提供一个抽象的">
+<meta name="keywords" content="设计模式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何设计一个能抗住上万服务实例的注册中心">
-<meta property="og:url" content="https://github.com/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/index.html">
+<meta property="og:title" content="策略模式">
+<meta property="og:url" content="https://github.com/2019/09/25/策略模式/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看服务注册中心的选型调研这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？ ​        目">
+<meta property="og:description" content="​        在软件开发中，常常会遇到这种情况：实现某个功能有多条途径，每一条途径对应一种算法，此时可以使用一种设计模式来实现灵活地选择解决途径，也能够方便地增加新的解决途径。那就是策略模式。 ​        在策略模式中，可以定义一些独立的类来封装不同的算法，每一个类封装一种具体的算法。在这里，每一个封装算法的类都可以称之为一种策略，为了保证这些策略在使用时具有一致性，一般会提供一个抽象的">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/%E5%8E%9F%E7%90%86%E5%9B%BE.png">
-<meta property="og:updated_time" content="2019-09-04T15:15:44.089Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/09/25/策略模式/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F%E7%BB%93%E6%9E%84%E5%9B%BE.png">
+<meta property="og:updated_time" content="2019-09-25T14:09:38.004Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="如何设计一个能抗住上万服务实例的注册中心">
-<meta name="twitter:description" content="​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看服务注册中心的选型调研这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？ ​        目">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/%E5%8E%9F%E7%90%86%E5%9B%BE.png">
+<meta name="twitter:title" content="策略模式">
+<meta name="twitter:description" content="​        在软件开发中，常常会遇到这种情况：实现某个功能有多条途径，每一条途径对应一种算法，此时可以使用一种设计模式来实现灵活地选择解决途径，也能够方便地增加新的解决途径。那就是策略模式。 ​        在策略模式中，可以定义一些独立的类来封装不同的算法，每一个类封装一种具体的算法。在这里，每一个封装算法的类都可以称之为一种策略，为了保证这些策略在使用时具有一致性，一般会提供一个抽象的">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/09/25/策略模式/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F%E7%BB%93%E6%9E%84%E5%9B%BE.png">
 
 
 
@@ -122,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/">
+  <link rel="canonical" href="https://github.com/2019/09/25/策略模式/">
 
 
 
 
 
-  <title>如何设计一个能抗住上万服务实例的注册中心 | Hexo</title>
+  <title>策略模式 | Hexo</title>
   
 
 
@@ -277,7 +277,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/25/策略模式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Cking">
@@ -294,7 +294,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">如何设计一个能抗住上万服务实例的注册中心</h1>
+          <h1 class="post-title" itemprop="name headline">策略模式</h1>
         
 
         <div class="post-meta">
@@ -306,8 +306,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-15T15:01:08+08:00">
-                2019-08-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-25T09:44:01+08:00">
+                2019-09-25
               </time>
             
 
@@ -329,8 +329,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
+                  <a href="/CKING.github.io/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -371,10 +371,48 @@
       
 
       
-        <p>​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看<a href="[https://gd-cking.github.io/CKING.github.io/2019/08/11/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E9%80%89%E5%9E%8B%E8%B0%83%E7%A0%94/](https://gd-cking.github.io/CKING.github.io/2019/08/11/服务注册中心的选型调研/)">服务注册中心的选型调研</a>这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？</p>
-<p>​        目前大公司的服务注册中心为了能支撑大规模的服务实例，基本都是自研服务注册中心。基本的思路就是实现一个<strong>分布式服务注册中心</strong>。主要设计逻辑包括：<strong>分片存储服务注册表、支持横向扩容、每台机器均摊高并发请求、各个服务主动拉取注册表信息，避免方向通知网卡被打爆</strong>等等。</p>
-<p>​        简单的原理图如下所示：</p>
-<p><img src="/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/%E5%8E%9F%E7%90%86%E5%9B%BE.png" alt="原理图"></p>
+        <p>​        在软件开发中，常常会遇到这种情况：实现某个功能有多条途径，每一条途径对应一种算法，此时可以使用一种设计模式来实现灵活地选择解决途径，也能够方便地增加新的解决途径。那就是<strong>策略模式</strong>。</p>
+<p>​        在策略模式中，可以定义一些独立的类来封装不同的算法，每一个类封装一种具体的算法。在这里，每一个封装算法的类都可以称之为一种策略，为了保证这些策略在使用时具有一致性，一般会提供一个抽象的策略来做规则的定义，而每种算法则对应一个具体策略类。</p>
+<p>​        策略模式的主要目的是将算法的定义与使用分开，也就是将算法的行为和环境分开，将算法的定义放在专门的策略类中，每一个策略类封装了一种实现算法，使用算法的环境类针对抽象策略类进行编程，符合依赖倒转原则。在出现新的算法时，只需要增加一个新的实现了抽象策略类的具体策略类即可。</p>
+<h2 id="策略模式定义"><a href="#策略模式定义" class="headerlink" title="策略模式定义"></a>策略模式定义</h2><p>​        定义了一系列算法类，将每一个算法封装起来，并让他们可以互相替换。策略模式让算法独立于使用它的客户而变化，也称为政策模式。策略模式是一种对象行为型模式。</p>
+<h2 id="策略模式结构图"><a href="#策略模式结构图" class="headerlink" title="策略模式结构图"></a>策略模式结构图</h2><p><img src="/CKING.github.io/2019/09/25/策略模式/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F%E7%BB%93%E6%9E%84%E5%9B%BE.png" alt="策略模式结构图"></p>
+<p>​        由结构图可以看到包含以下3个角色：</p>
+<ul>
+<li><strong>Context（环境类）</strong>：环境类是使用算法的角色，它在解决某个问题（即实现某个方法）时可以采用多种策略。在环境类中维持一个对抽象策略类的引用实例，用于定义所采用的策略。</li>
+<li><strong>Strategy（抽象类）</strong>：它为所支持的算法声明了抽象方法，是所有策略类的父类，它可以是抽象类或具体类，也可以是接口。环境类通过抽象策略中声明的方法在运行时调用具体策略类中实现的算法。</li>
+<li><strong>ConcreteStrategy（具体策略类）</strong>：它实现了在抽象策略类中声明的算法，在运行时，具体策略类将覆盖在环境类中定义的抽象策略类对象，使用一种具体的算法实现某个业务处理。</li>
+</ul>
+<h2 id="策略模式主要优缺点"><a href="#策略模式主要优缺点" class="headerlink" title="策略模式主要优缺点"></a>策略模式主要优缺点</h2><h3 id="主要优点"><a href="#主要优点" class="headerlink" title="主要优点"></a>主要优点</h3><ul>
+<li>策略模式提供了对开闭原则的完美支持，用户可以在不修改原有系统的基础上选择算法或行为，也可以灵活地增加新的算法或行为。</li>
+<li>策略模式提供了管理相关的算法族的办法，策略类的等级结构定义了一个算法或行为族，恰当使用继承可以把公共的代码移到抽象策略类中，从而避免重复的代码。</li>
+<li>策略模式提供了一种可以替换继承关系的办法。如果不使用策略模式，那么使用算法的环境类就可能会有一些子类，每个子类提供一种不同的算法。但是，这样一来算法的使用就和算法本身混在一起，不符合单一职责原则，决定使用哪一种算法的逻辑和该算法本身混合在一起，从而不可能再独立演化；而且使用继承无法实现算法或行为在程序运行时的动态切换。</li>
+<li>使用策略模式可以避免多重条件选择语句。多重条件选择语句不易维护，它把采取哪一种算法或行为的逻辑与算法或行为本身的实现逻辑混合在一起，将他们全部硬编码在一个庞大的多重条件选择语句中，比直接集成环境类的办法还要原始和落后。</li>
+<li>策略模式提供了一种算法的复用机制，由于将算法单独提取出来封装在策略类中，因此不同的环境类可以方便地复用这些策略类。</li>
+</ul>
+<h3 id="主要缺点"><a href="#主要缺点" class="headerlink" title="主要缺点"></a>主要缺点</h3><ul>
+<li>客户端必须知道所有的策略类，并且自行决定使用哪一个策略类。这就意味着客户端必要理解这些算法的区别，以便实时选择恰当的算法。换言之，策略模式只适用于客户端知道所有的算法或行为的情况。</li>
+<li>策略模式将造成系统产生很多具体策略类，任何细小的变化都将导致系统要增加一个新的具体策略类。</li>
+<li>无法同时在客户端使用多个策略类，也就是说，在使用策略模式时，客户端每次只能使用一个策略类，不支持使用一个策略类完成部分功能后再使用另一个策略类来完成剩余功能的情况。</li>
+</ul>
+<h2 id="策略模式适用场景"><a href="#策略模式适用场景" class="headerlink" title="策略模式适用场景"></a>策略模式适用场景</h2><p>​        在以下情况下可以考虑使用策略模式：</p>
+<ol>
+<li>一个系统需要动态地在几种算法中选择一种，那么可以将这些算法封装到一个个的具体算法类中，而这些算法类都是一个抽象算法类的子类。换言之，这些具体算法类均有统一的接口，根据里氏代换原则和面向对象的多态性，客户端可以选择使用任何一个具体算法类，并且只要维持一个数据类型是抽象算法类的对象。</li>
+<li>一个对象有很多的行为，如果不用恰当的模式，这些行为就只好使用多重条件选择语句来实现。此时，使用策略模式，把这些行为转移到相应的具体策略类里面，就可以避免使用难以维护的多重条件选择语句。</li>
+<li>不希望客户端知道复制的、与算法相关的数据结构，在具体策略类中封装算法与相关的数据结构，可以提高算法的保密性与安全性。</li>
+</ol>
+<h2 id="具体事例"><a href="#具体事例" class="headerlink" title="具体事例"></a>具体事例</h2><h3 id="案例1"><a href="#案例1" class="headerlink" title="案例1"></a>案例1</h3><p>​        Sunny软件公司为某电影院开发了一套影院售票系统，在改系统中需要为不同类型的用户提供不同的电影票打折方式，具体打折方案如下：</p>
+<ol>
+<li>学生凭学生证可以享受8折优惠。</li>
+<li>年龄在10周岁及以下的儿童可享受每张票减免10元的优惠（原始票价需大于等于20元）</li>
+<li>影院VIP用户除享受票价半价优惠外还可以积累积分，积分累计到一定额度可以兑换电影院赠送的奖品。</li>
+</ol>
+<p>​        改系统在将来可能还需要个根据需要引入新的打折方式。</p>
+<p>传统的实现方案大概会如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">calculate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//学生票折后票价计算</span></span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.type.equalsIgnoreCase(<span class="string">"student"</span>)) &#123;</span><br><span class="line">            System.out.println(<span class="string">"学生票： "</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.price * <span class="number">0.8</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//儿童票折后票价计算</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">this</span>.type.equalsIgnoreCase(<span class="string">"children"</span>) &amp;&amp; <span class="keyword">this</span>.price &gt;= <span class="number">20</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"儿童票："</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.price - <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//VIP票折价后票价计算</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">this</span>.type.equalsIgnoreCase(<span class="string">"vip"</span>)) &#123;</span><br><span class="line">            System.out.println(<span class="string">"VIP票："</span>);</span><br><span class="line">            System.out.println(<span class="string">"增加积分！"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.price * <span class="number">0.5</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.price;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        使用策略模式实现的代码已上传至<a href="https://github.com/GD-CKING/Design-Pattern/tree/master/Strategy-Pattern(%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F)/strategy">github</a>上。</p>
+<h3 id="案例2"><a href="#案例2" class="headerlink" title="案例2"></a>案例2</h3><p>​        使用策略模式和自定义注解去掉大量的<strong>if-else</strong></p>
+<p><a href="https://mp.weixin.qq.com/s/sa_MMAzYg6jpy9s_rtvcCQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/sa_MMAzYg6jpy9s_rtvcCQ</a></p>
 
       
     </div>
@@ -392,7 +430,7 @@
       
         <div class="post-tags">
           
-            <a href="/CKING.github.io/tags/分布式/" rel="tag"># 分布式</a>
+            <a href="/CKING.github.io/tags/设计模式/" rel="tag"># 设计模式</a>
           
         </div>
       
@@ -405,8 +443,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/CKING.github.io/2019/08/13/Zuul-实现动态路由/" rel="next" title="Zuul-实现动态路由">
-                <i class="fa fa-chevron-left"></i> Zuul-实现动态路由
+              <a href="/CKING.github.io/2019/09/22/生产环境中redis的数据备份和灾难恢复策略/" rel="next" title="生产环境中redis的数据备份和灾难恢复策略">
+                <i class="fa fa-chevron-left"></i> 生产环境中redis的数据备份和灾难恢复策略
               </a>
             
           </div>
@@ -414,10 +452,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/CKING.github.io/2019/08/16/分布式事务方案/" rel="prev" title="分布式事务方案">
-                分布式事务方案 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -498,8 +532,17 @@ var jiathis_config={
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -559,6 +602,22 @@ var jiathis_config={
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#策略模式定义"><span class="nav-number">1.</span> <span class="nav-text">策略模式定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#策略模式结构图"><span class="nav-number">2.</span> <span class="nav-text">策略模式结构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#策略模式主要优缺点"><span class="nav-number">3.</span> <span class="nav-text">策略模式主要优缺点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主要优点"><span class="nav-number">3.1.</span> <span class="nav-text">主要优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要缺点"><span class="nav-number">3.2.</span> <span class="nav-text">主要缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#策略模式适用场景"><span class="nav-number">4.</span> <span class="nav-text">策略模式适用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体事例"><span class="nav-number">5.</span> <span class="nav-text">具体事例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#案例1"><span class="nav-number">5.1.</span> <span class="nav-text">案例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例2"><span class="nav-number">5.2.</span> <span class="nav-text">案例2</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

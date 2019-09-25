@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="分布式,">
+  <meta name="keywords" content="JVM,">
 
 
 
@@ -79,20 +79,18 @@
 
 
 
-<meta name="description" content="​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看服务注册中心的选型调研这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？ ​        目">
-<meta name="keywords" content="分布式">
+<meta name="description" content="一步一步往上走">
+<meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何设计一个能抗住上万服务实例的注册中心">
-<meta property="og:url" content="https://github.com/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/index.html">
+<meta property="og:title" content="JVM中的一些参数介绍">
+<meta property="og:url" content="https://github.com/2019/09/16/JVM中的一些参数介绍/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看服务注册中心的选型调研这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？ ​        目">
+<meta property="og:description" content="一步一步往上走">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/%E5%8E%9F%E7%90%86%E5%9B%BE.png">
-<meta property="og:updated_time" content="2019-09-04T15:15:44.089Z">
+<meta property="og:updated_time" content="2019-09-25T14:09:37.993Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="如何设计一个能抗住上万服务实例的注册中心">
-<meta name="twitter:description" content="​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看服务注册中心的选型调研这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？ ​        目">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/%E5%8E%9F%E7%90%86%E5%9B%BE.png">
+<meta name="twitter:title" content="JVM中的一些参数介绍">
+<meta name="twitter:description" content="一步一步往上走">
 
 
 
@@ -122,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/">
+  <link rel="canonical" href="https://github.com/2019/09/16/JVM中的一些参数介绍/">
 
 
 
 
 
-  <title>如何设计一个能抗住上万服务实例的注册中心 | Hexo</title>
+  <title>JVM中的一些参数介绍 | Hexo</title>
   
 
 
@@ -277,7 +275,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/16/JVM中的一些参数介绍/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Cking">
@@ -294,7 +292,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">如何设计一个能抗住上万服务实例的注册中心</h1>
+          <h1 class="post-title" itemprop="name headline">JVM中的一些参数介绍</h1>
         
 
         <div class="post-meta">
@@ -306,8 +304,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-15T15:01:08+08:00">
-                2019-08-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-16T11:39:52+08:00">
+                2019-09-16
               </time>
             
 
@@ -329,8 +327,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
+                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -371,11 +369,7 @@
       
 
       
-        <p>​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看<a href="[https://gd-cking.github.io/CKING.github.io/2019/08/11/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E9%80%89%E5%9E%8B%E8%B0%83%E7%A0%94/](https://gd-cking.github.io/CKING.github.io/2019/08/11/服务注册中心的选型调研/)">服务注册中心的选型调研</a>这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？</p>
-<p>​        目前大公司的服务注册中心为了能支撑大规模的服务实例，基本都是自研服务注册中心。基本的思路就是实现一个<strong>分布式服务注册中心</strong>。主要设计逻辑包括：<strong>分片存储服务注册表、支持横向扩容、每台机器均摊高并发请求、各个服务主动拉取注册表信息，避免方向通知网卡被打爆</strong>等等。</p>
-<p>​        简单的原理图如下所示：</p>
-<p><img src="/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/%E5%8E%9F%E7%90%86%E5%9B%BE.png" alt="原理图"></p>
-
+        
       
     </div>
     
@@ -392,7 +386,7 @@
       
         <div class="post-tags">
           
-            <a href="/CKING.github.io/tags/分布式/" rel="tag"># 分布式</a>
+            <a href="/CKING.github.io/tags/JVM/" rel="tag"># JVM</a>
           
         </div>
       
@@ -405,8 +399,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/CKING.github.io/2019/08/13/Zuul-实现动态路由/" rel="next" title="Zuul-实现动态路由">
-                <i class="fa fa-chevron-left"></i> Zuul-实现动态路由
+              <a href="/CKING.github.io/2019/09/10/简单讲一下分库分表/" rel="next" title="简单讲一下分库分表">
+                <i class="fa fa-chevron-left"></i> 简单讲一下分库分表
               </a>
             
           </div>
@@ -415,8 +409,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/CKING.github.io/2019/08/16/分布式事务方案/" rel="prev" title="分布式事务方案">
-                分布式事务方案 <i class="fa fa-chevron-right"></i>
+              <a href="/CKING.github.io/2019/09/22/生产环境中redis的数据备份和灾难恢复策略/" rel="prev" title="生产环境中redis的数据备份和灾难恢复策略">
+                生产环境中redis的数据备份和灾难恢复策略 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>

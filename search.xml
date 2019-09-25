@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[策略模式]]></title>
+    <url>%2FCKING.github.io%2F2019%2F09%2F25%2F%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F%2F</url>
+    <content type="text"><![CDATA[​ 在软件开发中，常常会遇到这种情况：实现某个功能有多条途径，每一条途径对应一种算法，此时可以使用一种设计模式来实现灵活地选择解决途径，也能够方便地增加新的解决途径。那就是策略模式。 ​ 在策略模式中，可以定义一些独立的类来封装不同的算法，每一个类封装一种具体的算法。在这里，每一个封装算法的类都可以称之为一种策略，为了保证这些策略在使用时具有一致性，一般会提供一个抽象的策略来做规则的定义，而每种算法则对应一个具体策略类。 ​ 策略模式的主要目的是将算法的定义与使用分开，也就是将算法的行为和环境分开，将算法的定义放在专门的策略类中，每一个策略类封装了一种实现算法，使用算法的环境类针对抽象策略类进行编程，符合依赖倒转原则。在出现新的算法时，只需要增加一个新的实现了抽象策略类的具体策略类即可。 策略模式定义​ 定义了一系列算法类，将每一个算法封装起来，并让他们可以互相替换。策略模式让算法独立于使用它的客户而变化，也称为政策模式。策略模式是一种对象行为型模式。 策略模式结构图 ​ 由结构图可以看到包含以下3个角色： Context（环境类）：环境类是使用算法的角色，它在解决某个问题（即实现某个方法）时可以采用多种策略。在环境类中维持一个对抽象策略类的引用实例，用于定义所采用的策略。 Strategy（抽象类）：它为所支持的算法声明了抽象方法，是所有策略类的父类，它可以是抽象类或具体类，也可以是接口。环境类通过抽象策略中声明的方法在运行时调用具体策略类中实现的算法。 ConcreteStrategy（具体策略类）：它实现了在抽象策略类中声明的算法，在运行时，具体策略类将覆盖在环境类中定义的抽象策略类对象，使用一种具体的算法实现某个业务处理。 策略模式主要优缺点主要优点 策略模式提供了对开闭原则的完美支持，用户可以在不修改原有系统的基础上选择算法或行为，也可以灵活地增加新的算法或行为。 策略模式提供了管理相关的算法族的办法，策略类的等级结构定义了一个算法或行为族，恰当使用继承可以把公共的代码移到抽象策略类中，从而避免重复的代码。 策略模式提供了一种可以替换继承关系的办法。如果不使用策略模式，那么使用算法的环境类就可能会有一些子类，每个子类提供一种不同的算法。但是，这样一来算法的使用就和算法本身混在一起，不符合单一职责原则，决定使用哪一种算法的逻辑和该算法本身混合在一起，从而不可能再独立演化；而且使用继承无法实现算法或行为在程序运行时的动态切换。 使用策略模式可以避免多重条件选择语句。多重条件选择语句不易维护，它把采取哪一种算法或行为的逻辑与算法或行为本身的实现逻辑混合在一起，将他们全部硬编码在一个庞大的多重条件选择语句中，比直接集成环境类的办法还要原始和落后。 策略模式提供了一种算法的复用机制，由于将算法单独提取出来封装在策略类中，因此不同的环境类可以方便地复用这些策略类。 主要缺点 客户端必须知道所有的策略类，并且自行决定使用哪一个策略类。这就意味着客户端必要理解这些算法的区别，以便实时选择恰当的算法。换言之，策略模式只适用于客户端知道所有的算法或行为的情况。 策略模式将造成系统产生很多具体策略类，任何细小的变化都将导致系统要增加一个新的具体策略类。 无法同时在客户端使用多个策略类，也就是说，在使用策略模式时，客户端每次只能使用一个策略类，不支持使用一个策略类完成部分功能后再使用另一个策略类来完成剩余功能的情况。 策略模式适用场景​ 在以下情况下可以考虑使用策略模式： 一个系统需要动态地在几种算法中选择一种，那么可以将这些算法封装到一个个的具体算法类中，而这些算法类都是一个抽象算法类的子类。换言之，这些具体算法类均有统一的接口，根据里氏代换原则和面向对象的多态性，客户端可以选择使用任何一个具体算法类，并且只要维持一个数据类型是抽象算法类的对象。 一个对象有很多的行为，如果不用恰当的模式，这些行为就只好使用多重条件选择语句来实现。此时，使用策略模式，把这些行为转移到相应的具体策略类里面，就可以避免使用难以维护的多重条件选择语句。 不希望客户端知道复制的、与算法相关的数据结构，在具体策略类中封装算法与相关的数据结构，可以提高算法的保密性与安全性。 具体事例案例1​ Sunny软件公司为某电影院开发了一套影院售票系统，在改系统中需要为不同类型的用户提供不同的电影票打折方式，具体打折方案如下： 学生凭学生证可以享受8折优惠。 年龄在10周岁及以下的儿童可享受每张票减免10元的优惠（原始票价需大于等于20元） 影院VIP用户除享受票价半价优惠外还可以积累积分，积分累计到一定额度可以兑换电影院赠送的奖品。 ​ 改系统在将来可能还需要个根据需要引入新的打折方式。 传统的实现方案大概会如下： 123456789101112131415161718192021222324public double calculate() &#123; //学生票折后票价计算 if(this.type.equalsIgnoreCase("student")) &#123; System.out.println("学生票： "); return this.price * 0.8; &#125; //儿童票折后票价计算 else if(this.type.equalsIgnoreCase("children") &amp;&amp; this.price &gt;= 20) &#123; System.out.println("儿童票："); return this.price - 10; &#125; //VIP票折价后票价计算 else if(this.type.equalsIgnoreCase("vip")) &#123; System.out.println("VIP票："); System.out.println("增加积分！"); return this.price * 0.5; &#125; else &#123; return this.price; &#125; &#125; ​ 使用策略模式实现的代码已上传至github上。 案例2​ 使用策略模式和自定义注解去掉大量的if-else https://mp.weixin.qq.com/s/sa_MMAzYg6jpy9s_rtvcCQ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[生产环境中redis的数据备份和灾难恢复策略]]></title>
     <url>%2FCKING.github.io%2F2019%2F09%2F22%2F%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E4%B8%ADredis%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%92%8C%E7%81%BE%E9%9A%BE%E6%81%A2%E5%A4%8D%E7%AD%96%E7%95%A5%2F</url>
     <content type="text"><![CDATA[本节思维导图 ![生产环境中的数据 备份和灾难恢复](生产环境中redis的数据备份和灾难恢复策略/生产环境中的数据 备份和灾难恢复.png) ​ 我们生产环境中redis的数据备份和灾难恢复策略简单地说就是：开启AOF机制，并用RDB做冷备。 数据备份方案​ 具体的数据备份方案如下： 写crontab定时调度脚本去做数据备份。 每小时都备份一份rdb，可以copy到一个目录中去，并且只保留最近48小时的备份。 每天都保留一份当日的rdb备份到一个目录中去，仅仅保留最近一个月的备份。 每次copy备份的时候，把最旧的备份删掉。 每天晚上将当前服务器上所有的数据备份，发送一份到远程的云服务上去。 ​ 首先先创建一个目录，/usr/local/redis，然后在redis的目录中创建copy文件夹，用来存储复制快照文件的脚本。然后在redis目录中创建snapshotting文件夹，用来存储备份的rdb快照。 ​ 执行vi redis_rdb_copy_hourly.sh，编写每小时复制一份rdb的shell脚本。 123456789#!/bin/sh cur_date=`date +%Y%m%d%k`rm -rf /usr/local/redis/snapshotting/$cur_datemkdir /usr/local/redis/snapshotting/$cur_datecp /var/redis/6379/dump.rdb /usr/local/redis/snapshotting/$cur_datedel_date=`date -d -48hour +%Y%m%d%k`rm -rf /usr/local/redis/snapshotting/$del_date ​ 执行vi redis_rdb_copy_daily.sh，编写每天复制一份rdb的shell脚本。 123456789#!/bin/sh cur_date=`date +%Y%m%d`rm -rf /usr/local/redis/snapshotting/$cur_datemkdir /usr/local/redis/snapshotting/$cur_datecp /var/redis/6379/dump.rdb /usr/local/redis/snapshotting/$cur_datedel_date=`date -d -1month +%Y%m%d`rm -rf /usr/local/redis/snapshotting/$del_date ​ 上面cp /var/redis/6379/dump.rdb /usr/local/redis/snapshotting/$cur_date中的/var/redis/6379/dump.rdb是redis生成的快照文件的存储地址，可以根据具体情况进行修改。 ​ 最后再执行crontab -e新建调度任务，命令如下： 120 * * * * sh /usr/local/redis/copy/redis_rdb_copy_hourly.sh0 0 * * * sh /usr/local/redis/copy/redis_rdb_copy_daily.sh ​ 然后再每天一次将所有的数据上传一次到远程的云服务器上去，这样一个数据备份方案就算完成了。 数据恢复方案 如果是redis进程挂掉了，那么重启redis进程即可，直接基于AOF日志文件恢复数据。 如果是redis进程所在机器宕机了，那么重启机器后，尝试重启redis进程，尝试直接基于AOF日志文件进行数据恢复。如果AOF没有破损，那么久直接基于AOF恢复，如果AOF文件损坏，那么用redis-check-aof fix修复日志文件。 如果redis当前最新的AOF文件和RDB文件出现了丢失，那么可以尝试基于该机器上当前的某个最新的RDB数据副本进行数据恢复。具体操作步骤为：停掉redis，关闭AOF，拷贝AOF备份，重启redis，确认数据恢复，直接在命令行热修改redis配置，即在redis-cli中执行config set appendonly yes打开AOF。这个时候redis就会将内存中的数据对应的日志，写入AOF文件中，此时AOF和RDB两份数据文件的数据就同步了。用redis config set热修改配置参数，可能配置文件中的实际参数没有被持久化的修改，需要再停止redis，手动修改配置文件，打开AOF，然后再重启redis。 如果当前机器上的所有RDB文件全部损坏，那么从远程的云服务上拉取最新的RDB快照来恢复数据。 如果是发现有重大的数据错误，比如某个小时上线的程序一下子将数据全部污染了，数据全错了，那么可以选择某个更早的时间点，对数据进行恢复 举个例子，12点上线了代码，发现代码有bug，导致代码生成的所有的缓存数据，写入redis，全部错了 找到一份11点的rdb的冷备，然后按照上面的步骤，去恢复到11点的数据，就可以了。]]></content>
@@ -9,6 +20,17 @@
       </categories>
       <tags>
         <tag>Redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[JVM中的一些参数介绍]]></title>
+    <url>%2FCKING.github.io%2F2019%2F09%2F16%2FJVM%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%82%E6%95%B0%E4%BB%8B%E7%BB%8D%2F</url>
+    <content type="text"></content>
+      <categories>
+        <category>JVM</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
       </tags>
   </entry>
   <entry>
@@ -355,22 +377,22 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[消息队列优缺点]]></title>
-    <url>%2FCKING.github.io%2F2019%2F07%2F24%2F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%BC%98%E7%BC%BA%E7%82%B9%2F</url>
-    <content type="text"><![CDATA[本节思维导图 消息队列的优点消息队列主要有三个优点：解耦、异步和削峰 削峰假设一个业务场景如图所示，A系统分别发送信息给B C D系统，此时系统的耦合性比较高，当需求改变要求不给D系统发送消息，或者增加一个E系统也需要A系统发送数据，那么我们就不得不去修改A系统的代码。除此之外如果其他系统挂了，同样也会影响到A系统，如果引入MQ，那么A系统就只需要把数据放进MQ中，由需要这个数据的系统去订阅这个MQ，这样就可以实现系统解耦。这样A系统不仅不需关系哪个系统需要这个消息，也不需要关心消息发送失败或者超时等情况。 总结：通过MQ，Pub/Sub发布订阅消息模型，A系统就跟其他系统解耦了。 异步业务场景如图所示，用户向A系统发起请求，需要在本地写数据库，还需要在B C D系统写数据库，假设本地写耗时10ms，如下图需要10+20+30+40共100ms。那么这样相对来说比较慢。 但如果引入MQ，假设将消息放入MQ耗时5ms，那么总共需要15ms，极大提高了响应速度。 削峰假设每天0:00-12:00系统每秒并发请求数量只有十几个，但过了12点之后，请求数量猛增到几千个，而且数据库系统是mysql，每秒最多也就执行一千多条SQL语句，这样导致mysql崩溃，但过了高峰期之后并发请求又恢复到了相对比较低的水平，对整个系统又没啥压力了。 引入MQ之后，A系统每秒中只能处理一千个SQL，那就从MQ中取出一千个SQL去处理，这样即使在高峰的时候，A系统也不会崩溃，而在高峰期间MQ可能会有几百万的请求积压在MQ中，但这个短暂的高峰的积压是允许，等高峰期一过，MQ积压的数据就能够迅速被处理。 消息队列的缺点缺点有以下几个： 系统可用性降低引入的外部依赖越多，风险就越高。本来只是调用几个系统的接口就可以了，现在引入MQ之后，如果MQ挂了，整个系统就崩溃了。 系统复杂性提高引入MQ之后，需要考虑很多问题。例如如何保证消息传递的顺序，保证消息没有重复消费和怎么处理消息丢失的情况。 数据一致性问题A系统将数据放到MQ将返回成功了，但如果B系统数据丢失了，那就会造出数据不一致了。 ActiveMQ、RabbitMQ、RocketMQ和kafka有什么优缺点 特性 ActiveMQ RabbitMQ RocketMQ kafka 单机吞吐量 万级，比RocketMQ、kafka低一级 同ActiveMQ 10万级，支撑高吞吐 10万级，高吞吐，一般配合大数据类的系统机型实时数据计算，日志采集等场景 topic数量对吞吐量的影响 topic可以达到几百/几千的级别，这是RocketMQ的优势，在同等机器下，可以支撑大量的topic topic从几十到几百个左右的时候，吞吐量会大幅度下降，kafka尽量保证topic数量不要过多，如果要支撑大规模的topic，需要增加更多的机器资源 时效性 ms级 微秒级，这是RabbitMQ的一大特点，延迟最低 ms级 延迟在ms级以内 可用性 高，基于主从架构实现高可用 同ActiveMQ 非常高，分布式架构 非常高，分布式，一个数据多个副本，少数机器宕机，不会丢失数据，不会导致不可用 消息可靠性 有较低的概率丢失数据 基本不丢 经过参数优化配置，可以做到0丢失 同RocketMQ 功能支持 MQ领域的功能极其完备 基于erlang开发，并发能力很强，性能极好，延时很低 MQ功能较为完善，还是分布式的，扩展性好 功能较为简单，主要支持简单的MQ功能，在大数据领域的实时计算以及日志采集被大规模使用 综上，各种对比之后，有如下建议： 一般的业务系统要引入 MQ，最早大家都用 ActiveMQ，但是现在确实大家用的不多了，没经过大规模吞吐量场景的验证，社区也不是很活跃，所以大家还是算了吧，我个人不推荐用这个了； 后来大家开始用 RabbitMQ，但是确实 erlang 语言阻止了大量的 Java 工程师去深入研究和掌控它，对公司而言，几乎处于不可控的状态，但是确实人家是开源的，比较稳定的支持，活跃度也高； 不过现在确实越来越多的公司会去用 RocketMQ，确实很不错，毕竟是阿里出品，但社区可能有突然黄掉的风险（目前 RocketMQ 已捐给 Apache，但 GitHub 上的活跃度其实不算高）对自己公司技术实力有绝对自信的，推荐用 RocketMQ，否则回去老老实实用 RabbitMQ 吧，人家有活跃的开源社区，绝对不会黄。 所以中小型公司，技术实力较为一般，技术挑战不是特别高，用 RabbitMQ 是不错的选择；大型公司，基础架构研发实力较强，用 RocketMQ 是很好的选择。 如果是大数据领域的实时计算、日志采集等场景，用 Kafka 是业内标准的，绝对没问题，社区活跃度很高，绝对不会黄，何况几乎是全世界这个领域的事实性规范。]]></content>
+    <title><![CDATA[Hello World]]></title>
+    <url>%2FCKING.github.io%2F2019%2F07%2F24%2Fhello-world%2F</url>
+    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
       <categories>
-        <category>消息队列</category>
+        <category>Hello</category>
       </categories>
       <tags>
         <tag>分布式</tag>
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[Hello World]]></title>
-    <url>%2FCKING.github.io%2F2019%2F07%2F24%2Fhello-world%2F</url>
-    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
+    <title><![CDATA[消息队列优缺点]]></title>
+    <url>%2FCKING.github.io%2F2019%2F07%2F24%2F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%BC%98%E7%BC%BA%E7%82%B9%2F</url>
+    <content type="text"><![CDATA[本节思维导图 消息队列的优点消息队列主要有三个优点：解耦、异步和削峰 削峰假设一个业务场景如图所示，A系统分别发送信息给B C D系统，此时系统的耦合性比较高，当需求改变要求不给D系统发送消息，或者增加一个E系统也需要A系统发送数据，那么我们就不得不去修改A系统的代码。除此之外如果其他系统挂了，同样也会影响到A系统，如果引入MQ，那么A系统就只需要把数据放进MQ中，由需要这个数据的系统去订阅这个MQ，这样就可以实现系统解耦。这样A系统不仅不需关系哪个系统需要这个消息，也不需要关心消息发送失败或者超时等情况。 总结：通过MQ，Pub/Sub发布订阅消息模型，A系统就跟其他系统解耦了。 异步业务场景如图所示，用户向A系统发起请求，需要在本地写数据库，还需要在B C D系统写数据库，假设本地写耗时10ms，如下图需要10+20+30+40共100ms。那么这样相对来说比较慢。 但如果引入MQ，假设将消息放入MQ耗时5ms，那么总共需要15ms，极大提高了响应速度。 削峰假设每天0:00-12:00系统每秒并发请求数量只有十几个，但过了12点之后，请求数量猛增到几千个，而且数据库系统是mysql，每秒最多也就执行一千多条SQL语句，这样导致mysql崩溃，但过了高峰期之后并发请求又恢复到了相对比较低的水平，对整个系统又没啥压力了。 引入MQ之后，A系统每秒中只能处理一千个SQL，那就从MQ中取出一千个SQL去处理，这样即使在高峰的时候，A系统也不会崩溃，而在高峰期间MQ可能会有几百万的请求积压在MQ中，但这个短暂的高峰的积压是允许，等高峰期一过，MQ积压的数据就能够迅速被处理。 消息队列的缺点缺点有以下几个： 系统可用性降低引入的外部依赖越多，风险就越高。本来只是调用几个系统的接口就可以了，现在引入MQ之后，如果MQ挂了，整个系统就崩溃了。 系统复杂性提高引入MQ之后，需要考虑很多问题。例如如何保证消息传递的顺序，保证消息没有重复消费和怎么处理消息丢失的情况。 数据一致性问题A系统将数据放到MQ将返回成功了，但如果B系统数据丢失了，那就会造出数据不一致了。 ActiveMQ、RabbitMQ、RocketMQ和kafka有什么优缺点 特性 ActiveMQ RabbitMQ RocketMQ kafka 单机吞吐量 万级，比RocketMQ、kafka低一级 同ActiveMQ 10万级，支撑高吞吐 10万级，高吞吐，一般配合大数据类的系统机型实时数据计算，日志采集等场景 topic数量对吞吐量的影响 topic可以达到几百/几千的级别，这是RocketMQ的优势，在同等机器下，可以支撑大量的topic topic从几十到几百个左右的时候，吞吐量会大幅度下降，kafka尽量保证topic数量不要过多，如果要支撑大规模的topic，需要增加更多的机器资源 时效性 ms级 微秒级，这是RabbitMQ的一大特点，延迟最低 ms级 延迟在ms级以内 可用性 高，基于主从架构实现高可用 同ActiveMQ 非常高，分布式架构 非常高，分布式，一个数据多个副本，少数机器宕机，不会丢失数据，不会导致不可用 消息可靠性 有较低的概率丢失数据 基本不丢 经过参数优化配置，可以做到0丢失 同RocketMQ 功能支持 MQ领域的功能极其完备 基于erlang开发，并发能力很强，性能极好，延时很低 MQ功能较为完善，还是分布式的，扩展性好 功能较为简单，主要支持简单的MQ功能，在大数据领域的实时计算以及日志采集被大规模使用 综上，各种对比之后，有如下建议： 一般的业务系统要引入 MQ，最早大家都用 ActiveMQ，但是现在确实大家用的不多了，没经过大规模吞吐量场景的验证，社区也不是很活跃，所以大家还是算了吧，我个人不推荐用这个了； 后来大家开始用 RabbitMQ，但是确实 erlang 语言阻止了大量的 Java 工程师去深入研究和掌控它，对公司而言，几乎处于不可控的状态，但是确实人家是开源的，比较稳定的支持，活跃度也高； 不过现在确实越来越多的公司会去用 RocketMQ，确实很不错，毕竟是阿里出品，但社区可能有突然黄掉的风险（目前 RocketMQ 已捐给 Apache，但 GitHub 上的活跃度其实不算高）对自己公司技术实力有绝对自信的，推荐用 RocketMQ，否则回去老老实实用 RabbitMQ 吧，人家有活跃的开源社区，绝对不会黄。 所以中小型公司，技术实力较为一般，技术挑战不是特别高，用 RabbitMQ 是不错的选择；大型公司，基础架构研发实力较强，用 RocketMQ 是很好的选择。 如果是大数据领域的实时计算、日志采集等场景，用 Kafka 是业内标准的，绝对没问题，社区活跃度很高，绝对不会黄，何况几乎是全世界这个领域的事实性规范。]]></content>
       <categories>
-        <category>Hello</category>
+        <category>消息队列</category>
       </categories>
       <tags>
         <tag>分布式</tag>
