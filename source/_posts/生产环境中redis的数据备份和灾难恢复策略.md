@@ -1,8 +1,8 @@
 ---
 title: 生产环境中redis的数据备份和灾难恢复策略
 date: 2019-09-22 22:20:15
-tags: redis
-categories: redis
+tags: Redis
+categories: Redis
 ---
 
 > 本节思维导图
