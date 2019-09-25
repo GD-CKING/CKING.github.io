@@ -69,6 +69,34 @@ repl-diskless-sync-delay 5
 
 ![主从复制全过程](Redis的主从复制架构/主从复制全过程.png)
 
+### 数据同步相关的核心机制
+
+​		数据同步相关的核心机制指的就是第一次slave连接master的时候，执行的**全量复制**，这个过程里面的一些细节的机制。
+
+#### master和slave都会维护一个offset
+
+​		master会在自身不断累加offset，slave也会在自身不断累加offset。slave每秒都会上报自己的offset给master，同时master也会保存每个slave的offset。
+
+​		这个不是特定就用在全量复制的，**主要是master和slave都要知道各自的数据的offset，才能知道互相之间的数据不一致的情况**。
+
+#### backlog
+
+​		master node有一个backlog，默认是1MB大小。master node在给slave node复制数据时，也会将数据在backlog中同步写一份。**backlog主要是用来做全量复制中断开后的增量复制的**。
+
+#### master run id
+
+​		`info server`可以看到master run id。
+
+​		上面说过，根据host+ip定位master node是不靠谱的，**如果master node重启或者数据发生了变化，那么slave node应该根据不同的run id区分，run id不同就做全量复制**。如果需要不更改run id重启redis，可以使用`redis-cli debug reload`命令。
+
+![run id](Redis的主从复制架构/run id.png)
+
+#### psync
+
+​		从节点使用`psync`从master node进行复制，psync runid offset
+
+​		master node会根据自身的情况返回相应信息，可能是`FULLRESYNC runid offset`触发全量复制，可能是`CONTINUE`触发增量复制。
+
 ### 全量复制
 
 - master执行bgsave，在本地生成一份RDB快照文件
