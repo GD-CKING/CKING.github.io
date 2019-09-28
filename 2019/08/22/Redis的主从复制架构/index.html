@@ -91,7 +91,9 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/08/22/Redis的主从复制架构/%E4%B8%BB%E4%BB%8E.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/08/22/Redis的主从复制架构/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/08/22/Redis的主从复制架构/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%85%A8%E8%BF%87%E7%A8%8B.png">
-<meta property="og:updated_time" content="2019-09-04T15:15:43.788Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/22/Redis的主从复制架构/master.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/22/Redis的主从复制架构/slave.png">
+<meta property="og:updated_time" content="2019-09-28T03:33:52.191Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis的主从复制架构">
 <meta name="twitter:description" content="本节思维导图   Redis主从架构​        单机的Redis，能够承载的QPS大概在上万到几万不等。对于缓存来说，一般都是用来支撑读高并发的。因此架构设计成主从（master-slave）架构，一主多从，主负责写，并且将数据复制到其他的slave节点，从节点复制读。所有的读请求全部走从节点。这样也可以轻松实现水平扩容，支撑读高并发。  ​        redis replicatio">
@@ -404,6 +406,15 @@
 <h3 id="复制的完整流程"><a href="#复制的完整流程" class="headerlink" title="复制的完整流程"></a>复制的完整流程</h3><p>​        slave node启动时，会在自己本地保存master node的信息，包括master node的<code>host</code>和<code>ip</code>，但是复制流程没开始。</p>
 <p>​        slave node内部有个定时任务，每秒检查是否有新的master node要连接和复制，如果发现，就跟master node建立socket网络连接。然后master node发送<code>ping</code>命令给master node。如果master设置了requirepass，那么slave node必须发送masterauth的口令过去进行认证。master node<strong>第一次执行全量复制</strong>，将所有数据发送给slave node，而在后续，master node持续将写命令，异步复制给slave node。</p>
 <p><img src="/CKING.github.io/2019/08/22/Redis的主从复制架构/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%85%A8%E8%BF%87%E7%A8%8B.png" alt="主从复制全过程"></p>
+<h3 id="数据同步相关的核心机制"><a href="#数据同步相关的核心机制" class="headerlink" title="数据同步相关的核心机制"></a>数据同步相关的核心机制</h3><p>​        数据同步相关的核心机制指的就是第一次slave连接master的时候，执行的<strong>全量复制</strong>，这个过程里面的一些细节的机制。</p>
+<h4 id="master和slave都会维护一个offset"><a href="#master和slave都会维护一个offset" class="headerlink" title="master和slave都会维护一个offset"></a>master和slave都会维护一个offset</h4><p>​        master会在自身不断累加offset，slave也会在自身不断累加offset。slave每秒都会上报自己的offset给master，同时master也会保存每个slave的offset。</p>
+<p>​        这个不是特定就用在全量复制的，<strong>主要是master和slave都要知道各自的数据的offset，才能知道互相之间的数据不一致的情况</strong>。</p>
+<h4 id="backlog"><a href="#backlog" class="headerlink" title="backlog"></a>backlog</h4><p>​        master node有一个backlog，默认是1MB大小。master node在给slave node复制数据时，也会将数据在backlog中同步写一份。<strong>backlog主要是用来做全量复制中断开后的增量复制的</strong>。</p>
+<h4 id="master-run-id"><a href="#master-run-id" class="headerlink" title="master run id"></a>master run id</h4><p>​        <code>info server</code>可以看到master run id。</p>
+<p>​        上面说过，根据host+ip定位master node是不靠谱的，<strong>如果master node重启或者数据发生了变化，那么slave node应该根据不同的run id区分，run id不同就做全量复制</strong>。如果需要不更改run id重启redis，可以使用<code>redis-cli debug reload</code>命令。</p>
+<p>![run id](Redis的主从复制架构/run id.png)</p>
+<h4 id="psync"><a href="#psync" class="headerlink" title="psync"></a>psync</h4><p>​        从节点使用<code>psync</code>从master node进行复制，psync runid offset</p>
+<p>​        master node会根据自身的情况返回相应信息，可能是<code>FULLRESYNC runid offset</code>触发全量复制，可能是<code>CONTINUE</code>触发增量复制。</p>
 <h3 id="全量复制"><a href="#全量复制" class="headerlink" title="全量复制"></a>全量复制</h3><ul>
 <li><p>master执行bgsave，在本地生成一份RDB快照文件</p>
 </li>
@@ -430,6 +441,25 @@
 <h3 id="redis如何才能做到高可用"><a href="#redis如何才能做到高可用" class="headerlink" title="redis如何才能做到高可用"></a>redis如何才能做到高可用</h3><p>​        一个slave故障了，并不会影响可用性，还有其他的slave在提供服务。但master node死掉了，会导致无法写数据。没有master可以写数据，slave也就没用了，系统就不可用了。</p>
 <p>​        redis的高可用架构，叫做<code>failover</code><strong>故障转移</strong>，也可以叫做主备切换。</p>
 <p>​        master node在故障时，自动检测，并且将某个slave node自动切换为master node的过程，叫做主备切换。这个过程就实现了redis的主从架构下的高可用。</p>
+<h2 id="主从复制的配置"><a href="#主从复制的配置" class="headerlink" title="主从复制的配置"></a>主从复制的配置</h2><p>​        讲了那么多，我们来看看如何配置，从而实现主从架构。</p>
+<p>​        首先先配置从节点:</p>
+<ol>
+<li>打开从节点的配置文件，搜索replicaof （低版本的有些是slaveof），去配置从节点要连接的主节点。如<code>replicaof 192.168.1.1 6379</code>，其中<code>192.168.1.1</code>是我们主节点的IP地址。</li>
+<li>在配置文件中搜索<code>replica-read-only</code>（低版本的有些是slave-read-only），将该属性配置为也是：<code>replica-read-only yes</code>，这样就开启了只读redis从节点，它会拒绝所有的写操作，这样可以强制搭建读写分离的架构，从而实现读写分离。</li>
+<li>在配置文件中搜索<code>masterauth</code>，来配置主节点redis的连接口令。如<code>masterauth redis-pass</code>，其中<code>redis-pass</code>就是主节点的认证口令。</li>
+<li>在配置文件中搜索bind，将<code>bind 127.0.0.1</code>改成bind 自己的IP地址。bind 127.0.0.1是本地的开发调式的模式，就只有127.0.0.1本地才能访问到6379的端口。</li>
+<li>强制开启6379端口<code>iptables -A INPUT -ptcp --dport  6379 -j ACCEPT</code>。（这一步有时可以省略）</li>
+</ol>
+<p>​        配置主节点：</p>
+<ol>
+<li>打开主节点的配置文件，搜索<code>requirepass</code>，配置主节点的认证口令，使其与从节点配置的<code>masterauth</code>保持一致。</li>
+<li>在配置文件中搜索bind，将<code>bind 127.0.0.1</code>改成bind 自己的IP地址。</li>
+<li>强制开启6379端口<code>iptables -A INPUT -ptcp --dport  6379 -j ACCEPT</code>。（这一步有时可以省略）</li>
+</ol>
+<p>​        这样主从架构就配置好了，我们测试一下，先启动主节点，再启动从节点。进入主节点的redis中，执行<code>info replication</code>查看相关信息</p>
+<p><img src="/CKING.github.io/2019/08/22/Redis的主从复制架构/master.png" alt="master"></p>
+<p>​        同样的，进入从节点的redis，执行<code>info replication</code>查看相关信息</p>
+<p><img src="/CKING.github.io/2019/08/22/Redis的主从复制架构/slave.png" alt="slave"></p>
 
       
     </div>
@@ -633,7 +663,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis主从架构"><span class="nav-number">1.</span> <span class="nav-text">Redis主从架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#redis-replication的核心机制"><span class="nav-number">1.1.</span> <span class="nav-text">redis replication的核心机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redis主从复制的核心原理"><span class="nav-number">1.2.</span> <span class="nav-text">redis主从复制的核心原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主从复制的断点续传"><span class="nav-number">1.3.</span> <span class="nav-text">主从复制的断点续传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无磁盘化复制"><span class="nav-number">1.4.</span> <span class="nav-text">无磁盘化复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过期key处理"><span class="nav-number">1.5.</span> <span class="nav-text">过期key处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复制的完整流程"><span class="nav-number">1.6.</span> <span class="nav-text">复制的完整流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全量复制"><span class="nav-number">1.7.</span> <span class="nav-text">全量复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#增量复制"><span class="nav-number">1.8.</span> <span class="nav-text">增量复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#heartbeat"><span class="nav-number">1.9.</span> <span class="nav-text">heartbeat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步复制"><span class="nav-number">1.10.</span> <span class="nav-text">异步复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redis如何才能做到高可用"><span class="nav-number">1.11.</span> <span class="nav-text">redis如何才能做到高可用</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis主从架构"><span class="nav-number">1.</span> <span class="nav-text">Redis主从架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#redis-replication的核心机制"><span class="nav-number">1.1.</span> <span class="nav-text">redis replication的核心机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redis主从复制的核心原理"><span class="nav-number">1.2.</span> <span class="nav-text">redis主从复制的核心原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主从复制的断点续传"><span class="nav-number">1.3.</span> <span class="nav-text">主从复制的断点续传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无磁盘化复制"><span class="nav-number">1.4.</span> <span class="nav-text">无磁盘化复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过期key处理"><span class="nav-number">1.5.</span> <span class="nav-text">过期key处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复制的完整流程"><span class="nav-number">1.6.</span> <span class="nav-text">复制的完整流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据同步相关的核心机制"><span class="nav-number">1.7.</span> <span class="nav-text">数据同步相关的核心机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#master和slave都会维护一个offset"><span class="nav-number">1.7.1.</span> <span class="nav-text">master和slave都会维护一个offset</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#backlog"><span class="nav-number">1.7.2.</span> <span class="nav-text">backlog</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#master-run-id"><span class="nav-number">1.7.3.</span> <span class="nav-text">master run id</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#psync"><span class="nav-number">1.7.4.</span> <span class="nav-text">psync</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全量复制"><span class="nav-number">1.8.</span> <span class="nav-text">全量复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#增量复制"><span class="nav-number">1.9.</span> <span class="nav-text">增量复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#heartbeat"><span class="nav-number">1.10.</span> <span class="nav-text">heartbeat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步复制"><span class="nav-number">1.11.</span> <span class="nav-text">异步复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redis如何才能做到高可用"><span class="nav-number">1.12.</span> <span class="nav-text">redis如何才能做到高可用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制的配置"><span class="nav-number">2.</span> <span class="nav-text">主从复制的配置</span></a></li></ol></div>
             
 
           </div>
