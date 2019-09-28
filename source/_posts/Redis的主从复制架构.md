@@ -138,3 +138,29 @@ repl-diskless-sync-delay 5
 ​		redis的高可用架构，叫做`failover`**故障转移**，也可以叫做主备切换。
 
 ​		master node在故障时，自动检测，并且将某个slave node自动切换为master node的过程，叫做主备切换。这个过程就实现了redis的主从架构下的高可用。
+
+## 主从复制的配置
+
+​		讲了那么多，我们来看看如何配置，从而实现主从架构。
+
+​		首先先配置从节点:
+
+1. 打开从节点的配置文件，搜索replicaof （低版本的有些是slaveof），去配置从节点要连接的主节点。如`replicaof 192.168.1.1 6379`，其中`192.168.1.1`是我们主节点的IP地址。
+2. 在配置文件中搜索`replica-read-only`（低版本的有些是slave-read-only），将该属性配置为也是：`replica-read-only yes`，这样就开启了只读redis从节点，它会拒绝所有的写操作，这样可以强制搭建读写分离的架构，从而实现读写分离。
+3. 在配置文件中搜索`masterauth`，来配置主节点redis的连接口令。如`masterauth redis-pass`，其中`redis-pass`就是主节点的认证口令。
+4. 在配置文件中搜索bind，将`bind 127.0.0.1`改成bind 自己的IP地址。bind 127.0.0.1是本地的开发调式的模式，就只有127.0.0.1本地才能访问到6379的端口。
+5. 强制开启6379端口`iptables -A INPUT -ptcp --dport  6379 -j ACCEPT`。（这一步有时可以省略）
+
+​        配置主节点：
+
+1. 打开主节点的配置文件，搜索`requirepass`，配置主节点的认证口令，使其与从节点配置的`masterauth`保持一致。
+2. 在配置文件中搜索bind，将`bind 127.0.0.1`改成bind 自己的IP地址。
+3. 强制开启6379端口`iptables -A INPUT -ptcp --dport  6379 -j ACCEPT`。（这一步有时可以省略）
+
+​        这样主从架构就配置好了，我们测试一下，先启动主节点，再启动从节点。进入主节点的redis中，执行`info replication`查看相关信息
+
+![master](Redis的主从复制架构/master.png)
+
+​		同样的，进入从节点的redis，执行`info replication`查看相关信息
+
+![slave](Redis的主从复制架构/slave.png)
