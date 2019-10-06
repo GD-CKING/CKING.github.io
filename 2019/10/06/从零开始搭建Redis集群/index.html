@@ -87,17 +87,17 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="​        Redis Cluster集群，要求至少3个master去组成一个高可用，健壮的分布式的集群，每个master都建议至少给一个slave，因此，最少要求3个master，3个slave。在正式环境中，建议在6台机器上搭建。也可是3台，但要保证每个master都跟自己的slave不在同一台机器上。 搭建Redis​        搭建Redis Cluster之前，我们需要先搭建r">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/redis.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/%E5%BC%80%E5%90%AF%E5%90%AF%E5%8A%A8.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/add-node.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/4096.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/slave.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/del.png">
-<meta property="og:updated_time" content="2019-10-06T07:32:41.367Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/redis.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/%E5%BC%80%E5%90%AF%E5%90%AF%E5%8A%A8.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/add-node.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/4096.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/slave.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/del.png">
+<meta property="og:updated_time" content="2019-10-06T07:41:55.176Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零开始搭建Redis集群">
 <meta name="twitter:description" content="​        Redis Cluster集群，要求至少3个master去组成一个高可用，健壮的分布式的集群，每个master都建议至少给一个slave，因此，最少要求3个master，3个slave。在正式环境中，建议在6台机器上搭建。也可是3台，但要保证每个master都跟自己的slave不在同一台机器上。 搭建Redis​        搭建Redis Cluster之前，我们需要先搭建r">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/redis.png">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/redis.png">
 
 
 
@@ -386,7 +386,7 @@
 <li>安装好之后再次执行<code>make &amp;&amp; make test &amp;&amp; make install</code>进行编译，需要等待一定的时间。等他编译好之后，有可能会报一个warning，这个可以不用管它。</li>
 <li>这样我们就把redis装好了。执行<code>ls</code>查看redis文件夹下的文件</li>
 </ol>
-<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/redis.png" alt="redis"></p>
+<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/redis.png" alt="redis"></p>
 <h2 id="生产环境的redis启动方案"><a href="#生产环境的redis启动方案" class="headerlink" title="生产环境的redis启动方案"></a>生产环境的redis启动方案</h2><p>​        在生产环境中，要把redis作为一个系统的daemon进程去执行，每次系统启动，redis进程也一起启动。</p>
 <ol>
 <li>在redis_util目录中，有个redis_init_scipt脚本。将这个脚本拷贝到Linux的/etc/init.d目录中，将redis_init_script重命名为redis_6379,6379使我们希望这个redis实例监听的端口号。<code>cp redis_init_script /etc/init.d/redis_6379</code></li>
@@ -406,7 +406,7 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># chkconfig:   2345 90 10</span><br><span class="line"></span><br><span class="line"># description:  Redis is a persistent key-value database</span><br></pre></td></tr></table></figure>
 
-<p> <img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/%E5%BC%80%E5%90%AF%E5%90%AF%E5%8A%A8.png" alt="开启启动"></p>
+<p> <img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/%E5%BC%80%E5%90%AF%E5%90%AF%E5%8A%A8.png" alt="开启启动"></p>
 <h2 id="搭建Redis-Cluster"><a href="#搭建Redis-Cluster" class="headerlink" title="搭建Redis Cluster"></a>搭建Redis Cluster</h2><p>​        现在开始搭建redis集群。这个案例模拟的是在三台服务器上搭建redis cluster。在搭建redis集群的时候先关闭所有的redis实例。在搭建之前，先了解几个redis cluster的重要配置：</p>
 <ul>
 <li>cluster-enabled &lt;yes/no&gt;</li>
@@ -461,7 +461,7 @@
 <li><p>在7001服务器上执行<code>redis-cli --cluster add-node 192.168.0.114:7007 192.168.0.112:7001</code>，将新增的7007redis实例增加到redis cluster中。</p>
 </li>
 <li><p>执行<code>redis-cli --cluster check 192.168.0.114:7007</code>查看redis cluster的情况，可以看到7007实例已经作为master新增到redis cluster中。但这个master只有0个hash slots，所以我们还要给他分配hash slots.</p>
-<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/add-node.png" alt="add-node"></p>
+<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/add-node.png" alt="add-node"></p>
 </li>
 <li><p>因为16364 / 4 = 4096，因此需要从其他三个master中迁移总共4096个节点到7007上。在任意一台服务器上执行<code>redis-cli --cluster reshard 192.168.0.112 7001</code>。执行后会出现<code>How many slots do you want to move (from 1 to 16384)?</code>，这是询问你要迁移多少slots，我们输入4096。执行后会出现<code>What is the receiving node ID?</code>这是询问你要迁移到哪里去，根据上图可知7007的ID是<code>eb9267b3f16da7317e0f13f7f42fd2f2cf0857a1</code>，输入进行执行。然后会出现<code>Please enter all the source node IDs.
 Type &#39;all&#39; to use all the nodes as source nodes for the hash slots.
@@ -470,18 +470,18 @@ Type &#39;done&#39; once you entered all the source nodes IDs.</code>。这是�
 <li><p>再次执行<code>redis-cli --cluster check 192.168.0.114:7007</code>查看redis cluster的情况。可以看到此时7007已经有4096个slots了。</p>
 </li>
 </ol>
-<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/4096.png" alt="4096"></p>
+<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/4096.png" alt="4096"></p>
 <h3 id="增加slave节点"><a href="#增加slave节点" class="headerlink" title="增加slave节点"></a>增加slave节点</h3><ol>
 <li>先按照上述操作，新建一个端口号为7008的redis实例，并启动。</li>
 <li>执行<code>redis-cli --cluster add-node 192.168.0.114:7008 192.168.0.112:7001 --cluster-slave --cluster-master-id f7b8e55612bce7574deecd57827e3b8203c1c9a6</code>。其中的master-id是7004redis的ID。意思是将7008挂载为7004的slave。</li>
 <li>执行<code>redis-cli --cluster 192.168.0.113:7004</code>查看7004的情况，可以看到7008已经是7004的slave了，但之前7001本来是7004的slave，却挂载到本来没有slave的7007master上，称为7007的slave。</li>
 </ol>
-<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/slave.png" alt="slave"></p>
+<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/slave.png" alt="slave"></p>
 <h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><ol>
 <li><p>删除master之前。先用reshard将数据迁移到其他节点，确保node为空后，才能执行remove操作</p>
 </li>
 <li><p>假设我们要删除7007节点，先执行<code>redis-cli --cluster reshard 192.168.0.112:7001</code>，然后输入1365，将1365个slot迁移到其中一个master中。然后再依次迁移1365和1366个slot到另外两个master中。此时7007零个slots。</p>
-<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/git/CKING.github.io/source/_posts/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BARedis%E9%9B%86%E7%BE%A4/del.png" alt="del"></p>
+<p><img src="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/del.png" alt="del"></p>
 </li>
 <li><p>执行<code>redis-cli --cluster del-node 192.168.0.112:7001 eb9267b3f16da7317e0f13f7f42fd2f2cf0857a1</code>,，其中那串ID是7007的ID。当你清空了一个master的hashslot时，redis cluster就会自动将其slave挂载到其他master上去，这个时候就只要删除掉master就可以了。</p>
 </li>
