@@ -1,11 +1,3 @@
----
-title: 从零开始搭建Redis集群
-date: 2019-10-04 21:11:15
-tags: Redis
-categories: Redis
-
----
-
 ​		Redis Cluster集群，要求至少3个master去组成一个高可用，健壮的分布式的集群，每个master都建议至少给一个slave，因此，最少要求3个master，3个slave。在正式环境中，建议在6台机器上搭建。也可是3台，但要保证每个master都跟自己的slave不在同一台机器上。
 
 ## 搭建Redis
@@ -136,3 +128,40 @@ categories: Redis
 
 11. 这样就创建好集群了，它会帮你指定好谁当master谁当slave。你查看后觉得没问题就输入`yes`即可。
 
+## 节点的增加与删除
+
+### 增加master节点
+
+1. 先按照上述操作，新建一个端口号为7007的redis实例，并启动。
+
+2. 在7001服务器上执行`redis-cli --cluster add-node 192.168.0.114:7007 192.168.0.112:7001`，将新增的7007redis实例增加到redis cluster中。
+
+3. 执行` redis-cli --cluster check 192.168.0.114:7007`查看redis cluster的情况，可以看到7007实例已经作为master新增到redis cluster中。但这个master只有0个hash slots，所以我们还要给他分配hash slots.
+
+   ![add-node](从零开始搭建Redis集群/add-node.png)
+
+4. 因为16364 / 4 = 4096，因此需要从其他三个master中迁移总共4096个节点到7007上。在任意一台服务器上执行`redis-cli --cluster reshard 192.168.0.112 7001`。执行后会出现`How many slots do you want to move (from 1 to 16384)?`，这是询问你要迁移多少slots，我们输入4096。执行后会出现`What is the receiving node ID? `这是询问你要迁移到哪里去，根据上图可知7007的ID是`eb9267b3f16da7317e0f13f7f42fd2f2cf0857a1`，输入进行执行。然后会出现`Please enter all the source node IDs.
+     Type 'all' to use all the nodes as source nodes for the hash slots.
+     Type 'done' once you entered all the source nodes IDs.`。这是让我们输入数据源的redis的ID，我们输入另外3个master的ID后输入done，之后再输入yes即可。
+
+5. 再次执行`redis-cli --cluster check 192.168.0.114:7007`查看redis cluster的情况。可以看到此时7007已经有4096个slots了。
+
+![4096](从零开始搭建Redis集群/4096.png)
+
+### 增加slave节点
+
+1. 先按照上述操作，新建一个端口号为7008的redis实例，并启动。
+2. 执行`redis-cli --cluster add-node 192.168.0.114:7008 192.168.0.112:7001 --cluster-slave --cluster-master-id f7b8e55612bce7574deecd57827e3b8203c1c9a6`。其中的master-id是7004redis的ID。意思是将7008挂载为7004的slave。
+3. 执行`redis-cli --cluster 192.168.0.113:7004`查看7004的情况，可以看到7008已经是7004的slave了，但之前7001本来是7004的slave，却挂载到本来没有slave的7007master上，称为7007的slave。
+
+![slave](从零开始搭建Redis集群/slave.png)
+
+### 删除节点
+
+1. 删除master之前。先用reshard将数据迁移到其他节点，确保node为空后，才能执行remove操作
+
+2. 假设我们要删除7007节点，先执行`redis-cli --cluster reshard 192.168.0.112:7001`，然后输入1365，将1365个slot迁移到其中一个master中。然后再依次迁移1365和1366个slot到另外两个master中。此时7007零个slots。
+
+   ![del](从零开始搭建Redis集群/del.png)
+
+3. 执行`redis-cli --cluster del-node 192.168.0.112:7001 eb9267b3f16da7317e0f13f7f42fd2f2cf0857a1`,，其中那串ID是7007的ID。当你清空了一个master的hashslot时，redis cluster就会自动将其slave挂载到其他master上去，这个时候就只要删除掉master就可以了。
