@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="分布式,">
+  <meta name="keywords" content="分布式,Redis,">
 
 
 
@@ -80,16 +80,16 @@
 
 
 <meta name="description" content="本节思维导图   Cache Aside Pattern​        最经典的缓存+ 数据库读写的模式，就是这个Cache Aside Pattern  读的时候，先读缓存，缓存没有的话，就读数据库，然后取出数据后放入缓存，同时返回请求。 更新的时候，先更新数据库，然后再删除缓存。  ​        至于为什么是删除缓存，而不是更新缓存。原因在于在复杂的缓存场景，缓存不单单是数据库中直接拉">
-<meta name="keywords" content="分布式">
+<meta name="keywords" content="分布式,Redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="保证缓存与数据库双写的一致性">
 <meta property="og:url" content="https://github.com/2019/09/08/保证缓存与数据库双写的一致性/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
 <meta property="og:description" content="本节思维导图   Cache Aside Pattern​        最经典的缓存+ 数据库读写的模式，就是这个Cache Aside Pattern  读的时候，先读缓存，缓存没有的话，就读数据库，然后取出数据后放入缓存，同时返回请求。 更新的时候，先更新数据库，然后再删除缓存。  ​        至于为什么是删除缓存，而不是更新缓存。原因在于在复杂的缓存场景，缓存不单单是数据库中直接拉">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/09/08/保证缓存与数据库双写的一致性/%E7%BC%93%E5%AD%98%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8F%8C%E5%86%99%E4%B8%80%E8%87%B4%E6%80%A7.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/09/08/保证缓存与数据库双写的一致性/%E5%88%9D%E7%BA%A7%E9%97%AE%E9%A2%98.png">
-<meta property="og:updated_time" content="2019-09-08T13:51:34.500Z">
+<meta property="og:updated_time" content="2019-11-03T09:14:47.565Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="保证缓存与数据库双写的一致性">
 <meta name="twitter:description" content="本节思维导图   Cache Aside Pattern​        最经典的缓存+ 数据库读写的模式，就是这个Cache Aside Pattern  读的时候，先读缓存，缓存没有的话，就读数据库，然后取出数据后放入缓存，同时返回请求。 更新的时候，先更新数据库，然后再删除缓存。  ​        至于为什么是删除缓存，而不是更新缓存。原因在于在复杂的缓存场景，缓存不单单是数据库中直接拉">
@@ -129,7 +129,7 @@
 
 
 
-  <title>保证缓存与数据库双写的一致性 | Hexo</title>
+  <title>保证缓存与数据库双写的一致性 | Ckin's Blog</title>
   
 
 
@@ -159,7 +159,7 @@
     <div class="custom-logo-site-title">
       <a href="/CKING.github.io/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">Ckin's Blog</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -281,13 +281,13 @@
     <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/08/保证缓存与数据库双写的一致性/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Cking">
+      <meta itemprop="name" content="Ckin">
       <meta itemprop="description" content>
       <meta itemprop="image" content="/CKING.github.io/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="Ckin's Blog">
     </span>
 
     
@@ -332,6 +332,17 @@
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
                     <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -433,6 +444,8 @@
         <div class="post-tags">
           
             <a href="/CKING.github.io/tags/分布式/" rel="tag"># 分布式</a>
+          
+            <a href="/CKING.github.io/tags/Redis/" rel="tag"># Redis</a>
           
         </div>
       
@@ -541,7 +554,7 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">Cking</p>
+              <p class="site-author-name" itemprop="name">Ckin</p>
               <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
           </div>
 
@@ -552,7 +565,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-count">46</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -574,7 +587,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
@@ -631,7 +644,7 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">Cking</span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
 
   
 </div>

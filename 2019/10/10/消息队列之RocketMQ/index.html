@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="消息队列,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="​        RocketMQ是阿里开源并贡献给Apache基金会的一款分布式消息平台，具有低延迟。高性能和可靠性、万亿级容量和灵活的可伸缩性的特点。单机也可以支持亿级的消息堆积能力、单机写入TPS单实例越7万条/秒，单机部署3个Broker，最高可以跑到12万条/秒。 RocketMQ的基本构成​        整个RocketMQ消息系统主要由4个部分组成。 ​        从中间件服务">
+<meta name="keywords" content="消息队列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="消息队列之RocketMQ">
+<meta property="og:url" content="https://github.com/2019/10/10/消息队列之RocketMQ/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="​        RocketMQ是阿里开源并贡献给Apache基金会的一款分布式消息平台，具有低延迟。高性能和可靠性、万亿级容量和灵活的可伸缩性的特点。单机也可以支持亿级的消息堆积能力、单机写入TPS单实例越7万条/秒，单机部署3个Broker，最高可以跑到12万条/秒。 RocketMQ的基本构成​        整个RocketMQ消息系统主要由4个部分组成。 ​        从中间件服务">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-03T09:03:48.383Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="消息队列之RocketMQ">
+<meta name="twitter:description" content="​        RocketMQ是阿里开源并贡献给Apache基金会的一款分布式消息平台，具有低延迟。高性能和可靠性、万亿级容量和灵活的可伸缩性的特点。单机也可以支持亿级的消息堆积能力、单机写入TPS单实例越7万条/秒，单机部署3个Broker，最高可以跑到12万条/秒。 RocketMQ的基本构成​        整个RocketMQ消息系统主要由4个部分组成。 ​        从中间件服务">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2019/10/10/消息队列之RocketMQ/">
+
+
+
+
+
+  <title>消息队列之RocketMQ | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/10/10/消息队列之RocketMQ/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">消息队列之RocketMQ</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-10T14:33:59+08:00">
+                2019-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>​        RocketMQ是阿里开源并贡献给Apache基金会的一款分布式消息平台，具有低延迟。高性能和可靠性、万亿级容量和灵活的可伸缩性的特点。单机也可以支持亿级的消息堆积能力、单机写入TPS单实例越7万条/秒，单机部署3个Broker，最高可以跑到12万条/秒。</p>
+<h2 id="RocketMQ的基本构成"><a href="#RocketMQ的基本构成" class="headerlink" title="RocketMQ的基本构成"></a>RocketMQ的基本构成</h2><p>​        整个RocketMQ消息系统主要由4个部分组成。</p>
+<p>​        从中间件服务角度来看整个RocketMQ消息系统（服务端）主要分为：<strong>NameSrv</strong>和<strong>Broker</strong>两个部分。</p>
+<h3 id="NameSrv"><a href="#NameSrv" class="headerlink" title="NameSrv"></a>NameSrv</h3><p>​        在RocketMQ分布式消息系统中，NameSrv主要提供两个功能：</p>
+<ul>
+<li>提供服务发现和注册。这里主要是管理Broker，NameSrv接受来自Broker的注册，并通过心跳机制来检测Broker服务的健康性。</li>
+<li>提供路由功能。集群（这里是指以集群方式部署的NameSrv）中的每个NameSrv都保存了Broker集群（这是是指以集群方式部署的Broker）中整个的路由信息和队列信息。这里需要注意，在NameSrv集群中，每个NameSrv都是相互独立的，所以每个Broker需要连接所有的NameSrv，每创建一个新的topic都要同步到所有的NameSrv上。</li>
+</ul>
+<h3 id="Broker"><a href="#Broker" class="headerlink" title="Broker"></a>Broker</h3><p>​        主要是负责消息的存储、传递、查询以及高可用（HA）保证等。其由如下几个子模块构成：</p>
+<ul>
+<li>remoting：是Broker的服务入口，负责客户端的接入（Producer和Consumer）和请求处理。</li>
+<li>client：管理客户端和维护消费者对于Topic的订阅。</li>
+<li>store：提供针对存储和消息查询的简单的API（数据存储在物理磁盘）。</li>
+<li>HA：提供数据在主从节点间同步的功能特性。</li>
+<li>Index：通过特定的key构建消息索引，并提供快速的索引查询服务。</li>
+</ul>
+<p>​        而从客户端的角度看主要有：<strong>Producer</strong>、<strong>Consumer</strong>两个部分。</p>
+<h3 id="Producer"><a href="#Producer" class="headerlink" title="Producer"></a>Producer</h3><p>​        消息的生产者，由用户进行分布式部署，消息有Producer通过多种负载均衡模式发送到Broker集群，发送低延时，支持快速失败。</p>
+<h3 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h3><p>​        消息的消费者，也有用户部署，支持PUSH和PULL两种消费模式，支持集群消费和广播消费，提供实时的消息订阅机制，满足大多数消费场景。</p>
+<h2 id="RocketMQ的其他概念"><a href="#RocketMQ的其他概念" class="headerlink" title="RocketMQ的其他概念"></a>RocketMQ的其他概念</h2><h3 id="Producer-Group"><a href="#Producer-Group" class="headerlink" title="Producer Group"></a>Producer Group</h3><p>​        相同角色的生产者被组织到一起。在事务提交后，生产组中不同实例都可以连接broker执行提交或回滚事务，以防原生产者在提交后就挂掉。</p>
+<h3 id="Consumer-Group"><a href="#Consumer-Group" class="headerlink" title="Consumer Group"></a>Consumer Group</h3><p>​        具有完全相同角色的消费者被组合在一起并命名为消费者组，消费群体是一个很好的概念，它在消费信息方面实现负载平衡和容错目标是非常容易的。另外，<strong>消费者组的消费者实例必须具有完全相同的主题订阅。</strong></p>
+<h3 id="Topic"><a href="#Topic" class="headerlink" title="Topic"></a>Topic</h3><p>​        主题是生产者提供消息和消费者提取消息的类别。主题与生产者和消费者的关系非常松散，具体而言，一个主题可能有零个，一个或多个向其发送消息的生产者；相反，生产者可以发送不同主题的信息。从消费者的角度来看，一个主题可能有零个，一个或多个消费者群体订阅。同样，一个消费群体可以订阅一个或多个主题，只要这个群体的实例保持其订阅的一致性即可。</p>
+<h3 id="Message"><a href="#Message" class="headerlink" title="Message"></a>Message</h3><p>​        消息是要传递的信息。一条信息必须要有一个主题，可以将其解释为要发送给您的信件的地址。一条消息也可能有一个可选标签和额外的键值对。例如，你可以为消息设置业务密钥，并在Broker上查找消息以在开发期间诊断问题。</p>
+<h3 id="Message-Queue"><a href="#Message-Queue" class="headerlink" title="Message Queue"></a>Message Queue</h3><p>​        主题被划分为一个或多个子主题，这就是消息队列。</p>
+<h3 id="Tag"><a href="#Tag" class="headerlink" title="Tag"></a>Tag</h3><p>​        标签可以理解为更细一级的主题，为使用者提供更灵活的查找。使用标签，来自同一业务模块的具有不同目的消息可能就有相同的主题和不同的标签。标签将有助于保持代码的清洁和一致性，并且标签还可以方便RocketMQ提供的查询系统。</p>
+<h3 id="Message-Order"><a href="#Message-Order" class="headerlink" title="Message Order"></a>Message Order</h3><p>​        当使用DefaultMQPushConsumer时，你可能需要决定消费是顺序的还是并发的。</p>
+<ul>
+<li>Orderly（顺序）：有序的消息意味着消息的使用顺序与生产者为每个消息队列发送的顺序相同。如果你的使用场景要求是必须顺序的，你要确保只用一个队列存放消息。如果消费顺序被指定，最大的消费并发数就是这个消费者组的消息队列的订阅数。</li>
+<li>Concurrently（并发）：并发使用消息时，消费消息的最大并发性仅受限于为每个消费者客户端指定的线程池。</li>
+</ul>
+<h2 id="安装RocketMQ"><a href="#安装RocketMQ" class="headerlink" title="安装RocketMQ"></a>安装RocketMQ</h2><h3 id="1、下载Apache最新rocketmq二进制压缩文件"><a href="#1、下载Apache最新rocketmq二进制压缩文件" class="headerlink" title="1、下载Apache最新rocketmq二进制压缩文件"></a>1、下载Apache最新rocketmq二进制压缩文件</h3><p>​        可以到官网下载后上传到服务器上，也可以用<code>wget</code>命令。    </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://www.apache.org/dyn/closer.cgi?path=rocketmq/4.5.2/rocketmq-all-4.5.2-bin-release.zip/</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、解压安装"><a href="#2、解压安装" class="headerlink" title="2、解压安装"></a>2、解压安装</h3><p>​        使用<code>unzip</code>命令进行解压。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip -d /usr/local rocketmq-all-4.5.2-bin-release.zip</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、环境变量"><a href="#3、环境变量" class="headerlink" title="3、环境变量"></a>3、环境变量</h3><p>​        配置环境变量 <code>vi /etc/profile</code>。添加如下代码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export NAMESRV_ADDR=127.0.0.1:9876</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、启动RocketMQ"><a href="#4、启动RocketMQ" class="headerlink" title="4、启动RocketMQ"></a>4、启动RocketMQ</h3><p>​        进入rocketmq的bin目录，修改<code>runserver.sh</code>，如下代码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JAVA_OPT="$&#123;JAVA_OPT&#125; -server -Xms8g -Xmx8g -Xmn4g -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=320m"</span><br></pre></td></tr></table></figure>
+
+<p>​        主要根据自己机器内存酌情修改-Xms -Xmx -Xmn这几个参数的内存。</p>
+<p>​        同理修改bin目录下的<code>runbroker.sh</code>的JVM参数。</p>
+<p>​        进入conf目录，修改<code>broker.conf</code>，新增一行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brokerIP1=xx.xx.xx.xx  # 你的公网IP</span><br></pre></td></tr></table></figure>
+
+<p>​        然后开始启动mqnamesrv，进入到rocket目录，执行<code>nohup sh bin/mqnamesrv &amp;</code>启动namesrv，然后再执行<code>nohup sh bin/mqbroker -n localhost:9876 -c conf/broker.conf &amp;</code>启动broker。</p>
+<p>​        执行<code>jps</code>，看namesrv和broker是否启动成功，如果没成功。可以通过执行<code>tail -f ~/logs/rocketmqlogs/namesrv.log</code>和<code>tail -f ~/logs/rocketmqlogs/broker.log</code>查看相应日志。</p>
+<h2 id="RocketMQ集群模式"><a href="#RocketMQ集群模式" class="headerlink" title="RocketMQ集群模式"></a>RocketMQ集群模式</h2><p>​        RocketMQ集群部署有多种方式，对于NameSrv来说可以同时部署多个节点，并且这些节点间也不需要有任何的信息同步，因为这里每个NameSrv节点都会存储全量路由信息。在NameSrv集群模式下，每个Broker都需要同时向集群中的每个NameSrv节点发送注册信息，所以这里对于NameSrv的集群部署来说并不需要做什么额外的设置。</p>
+<p>​        而对于Broker集群来说就有多种模式了，主要有如下几个模式：</p>
+<h3 id="单个Master模式"><a href="#单个Master模式" class="headerlink" title="单个Master模式"></a>单个Master模式</h3><p>​        一个Broker作为主服务，不设置任何Slave，这种方式风险比较大，存在单节点故障会导致整个基于消息的服务挂掉，所以生产环境不可能采用这种模式。</p>
+<h3 id="多Master模式"><a href="#多Master模式" class="headerlink" title="多Master模式"></a>多Master模式</h3><p>​        这种模式的Broker集群，全是Master，没有Slave。</p>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><p>​        配置会比较简单一些，如果单个Master挂掉或重启维护的话对应用是没有什么影响的。如果磁盘配置为RAID10（服务器的磁盘阵列模式）的话，即使在机器宕机不可恢复的情况下，由于RAID10磁盘本身的可靠性，消息也不会丢失（异步刷盘丢失少量消息，同步刷盘一条不丢），这个Broker的集群模式性能相对来说是最高的。</p>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><p>​        在单台机器宕机期间，这台机器上未被消费的消息在机器恢复之前是不可以进行消息订阅的，这对消息的实时性有一些影响。</p>
+<h3 id="多Master多Slave模式（异步复制）"><a href="#多Master多Slave模式（异步复制）" class="headerlink" title="多Master多Slave模式（异步复制）"></a>多Master多Slave模式（异步复制）</h3><p>​        这种模式下的Broker集群存在多个Master节点，并且每个Master节点都会对应一个Slave节点，有多对Master-Slave，HA（高可用）之间采用异步复制的方式进行信息同步，在这种方式下主从之间会有短暂的毫秒级的消息延迟。</p>
+<h4 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h4><p>​        这种模式下即使磁盘损坏了，消息丢失的情况也非常少，因为主从之间有消息备份。并且，这种模式下的实时性也不会受影响，因为Master宕机后Slave可以自动切换为Master模式，这样Consumer仍然可以通过Slave进行消息消费，而这个过程对应用来说是完全透明的，并不需要人工干预。另外，这种模式的性能与多Master模式几乎差不多。</p>
+<h4 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h4><p>​        如果Master宕机，并且在磁盘损坏的情况下，会丢失少量的消息。</p>
+<h3 id="多Master多Slave模式（同步复制）"><a href="#多Master多Slave模式（同步复制）" class="headerlink" title="多Master多Slave模式（同步复制）"></a>多Master多Slave模式（同步复制）</h3><p>​        这种模式与上面那个差不多，只是HA采用的是同步双写的方式，即主备都写成功后，才会向应用返回成功。</p>
+<h4 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h4><p>​        这种模式下数据与服务不存在单点的情况，在Master宕机的情况下，消息也没有延迟，服务的可用性以及数据的可用性都非常高。</p>
+<h4 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h4><p>​        性能相比于异步复制略低一些（大约10%）。</p>
+<h2 id="SpringBoot整合RocketMQ"><a href="#SpringBoot整合RocketMQ" class="headerlink" title="SpringBoot整合RocketMQ"></a>SpringBoot整合RocketMQ</h2><p>​        这里主要讲解一下生产者和消费者的代码，完整的项目代码已上传到<a href="https://github.com/GD-CKING/demo/tree/master/rocketmq_demo">github</a>上。</p>
+<h3 id="消息生产者RocketMQProvider"><a href="#消息生产者RocketMQProvider" class="headerlink" title="消息生产者RocketMQProvider"></a>消息生产者RocketMQProvider</h3><p>​        以顺序发消息为例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.rocketmqDemo.rocketmq;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.producer.DefaultMQProducer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.producer.MessageQueueSelector;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.producer.SendResult;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.Message;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.MessageQueue;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Value;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"><span class="keyword">import</span> org.springframework.util.StopWatch;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RocketMQProvider</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;apache.rocketmq.producer.producerGroup&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String producerGroup;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;apache.rocketmq.namesrvAddr&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String namesrvAddr;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">defaultMQProducer</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//生产组的名称</span></span><br><span class="line">        DefaultMQProducer producer = <span class="keyword">new</span> DefaultMQProducer(producerGroup);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//指定NameServer地址，多个地址以;隔开</span></span><br><span class="line">        producer.setNamesrvAddr(namesrvAddr);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//Producer对象在使用之前必须要调用start初始化，初始化一次即可</span></span><br><span class="line">            <span class="comment">//注意：切记不可以在每次发送消息时，都调用start方法</span></span><br><span class="line">            producer.start();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//创建一个消息实例，包含topic、tag和消息体</span></span><br><span class="line">            <span class="comment">//如下：topic为"TopicTest"，tag为"push"</span></span><br><span class="line">            Message message = <span class="keyword">new</span> Message(<span class="string">"TopicTest"</span>, <span class="string">"push"</span>, <span class="string">"发送消息----"</span>.getBytes());</span><br><span class="line"></span><br><span class="line">            StopWatch stop = <span class="keyword">new</span> StopWatch();</span><br><span class="line"></span><br><span class="line">            stop.start();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">                SendResult result = producer.send(message, <span class="keyword">new</span> MessageQueueSelector() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="function"><span class="keyword">public</span> MessageQueue <span class="title">select</span><span class="params">(List&lt;MessageQueue&gt; mqs, Message msg, Object arg)</span> </span>&#123;</span><br><span class="line">                        Integer id = (Integer) arg;</span><br><span class="line">                        <span class="keyword">int</span> index = id % mqs.size();</span><br><span class="line">                        <span class="keyword">return</span> mqs.get(index);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;, <span class="number">1</span>);</span><br><span class="line">                System.out.println(<span class="string">"发送相应：MsgId: "</span> + result.getMsgId() + <span class="string">".发送状态: "</span> + result.getSendStatus());</span><br><span class="line">            &#125;</span><br><span class="line">            stop.stop();</span><br><span class="line">            System.out.println(<span class="string">"-----------------------发送十条消息耗时："</span> + stop.getTotalTimeMillis());</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            producer.shutdown();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        一般消息时通过轮询所有队列来发送的（负载均衡策略），顺序消息可以根据业务发送到同一个队列。比如将订单号相同的消息发送到同一个队列。下面的代码中指定了1,1处这个值相同的获取到的队列是同一个队列。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SendResult result = producer.send(message, <span class="keyword">new</span> MessageQueueSelector() &#123;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> MessageQueue <span class="title">select</span><span class="params">(List&lt;MessageQueue&gt; mqs, Message msg, Object arg)</span> </span>&#123;</span><br><span class="line">         Integer id = (Integer) arg;</span><br><span class="line">         <span class="keyword">int</span> index = id % mqs.size();</span><br><span class="line">         <span class="keyword">return</span> mqs.get(index);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="消息消费者RocketMQConsumer"><a href="#消息消费者RocketMQConsumer" class="headerlink" title="消息消费者RocketMQConsumer"></a>消息消费者RocketMQConsumer</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.rocketmqDemo.rocketmq;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.consumer.ConsumeFromWhere;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.MessageExt;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Value;</span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.CommandLineRunner;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RocketMQConsumer</span> <span class="keyword">implements</span> <span class="title">CommandLineRunner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//消费者的组名</span></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;apache.rocketmq.consumer.PushConsumer&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String consumerGroup;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;apache.rocketmq.namesrvAddr&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String namesrvAddr;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">defaultMQPushConsumer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        DefaultMQPushConsumer consumer = <span class="keyword">new</span> DefaultMQPushConsumer(consumerGroup);</span><br><span class="line"></span><br><span class="line">        consumer.setNamesrvAddr(namesrvAddr);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//订阅PushTopic下Tag为push的消息</span></span><br><span class="line">            consumer.subscribe(<span class="string">"TopicTest"</span>, <span class="string">"push"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//设置Consumer第一次启动是从头部开始消费还是队列尾部开始消费</span></span><br><span class="line">            <span class="comment">//如果非第一次启动，那么按照上次消费的位置继续消费</span></span><br><span class="line">            consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);</span><br><span class="line">            consumer.registerMessageListener((MessageListenerConcurrently)(list, context)-&gt; &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">for</span>(MessageExt messageExt : list) &#123;</span><br><span class="line">                        <span class="comment">//输出消息内容</span></span><br><span class="line">                        System.out.println(<span class="string">"messageExt: "</span> + messageExt);</span><br><span class="line"></span><br><span class="line">                        String messageBody = <span class="keyword">new</span> String(messageExt.getBody());</span><br><span class="line"></span><br><span class="line">                        <span class="comment">//输出消息内容</span></span><br><span class="line">                        System.out.println(<span class="string">"消费响应：msgId : "</span> + messageExt.getMsgId() + <span class="string">", msgBody : "</span> + messageBody);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                    <span class="comment">//稍后重试</span></span><br><span class="line">                    <span class="keyword">return</span> ConsumeConcurrentlyStatus.RECONSUME_LATER;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//消费成功</span></span><br><span class="line">                <span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS;</span><br><span class="line">            &#125;);</span><br><span class="line">            consumer.start();</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(String... args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.defaultMQPushConsumer();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        消费者中我们实现了<code>CommandLineRunner</code>接口。它的作用是让消费者在springboot启动时执行。具体可以参考<a href="https://blog.csdn.net/qq_34531925/article/details/82527066" target="_blank" rel="noopener">CommandLineRunnable详解</a>。</p>
+<p>​        项目成功启动后，测试的结果应该是：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span>-<span class="number">10</span>-<span class="number">11</span> <span class="number">17</span>:<span class="number">13</span>:<span class="number">50</span><span class="variable">.785</span>  INFO <span class="number">12872</span> --- [nio-<span class="number">8080</span>-exec-<span class="number">2</span>] o<span class="variable">.a</span><span class="variable">.c</span><span class="variable">.c</span><span class="variable">.C</span>.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'</span><br><span class="line"><span class="number">2019</span>-<span class="number">10</span>-<span class="number">11</span> <span class="number">17</span>:<span class="number">13</span>:<span class="number">50</span><span class="variable">.785</span>  INFO <span class="number">12872</span> --- [nio-<span class="number">8080</span>-exec-<span class="number">2</span>] o<span class="variable">.s</span><span class="variable">.web</span><span class="variable">.servlet</span><span class="variable">.DispatcherServlet</span>        : Initializing Servlet 'dispatcherServlet'</span><br><span class="line"><span class="number">2019</span>-<span class="number">10</span>-<span class="number">11</span> <span class="number">17</span>:<span class="number">13</span>:<span class="number">50</span><span class="variable">.793</span>  INFO <span class="number">12872</span> --- [nio-<span class="number">8080</span>-exec-<span class="number">2</span>] o<span class="variable">.s</span><span class="variable">.web</span><span class="variable">.servlet</span><span class="variable">.DispatcherServlet</span>        : Completed initialization in <span class="number">8</span> ms</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">51</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233301</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785231900</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEAFFF, commitLogOffset=<span class="number">28225535</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">52</span>, CONSUME_START_TIME=<span class="number">1570785233370</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">50</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233233</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785231856</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEAF4D, commitLogOffset=<span class="number">28225357</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">52</span>, CONSUME_START_TIME=<span class="number">1570785233370</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">52</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233346</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785231943</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEB0B1, commitLogOffset=<span class="number">28225713</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">53</span>, CONSUME_START_TIME=<span class="number">1570785233411</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">53</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233387</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785231986</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEB163, commitLogOffset=<span class="number">28225891</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">54</span>, CONSUME_START_TIME=<span class="number">1570785233453</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">54</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233430</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785232028</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEB215, commitLogOffset=<span class="number">28226069</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">55</span>, CONSUME_START_TIME=<span class="number">1570785233495</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">55</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233472</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785232071</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEB2C7, commitLogOffset=<span class="number">28226247</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">56</span>, CONSUME_START_TIME=<span class="number">1570785233538</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">56</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233516</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785232114</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEB379, commitLogOffset=<span class="number">28226425</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">57</span>, CONSUME_START_TIME=<span class="number">1570785233580</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">57</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233557</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785232156</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEB42B, commitLogOffset=<span class="number">28226603</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">58</span>, CONSUME_START_TIME=<span class="number">1570785233622</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">58</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233600</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785232199</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEB4DD, commitLogOffset=<span class="number">28226781</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">59</span>, CONSUME_START_TIME=<span class="number">1570785233665</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br><span class="line">发送相应：MsgId: <span class="number">847</span>F127D324818B4AAC2373225500000.发送状态: SEND_OK</span><br><span class="line">-----------------------发送十条消息耗时：<span class="number">1479</span></span><br><span class="line">messageExt: MessageExt [queueId=<span class="number">1</span>, storeSize=<span class="number">178</span>, queueOffset=<span class="number">59</span>, sysFlag=<span class="number">0</span>, bornTimestamp=<span class="number">1570785233642</span>, bornHost=/<span class="number">61</span><span class="variable">.144</span><span class="variable">.97</span><span class="variable">.110</span>:<span class="number">2191</span>, storeTimestamp=<span class="number">1570785232241</span>, storeHost=/<span class="number">47</span><span class="variable">.105</span><span class="variable">.176</span><span class="variable">.129</span>:<span class="number">10911</span>, msgId=<span class="number">2</span>F69B08100002A9F0000000001AEB58F, commitLogOffset=<span class="number">28226959</span>, bodyCRC=<span class="number">800335203</span>, reconsumeTimes=<span class="number">0</span>, preparedTransactionOffset=<span class="number">0</span>, toString()=Message [topic=TopicTest, flag=<span class="number">0</span>, properties=&#123;MIN_OFFSET=<span class="number">0</span>, MAX_OFFSET=<span class="number">60</span>, CONSUME_START_TIME=<span class="number">1570785233707</span>, UNIQ_KEY=<span class="number">847</span>F127D324818B4AAC2373225500000, WAIT=true, TAGS=push&#125;, body=<span class="number">16</span>]]</span><br><span class="line">消费响应：msgId : <span class="number">847</span>F127D324818B4AAC2373225500000, msgBody : 发送消息----</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.jianshu.com/p/04a98ba770a4" target="_blank" rel="noopener">Centos7下安装Rocket</a></p>
+<p><a href="https://blog.csdn.net/q258523454/article/details/82716027?utm_source=blogxgwz4" target="_blank" rel="noopener">RocketMQ连接异常</a></p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzU3NDY4NzQwNQ==&mid=2247484461&idx=1&sn=72794d12ffe3c8ec3520fdba1c87c3b3&chksm=fd2fd5efca585cf955d240bbabd99b24262d255a3880454297f10a84e4c38445bc7b9d3ba339&scene=21" target="_blank" rel="noopener">基于RocketMQ搭建生产级消息集群</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/消息队列/" rel="tag"># 消息队列</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2019/10/08/外观模式/" rel="next" title="外观模式">
+                <i class="fa fa-chevron-left"></i> 外观模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2019/10/18/JVM之垃圾回收/" rel="prev" title="JVM之垃圾回收">
+                JVM之垃圾回收 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ的基本构成"><span class="nav-number">1.</span> <span class="nav-text">RocketMQ的基本构成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NameSrv"><span class="nav-number">1.1.</span> <span class="nav-text">NameSrv</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Broker"><span class="nav-number">1.2.</span> <span class="nav-text">Broker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Producer"><span class="nav-number">1.3.</span> <span class="nav-text">Producer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Consumer"><span class="nav-number">1.4.</span> <span class="nav-text">Consumer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ的其他概念"><span class="nav-number">2.</span> <span class="nav-text">RocketMQ的其他概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Producer-Group"><span class="nav-number">2.1.</span> <span class="nav-text">Producer Group</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Consumer-Group"><span class="nav-number">2.2.</span> <span class="nav-text">Consumer Group</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Topic"><span class="nav-number">2.3.</span> <span class="nav-text">Topic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Message"><span class="nav-number">2.4.</span> <span class="nav-text">Message</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Message-Queue"><span class="nav-number">2.5.</span> <span class="nav-text">Message Queue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tag"><span class="nav-number">2.6.</span> <span class="nav-text">Tag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Message-Order"><span class="nav-number">2.7.</span> <span class="nav-text">Message Order</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装RocketMQ"><span class="nav-number">3.</span> <span class="nav-text">安装RocketMQ</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、下载Apache最新rocketmq二进制压缩文件"><span class="nav-number">3.1.</span> <span class="nav-text">1、下载Apache最新rocketmq二进制压缩文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、解压安装"><span class="nav-number">3.2.</span> <span class="nav-text">2、解压安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、环境变量"><span class="nav-number">3.3.</span> <span class="nav-text">3、环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、启动RocketMQ"><span class="nav-number">3.4.</span> <span class="nav-text">4、启动RocketMQ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ集群模式"><span class="nav-number">4.</span> <span class="nav-text">RocketMQ集群模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单个Master模式"><span class="nav-number">4.1.</span> <span class="nav-text">单个Master模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多Master模式"><span class="nav-number">4.2.</span> <span class="nav-text">多Master模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点"><span class="nav-number">4.2.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点"><span class="nav-number">4.2.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多Master多Slave模式（异步复制）"><span class="nav-number">4.3.</span> <span class="nav-text">多Master多Slave模式（异步复制）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点-1"><span class="nav-number">4.3.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点-1"><span class="nav-number">4.3.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多Master多Slave模式（同步复制）"><span class="nav-number">4.4.</span> <span class="nav-text">多Master多Slave模式（同步复制）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点-2"><span class="nav-number">4.4.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点-2"><span class="nav-number">4.4.2.</span> <span class="nav-text">缺点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SpringBoot整合RocketMQ"><span class="nav-number">5.</span> <span class="nav-text">SpringBoot整合RocketMQ</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#消息生产者RocketMQProvider"><span class="nav-number">5.1.</span> <span class="nav-text">消息生产者RocketMQProvider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息消费者RocketMQConsumer"><span class="nav-number">5.2.</span> <span class="nav-text">消息消费者RocketMQConsumer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

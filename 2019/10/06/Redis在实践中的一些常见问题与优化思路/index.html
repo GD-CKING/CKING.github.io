@@ -84,7 +84,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis在实践中的一些常见问题与优化思路">
 <meta property="og:url" content="https://github.com/2019/10/06/Redis在实践中的一些常见问题与优化思路/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
 <meta property="og:description" content="fork耗时操作导致高并发请求延时​        Redis在开启RDB和AOF持久化机制的时候，会有生成RDB快照，AOF rewrite等耗费磁盘IO的操作，此时主进程会fork子进程去执行。fork的时候，子进程需要拷贝父进程的空间内存页表的，这个也会耗费一定的时间。一般来说，如果父进程内存有1个G的数据，那么fork可能会耗费20ms左右，如果是10G30G，那么就会耗费200600ms">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/06/Redis在实践中的一些常见问题与优化思路/%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.png">
@@ -128,7 +128,7 @@
 
 
 
-  <title>Redis在实践中的一些常见问题与优化思路 | Hexo</title>
+  <title>Redis在实践中的一些常见问题与优化思路 | Ckin's Blog</title>
   
 
 
@@ -158,7 +158,7 @@
     <div class="custom-logo-site-title">
       <a href="/CKING.github.io/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">Ckin's Blog</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -280,13 +280,13 @@
     <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/10/06/Redis在实践中的一些常见问题与优化思路/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Cking">
+      <meta itemprop="name" content="Ckin">
       <meta itemprop="description" content>
       <meta itemprop="image" content="/CKING.github.io/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="Ckin's Blog">
     </span>
 
     
@@ -467,6 +467,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/" rel="prev" title="消息队列之RabbitMQ">
+                消息队列之RabbitMQ <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -534,7 +538,7 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">Cking</p>
+              <p class="site-author-name" itemprop="name">Ckin</p>
               <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
           </div>
 
@@ -545,7 +549,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-count">46</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -567,7 +571,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
@@ -624,7 +628,7 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">Cking</span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
 
   
 </div>

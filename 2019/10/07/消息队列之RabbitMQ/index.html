@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="消息队列,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="​        RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息在传输过程中的安全。 基础概念​        RabbitMQ中除了正常的生产者消费者之外，还有一些其他的概念来支撑这样一个复杂的消息队列。 Broker​        Broker是消息服务中间件的一个服务节点，大部分情况下可以把一个Broker看成一个Rabb">
+<meta name="keywords" content="消息队列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="消息队列之RabbitMQ">
+<meta property="og:url" content="https://github.com/2019/10/07/消息队列之RabbitMQ/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="​        RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息在传输过程中的安全。 基础概念​        RabbitMQ中除了正常的生产者消费者之外，还有一些其他的概念来支撑这样一个复杂的消息队列。 Broker​        Broker是消息服务中间件的一个服务节点，大部分情况下可以把一个Broker看成一个Rabb">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/broker.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E9%98%9F%E5%88%97.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E4%BA%A4%E6%8D%A2%E6%9C%BA.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/direct.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/topic.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E9%95%9C%E5%83%8F%E6%A8%A1%E5%BC%8F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%B9%8BRabbitMQ%5C%E6%B6%88%E6%81%AF%E4%BC%A0%E8%BE%93%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.png">
+<meta property="og:updated_time" content="2019-11-03T09:03:48.378Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="消息队列之RabbitMQ">
+<meta name="twitter:description" content="​        RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息在传输过程中的安全。 基础概念​        RabbitMQ中除了正常的生产者消费者之外，还有一些其他的概念来支撑这样一个复杂的消息队列。 Broker​        Broker是消息服务中间件的一个服务节点，大部分情况下可以把一个Broker看成一个Rabb">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/broker.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2019/10/07/消息队列之RabbitMQ/">
+
+
+
+
+
+  <title>消息队列之RabbitMQ | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">消息队列之RabbitMQ</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-07T20:40:02+08:00">
+                2019-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>​        RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息在传输过程中的安全。</p>
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><p>​        RabbitMQ中除了正常的生产者消费者之外，还有一些其他的概念来支撑这样一个复杂的消息队列。</p>
+<h3 id="Broker"><a href="#Broker" class="headerlink" title="Broker"></a>Broker</h3><p>​        Broker是消息服务中间件的一个服务节点，大部分情况下可以把一个Broker看成一个RabbitMQ的服务器。</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/broker.png" alt="broker"></p>
+<p>​        上图可以看出Broker相当于一个消息服务的中央节点，而我们的消息队列核心功能也就在Broker上。</p>
+<h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><p>​        消息都存储在队列中，下图是一个简单的模型。实际上，一个简单的消息队列服务只要有生成者、消费者和存储单元组成队列即可。</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E9%98%9F%E5%88%97.png" alt="队列"></p>
+<h3 id="Exchange"><a href="#Exchange" class="headerlink" title="Exchange"></a>Exchange</h3><p>​        交换机（Exchange）在RabbitMQ中承担了一些队列的逻辑处理功能。一般来说，对于生产者，我们只知道把产生的内容丢到MQ当中，但是发到哪个队列中，这一点对于生产者来说是无感知的，也不知道目前对列的状况如何。而Exchange就承担了<strong>发到哪个队列中</strong>的职责，用几种路由策略来决定如何分发给不同的队列。</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E4%BA%A4%E6%8D%A2%E6%9C%BA.png" alt="交换机"></p>
+<h3 id="Connection和Channel"><a href="#Connection和Channel" class="headerlink" title="Connection和Channel"></a>Connection和Channel</h3><p>​        每一个Connection是一条TCP连接，理论上而言每一个消费者和生产者都需要一条Connection，但是TCP连接的开销很大，所以我们会使用Channel来进行TCP复用，减少性能的开销。</p>
+<h3 id="Exchange类型"><a href="#Exchange类型" class="headerlink" title="Exchange类型"></a>Exchange类型</h3><h4 id="fanout"><a href="#fanout" class="headerlink" title="fanout"></a>fanout</h4><p>​        我们比较常用的一种Exchange类型，它会把所有发送到该交换器的消息路由到所有与该交换器绑定的队列中。</p>
+<h4 id="direct"><a href="#direct" class="headerlink" title="direct"></a>direct</h4><p>​        把消息路由到binding 可以和routing key完全匹配的队列中。</p>
+<p>​        binding key和routing key基本上可以理解为对一个Queue的称呼。</p>
+<p>​        图中Queue1叫<code>warning</code>，Queue2可以叫<code>info</code>，<code>warning</code>或者<code>debug</code>，那样Exchange叫了声<code>warning</code>的时候会有两个Queue过来拿数据，而<code>info</code>只有Queue2会回应。</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/direct.png" alt="direct"></p>
+<h4 id="topic"><a href="#topic" class="headerlink" title="topic"></a>topic</h4><p>​        direct类型太过严格，大部分我们都用不上这么严格的规则，因此有了topic。topic可以看做是一种正则表达式规则，满足正则表达式的规则就会进入队列。</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/topic.png" alt="topic"></p>
+<h4 id="headers"><a href="#headers" class="headerlink" title="headers"></a>headers</h4><p>​        这种类型根据发送信息中的header来匹配，性能差，基本没用。</p>
+<h3 id="死信队列"><a href="#死信队列" class="headerlink" title="死信队列"></a>死信队列</h3><p>​        DLX（Dead-Letter-Exchanage）。利用DLX，当消息在一个对列中变成死信之后，它能被重新publish到另一个Exchange，这个Exchange就是DLX。消息变成死信一般有以下几种情况：</p>
+<ul>
+<li>消息被拒绝（basic.reject/basic.nack）并且不再重新投递 require = false</li>
+<li>消息过期（rabbitmq Time-To-Live -&gt; messageProperties.setExpiration()）</li>
+<li>队列达到最长长度</li>
+</ul>
+<p>​        当一个消息变成死信导致队列无法处理的时候，开启死信队列，使得消息不会堆积在队列中，而换到死信队列被消费。在RabbitMQ中开启死信队列非常简单，只要配置为DLX即可。</p>
+<h3 id="公用Connection而不是Channel"><a href="#公用Connection而不是Channel" class="headerlink" title="公用Connection而不是Channel"></a>公用Connection而不是Channel</h3><p>​        公用Connection的理由在上面已经提过，那为什么不建议功能Channel呢？</p>
+<p>​        计算机网络传输信息的时候，本质上都是二进制传输，而传输的数据经过一定的处理，最终变成我们可读可处理的数据，Channel已经是复用了TCP连接的，此时如果我们再进行并行的数据传输，很有可能会导致某一帧数据的异常。</p>
+<h2 id="RabbitMQ的高可用性"><a href="#RabbitMQ的高可用性" class="headerlink" title="RabbitMQ的高可用性"></a>RabbitMQ的高可用性</h2><p>​        RabbitMQ是<strong>基于主从</strong>做高可用性的。一般来说，RabbitMQ有三种模式：单机模式、普通集群模式和镜像集群模式。</p>
+<h3 id="单机模式"><a href="#单机模式" class="headerlink" title="单机模式"></a>单机模式</h3><p>​        单机模式，就是Demo级别的，一般就是你本地启动了做做demo，基本没人生产用单机模式。</p>
+<h3 id="普通集群模式（无高可用性）"><a href="#普通集群模式（无高可用性）" class="headerlink" title="普通集群模式（无高可用性）"></a>普通集群模式（无高可用性）</h3><p>​        普通集群模式，意思就是在多台机器上启动多个RabbitMQ实例，每个机器启动一个。你<strong>创建的queue，只会放在一个RabbitMQ实例上</strong>，但是每个实例都同步queue的元数据（元数据可以认为是queue的一些配置信息，通过元数据，可以找到queue所在实例）。你消费的时候，实际上如果连接到了另一个实例，那么那个实例会从queue所在实例上拉取数据过来。</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F.png" alt="集群模式"></p>
+<p>​        这种方式不仅麻烦，而且也<strong>没做到所谓的分布式</strong>，就是个普通集群。因为这导致你要么消费者每次随机连接一个实例后拉取数据，要么固定连接那个queue所在实例消费数据，前者有<strong>数据拉取的开销</strong>，后者导致<strong>单实例性能瓶颈</strong>。</p>
+<p>​        而且如果那个放queue的实例宕机了，会导致接下来其他实例无法从那个实例拉取数据。如果你<strong>开启了消息持久化</strong>，让RabbitMQ落地存储消息的话，<strong>消息不一定会丢</strong>，得等这个实例恢复了，然后才可以继续从这个queue拉取数据。</p>
+<p>​        因此这个方案主要是<strong>用来提供吞吐量的</strong>，就是让集群中多个节点来服务某个queue的读写操作，没有所谓的高可用性。</p>
+<h3 id="镜像集群模式（高可用性）"><a href="#镜像集群模式（高可用性）" class="headerlink" title="镜像集群模式（高可用性）"></a>镜像集群模式（高可用性）</h3><p>​        这种模式，才是所谓的RabbitMQ的高可用模式。跟普通集群模式不一样的是，你创建的queue，无论元数据还是queue里的消息都会存在于多个实例上，就是说，每个RabbitMQ节点都有这个queue的一个完成镜像，包含queue的全部数据的意思。然后你每次写消息到queue的时候，都会自动把消息同步到多个实例的queue上。</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E9%95%9C%E5%83%8F%E6%A8%A1%E5%BC%8F.png" alt="镜像模式"></p>
+<p>​        如何开启镜像集群模式？RabbitMQ有很好的管理控制台，就是在后台新增一个策略，这个策略是<strong>镜像集群模式的策略</strong>，指定的时候可以要求数据同步到所有节点的，也可以要求同步指定数据的节点，再次创建queue的时候，应用这个策略，就会自动将数据同步到其他的节点上去了。</p>
+<p>​        这样处理，好处在于任何一个机器宕机了，其他机器还包含了这个queue的完整数据，别的consumer都可以到其他节点上去消费数据。坏处在于：第一，<strong>性能开销太大</strong>，消息需要同步到所有机器上，导致网络带宽压力和消耗都重；第二，这样处理并不是分布式的，<strong>没有扩展性可言</strong>，如果某个queue负载很重，你加机器，新的机器也包含了这个queue的所有数据，并没有办法线性扩展你的queue。</p>
+<h2 id="RabbitMQ的可靠性传输"><a href="#RabbitMQ的可靠性传输" class="headerlink" title="RabbitMQ的可靠性传输"></a>RabbitMQ的可靠性传输</h2><p>​        数据的丢失问题，可能出现在生产者、MQ、消费者中，如下图：</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1.png" alt="消息丢失"></p>
+<h3 id="生产者弄丢了数据"><a href="#生产者弄丢了数据" class="headerlink" title="生产者弄丢了数据"></a>生产者弄丢了数据</h3><p>​        生产者将数据发送到RabbitMQ的时候，因为网络问题或其他情况，导致数据在半路就搞丢了。</p>
+<h4 id="事务机制"><a href="#事务机制" class="headerlink" title="事务机制"></a>事务机制</h4><p>​        此时可以选择用RabbitMQ提供的事务功能，就是生产者发送数据之前开启RabbitMQ事务<code>channel.txSelect</code>，然后发送消息，如果消息没有成功被RabbitMQ接收到，那么生产者会收到异常报错，此时就可以回滚事务<code>channel.txRollback</code>，然后重试发送消息，如果收到了消息，那么可以提交事务<code>channel.txCommit</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 开启事务</span></span><br><span class="line">channel.txSelect</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 这里发送消息</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    channel.txRollback</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里再次重发这条消息</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 提交事务</span></span><br><span class="line">channel.txCommit</span><br></pre></td></tr></table></figure>
+
+<p>​        但是问题是，这样会<strong>导致吞吐量下来，因为太耗性能</strong>。</p>
+<h4 id="confirm机制"><a href="#confirm机制" class="headerlink" title="confirm机制"></a>confirm机制</h4><p>​        因此一般情况下，要确保RabbitMQ的消息别丢，可以开启confirm模式，在生产者那里设置开启confirm模式之后，你每次写的消息都会分配一个唯一的id，然后如果写入了RabbitMQ中，RabbitMQ会给你回传一个<code>ack</code>消息，告诉你这个消息OK了，如果RabbitMQ没能处理这个消息，会回调你的一个<code>nack</code>接口，告诉你这个消息接收失败，你可以重试。而且你可以结合这个机制自己在内存里维护每个消息id的状态，如果超过一定时间还没接收到这个消息的回调，那么你可以重发。</p>
+<h4 id="两个机制的区别"><a href="#两个机制的区别" class="headerlink" title="两个机制的区别"></a>两个机制的区别</h4><p>​        事务机制和<code>confirm</code>机制最大的不同在于，<strong>事务机制是同步的</strong>，你提交一个事务之后会阻塞在那，<strong>但是confirm机制是异步的</strong>，你发送个消息之后就可以发送下一个消息，然后那个消息RabbitMQ接收了之后会异步回调你的一个接口通知你这个消息接收到了。所以一般在生产者这块避免数据丢失，都是用<code>confirm</code>机制。</p>
+<h3 id="RabbitMQ弄丢了数据"><a href="#RabbitMQ弄丢了数据" class="headerlink" title="RabbitMQ弄丢了数据"></a>RabbitMQ弄丢了数据</h3><p>​        即使RabbitMQ自己弄丢了数据，这个你必须<strong>开启RabbitMQ的持久化</strong>，就是消息写入之后会持久化到磁盘，哪怕是RabbitMQ自己挂了，<strong>恢复之后会自动读取之前存储的数据</strong>，一般数据不会丢。除非RabbitMQ还没持久化，自己就挂了，<strong>可能导致少量数据丢失</strong>，但是这个概率比较小。</p>
+<p>​        设置持久化有两个步骤：</p>
+<ul>
+<li>创建queue的时候将其设置为持久化，这样就可以保证RabbitMQ持久化queue的元数据，但是它不会持久化queue里的数据。</li>
+<li>第二是是发送消息的时候将消息的<code>deliveryMode</code>设置为2，就是将消息设置为持久化的，此时RabbitMQ就会将消息持久化到磁盘上去。</li>
+</ul>
+<p>​        必须要同时设置这两个持久化才行，这样RabbitMQ哪怕是挂了，再次重启，也会从磁盘上重启恢复queue，恢复这个queue里的数据。</p>
+<p>​        但是哪怕是你给RabbitMQ开启了持久化机制，也有一种可能，就是这个消息写到了RabbitMQ中，但是还没来得及持久化到磁盘上，结果RabbitMQ挂了，就会导师内存里的一点点数据丢失。所以，持久化可以跟生产者那边的<code>confirm</code>机制配合起来，只有消息被持久化到磁盘之后，才会通知生产这<code>ack</code>了。这样即便是持久化到磁盘之前，RabbitMQ挂了，数据丢了，生产者收不到<code>ack</code>，你也是可以自己重发的。</p>
+<h3 id="消费端弄丢了数据"><a href="#消费端弄丢了数据" class="headerlink" title="消费端弄丢了数据"></a>消费端弄丢了数据</h3><p>​        如果消费端<strong>刚消费到消息，但还没处理，结果进程挂了</strong>，这样就尴尬了。RabbitMQ认为你都消费了，这数据也就丢了。</p>
+<p>​        这个时候可以用RabbitMQ提供的<code>ack</code>机制，即，你必须关闭RabbitMQ的自动<code>ack</code>,可以通过一个api来调用就行，然后每次你自己代码里确保处理完的时候，再在程序里<code>ack</code>一把。这样的话，如果你还没处理完，就没有<code>ack</code>,RabbitMQ就认为你还没处理完，这个时候RabbitMQ会把这个消费分配给别的consumer去处理，消息是不会丢的。</p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%B9%8BRabbitMQ%5C%E6%B6%88%E6%81%AF%E4%BC%A0%E8%BE%93%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.png" alt="消息传输解决方案"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/消息队列/" rel="tag"># 消息队列</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2019/10/06/Redis在实践中的一些常见问题与优化思路/" rel="next" title="Redis在实践中的一些常见问题与优化思路">
+                <i class="fa fa-chevron-left"></i> Redis在实践中的一些常见问题与优化思路
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2019/10/08/外观模式/" rel="prev" title="外观模式">
+                外观模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础概念"><span class="nav-number">1.</span> <span class="nav-text">基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Broker"><span class="nav-number">1.1.</span> <span class="nav-text">Broker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#队列"><span class="nav-number">1.2.</span> <span class="nav-text">队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exchange"><span class="nav-number">1.3.</span> <span class="nav-text">Exchange</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Connection和Channel"><span class="nav-number">1.4.</span> <span class="nav-text">Connection和Channel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exchange类型"><span class="nav-number">1.5.</span> <span class="nav-text">Exchange类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#fanout"><span class="nav-number">1.5.1.</span> <span class="nav-text">fanout</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#direct"><span class="nav-number">1.5.2.</span> <span class="nav-text">direct</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#topic"><span class="nav-number">1.5.3.</span> <span class="nav-text">topic</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#headers"><span class="nav-number">1.5.4.</span> <span class="nav-text">headers</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#死信队列"><span class="nav-number">1.6.</span> <span class="nav-text">死信队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#公用Connection而不是Channel"><span class="nav-number">1.7.</span> <span class="nav-text">公用Connection而不是Channel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ的高可用性"><span class="nav-number">2.</span> <span class="nav-text">RabbitMQ的高可用性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单机模式"><span class="nav-number">2.1.</span> <span class="nav-text">单机模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#普通集群模式（无高可用性）"><span class="nav-number">2.2.</span> <span class="nav-text">普通集群模式（无高可用性）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#镜像集群模式（高可用性）"><span class="nav-number">2.3.</span> <span class="nav-text">镜像集群模式（高可用性）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ的可靠性传输"><span class="nav-number">3.</span> <span class="nav-text">RabbitMQ的可靠性传输</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生产者弄丢了数据"><span class="nav-number">3.1.</span> <span class="nav-text">生产者弄丢了数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#事务机制"><span class="nav-number">3.1.1.</span> <span class="nav-text">事务机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#confirm机制"><span class="nav-number">3.1.2.</span> <span class="nav-text">confirm机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#两个机制的区别"><span class="nav-number">3.1.3.</span> <span class="nav-text">两个机制的区别</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RabbitMQ弄丢了数据"><span class="nav-number">3.2.</span> <span class="nav-text">RabbitMQ弄丢了数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消费端弄丢了数据"><span class="nav-number">3.3.</span> <span class="nav-text">消费端弄丢了数据</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

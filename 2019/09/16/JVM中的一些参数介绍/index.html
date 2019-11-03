@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="一步一步往上走">
+<meta name="description" content="JVM配置常用参数堆参数   参数 描述    -Xms 设置JVM启动时堆内存的初始化大小   -Xmx 设置堆内存最大值   -Xmn 设置年轻代的空间大小，剩下的为老年代的空间大小   -XX:PermGen 设置永久代内存的初始化大小（JDK1.8开始废弃了永久代）   -XX:MaxPermGen 设置永久代的最大值   -XX:SurvivorRatio 设置Eden区和Survivo">
 <meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM中的一些参数介绍">
 <meta property="og:url" content="https://github.com/2019/09/16/JVM中的一些参数介绍/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="一步一步往上走">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="JVM配置常用参数堆参数   参数 描述    -Xms 设置JVM启动时堆内存的初始化大小   -Xmx 设置堆内存最大值   -Xmn 设置年轻代的空间大小，剩下的为老年代的空间大小   -XX:PermGen 设置永久代内存的初始化大小（JDK1.8开始废弃了永久代）   -XX:MaxPermGen 设置永久代的最大值   -XX:SurvivorRatio 设置Eden区和Survivo">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-09-25T14:09:37.993Z">
+<meta property="og:updated_time" content="2019-11-03T09:03:48.244Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM中的一些参数介绍">
-<meta name="twitter:description" content="一步一步往上走">
+<meta name="twitter:description" content="JVM配置常用参数堆参数   参数 描述    -Xms 设置JVM启动时堆内存的初始化大小   -Xmx 设置堆内存最大值   -Xmn 设置年轻代的空间大小，剩下的为老年代的空间大小   -XX:PermGen 设置永久代内存的初始化大小（JDK1.8开始废弃了永久代）   -XX:MaxPermGen 设置永久代的最大值   -XX:SurvivorRatio 设置Eden区和Survivo">
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <title>JVM中的一些参数介绍 | Hexo</title>
+  <title>JVM中的一些参数介绍 | Ckin's Blog</title>
   
 
 
@@ -156,7 +156,7 @@
     <div class="custom-logo-site-title">
       <a href="/CKING.github.io/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">Ckin's Blog</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -278,13 +278,13 @@
     <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/16/JVM中的一些参数介绍/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Cking">
+      <meta itemprop="name" content="Ckin">
       <meta itemprop="description" content>
       <meta itemprop="image" content="/CKING.github.io/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="Ckin's Blog">
     </span>
 
     
@@ -369,7 +369,217 @@
       
 
       
-        
+        <h2 id="JVM配置常用参数"><a href="#JVM配置常用参数" class="headerlink" title="JVM配置常用参数"></a>JVM配置常用参数</h2><h3 id="堆参数"><a href="#堆参数" class="headerlink" title="堆参数"></a>堆参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-Xms</td>
+<td>设置JVM启动时堆内存的初始化大小</td>
+</tr>
+<tr>
+<td>-Xmx</td>
+<td>设置堆内存最大值</td>
+</tr>
+<tr>
+<td>-Xmn</td>
+<td>设置年轻代的空间大小，剩下的为老年代的空间大小</td>
+</tr>
+<tr>
+<td>-XX:PermGen</td>
+<td>设置永久代内存的初始化大小（JDK1.8开始废弃了永久代）</td>
+</tr>
+<tr>
+<td>-XX:MaxPermGen</td>
+<td>设置永久代的最大值</td>
+</tr>
+<tr>
+<td>-XX:SurvivorRatio</td>
+<td>设置Eden区和Survivor区的空间比例：Eden/S0 = Eden/S1 默认为8</td>
+</tr>
+<tr>
+<td>-XX:NewRatio</td>
+<td>设置老年代与年轻代的比例大小，默认值为2</td>
+</tr>
+</tbody></table>
+<h3 id="回收器参数"><a href="#回收器参数" class="headerlink" title="回收器参数"></a>回收器参数</h3><table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">-XX:+UseSerialGC</td>
+<td align="left">串行，Young区和Old区都使用串行，使用复制算法回收，逻辑简单高效，无线程切换开销</td>
+</tr>
+<tr>
+<td align="left">-XX:+UseParallelGC</td>
+<td align="left">并行，Young区：使用Parallel scavenge回收算法，会产生多个线程并行回收。通过-XX:ParallelGCThreads=n参数指定有线程数，默认是CPU核数；Old区：单线程</td>
+</tr>
+<tr>
+<td align="left">-XX:+UseParallelOldGC</td>
+<td align="left">并行，和UseParallelGCC一样，Young区和Old区的垃圾回收时都使用多线程手机</td>
+</tr>
+<tr>
+<td align="left">-XX:+UseConcMarkSweepGC</td>
+<td align="left">并发，短暂停顿的并发收集。Young区：可以使用普通的或者parallel垃圾回收算法，由参数 -XX:+UseParNewGC来控制；Old区：只能使用Concurrent Mark Sweep</td>
+</tr>
+<tr>
+<td align="left">-XX:+UseG1GC</td>
+<td align="left">并行的、并发的和增量式压缩短暂停顿的垃圾收集器。不区分Young区和Old区空间。它把堆空间划分为多个大小相等的区域。当进行垃圾收集时，它会优先收集存活对象较少的区域，因此叫“Garbage First”</td>
+</tr>
+</tbody></table>
+<p>​        如上表所示，目前主要有<strong>串行、并行和并发</strong>三种。对于大内存的应用而言，串行的性能太低，因此使用到的主要是并行和并发两种。并行和并发GC的策略通过UseParallelGCC和UseCon从MarkSweepGC来指定，还有一些细节的配置参数用来配置策略的执行。例如：XX:ParallelGCThreads、XX:CMSInitiatingOccupancyFraction等。通常：Young区对象回收只可选择并行（耗时间），Old区选择并发（耗CPU）。</p>
+<h3 id="项目中常用配置"><a href="#项目中常用配置" class="headerlink" title="项目中常用配置"></a>项目中常用配置</h3><table>
+<thead>
+<tr>
+<th>参数设置</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-Xms4800m</td>
+<td>初始化堆空间大小</td>
+</tr>
+<tr>
+<td>-Xmx4800m</td>
+<td>最大堆空间大小</td>
+</tr>
+<tr>
+<td>-Xmn1800m</td>
+<td>年轻代的空间大小</td>
+</tr>
+<tr>
+<td>-Xss512k</td>
+<td>设置线程栈空间大小</td>
+</tr>
+<tr>
+<td>-XX:PermSize=256m</td>
+<td>永久区空间大小（jdk1.8开始废弃了永久代）</td>
+</tr>
+<tr>
+<td>-XX:MaxPermSize=256m</td>
+<td>最大永久区空间大小</td>
+</tr>
+<tr>
+<td>-XX:+UseStringCache</td>
+<td>默认开启，启用缓存常用的字符串</td>
+</tr>
+<tr>
+<td>-XX:+UseConcMarkSewwpGC</td>
+<td>老年代使用CMS收集器</td>
+</tr>
+<tr>
+<td>-XX:UseParNewGC</td>
+<td>新生代使用并行收集器</td>
+</tr>
+<tr>
+<td>-XX:ParallelGCThreads=4</td>
+<td>并行线程数量4</td>
+</tr>
+<tr>
+<td>-XX:+CMSClassUnloadingEnabled</td>
+<td>允许对类的元数据进行清理</td>
+</tr>
+<tr>
+<td>XX:+DisableExplicitGC</td>
+<td>禁止显示的GC</td>
+</tr>
+<tr>
+<td>-XX:+UseCMSInitiatingOccupancyOnly</td>
+<td>表示只有达到阈值之后才进行CMS回收</td>
+</tr>
+<tr>
+<td>-XX:CMSInitiatingOccupancyFraction=68</td>
+<td>设置CMS在老年代回收的阈值为68%</td>
+</tr>
+<tr>
+<td>-verbose:gc</td>
+<td>输出虚拟机GC详情</td>
+</tr>
+<tr>
+<td>-XX:+PrintGCDetails</td>
+<td>打印GC详情日志</td>
+</tr>
+<tr>
+<td>-XX:+PrintGCDataStamps</td>
+<td>打印GC的耗时</td>
+</tr>
+<tr>
+<td>-XX:+PrintTenuringDistribution</td>
+<td>打印Tenuring年龄信息</td>
+</tr>
+<tr>
+<td>-XX:+HeapDumpOnOutOfMemoryError</td>
+<td>当抛出OOM时进行HeapDump</td>
+</tr>
+<tr>
+<td>-XX:HeapDumpPath=/home/admin/logs</td>
+<td>指定HeapDump的文件路径或目录</td>
+</tr>
+</tbody></table>
+<h3 id="常用组合"><a href="#常用组合" class="headerlink" title="常用组合"></a>常用组合</h3><table>
+<thead>
+<tr>
+<th>Young</th>
+<th>Old</th>
+<th>JVM Options</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Serial</td>
+<td>Serial</td>
+<td>-XX:+UseSerialGC</td>
+</tr>
+<tr>
+<td>Parallel scavenge</td>
+<td>Parallel Old/Serial</td>
+<td>-XX:+UseParallelGC<br>-XX:+UseParallelOldGC</td>
+</tr>
+<tr>
+<td>Serial/Parallel scavenge</td>
+<td>CMS</td>
+<td>-XX:+UseParNewGC<br>-XX:+UseConcMarkSweepGC</td>
+</tr>
+<tr>
+<td>G1</td>
+<td></td>
+<td>-XX:+UseG1GC</td>
+</tr>
+</tbody></table>
+<h2 id="常用GC调优策略"><a href="#常用GC调优策略" class="headerlink" title="常用GC调优策略"></a>常用GC调优策略</h2><h3 id="GC调优原则"><a href="#GC调优原则" class="headerlink" title="GC调优原则"></a>GC调优原则</h3><p>​        在调优之前，我们需要记住下面的原则：</p>
+<ul>
+<li>多数的Java应用不需要在服务器上进行GC优化。</li>
+<li>多数导致GC问题的Java应用，都不是因为我们参数设置错误，而是代码问题。</li>
+<li>在应用上线之前，先考虑将机器的JVM参数设置到最优（最适合）。</li>
+<li>减少创建对象的数量。</li>
+<li>减少使用全局变量和大对象。</li>
+<li>GC优化是到最后不得已才 采用的手段。</li>
+<li>在实际使用中，分析GC情况优化代码比优化GC参数要多得多。</li>
+</ul>
+<h3 id="GC调优目的"><a href="#GC调优目的" class="headerlink" title="GC调优目的"></a>GC调优目的</h3><ul>
+<li>将转移到老年代的对象数量降低到最小。</li>
+<li>减少GC的执行时间</li>
+</ul>
+<h3 id="GC调优策略"><a href="#GC调优策略" class="headerlink" title="GC调优策略"></a>GC调优策略</h3><ul>
+<li><strong>策略1</strong>：将新对象预留在新生代，由于Full GC的成本远高于Minor GC，因此尽可能将对象分配在新生代是明智的做法，实际项目中根据GC日志分析新生代空间大小分配是否合理，适当通过“-Xmn”命令调节新生代大小，最低限度降低新对象直接进入老年代的情况。</li>
+<li><strong>策略2</strong>：大对象进入老年代，虽然在大部分情况下，将对象分配在新生代是合理的。但是对于大对象这种做法却值得商榷，大对象如果首次在新生代分配可能会出现空间不足导致很多年龄不够的小对象被分配到老年代，破坏新生代的对象结构，可能会出现频繁的full gc。因此，对于大对象，可以设置直接进入老年代（当然短命的大对象对于垃圾回收来说就是噩梦）。-<code>XX:PretenureSizeThreshold</code>可以设置直接进入老年代的对象大小。</li>
+<li><strong>策略3</strong>：合理设置进入老年代对象的年龄，-XX:MaxTenuingThreshold设置对象进入老年代的年龄大小，减少老年代的内存占用，降低full GC发送的频率。</li>
+<li><strong>策略4</strong>：设置稳定的堆大小，堆打下设置有两个参数：-Xms初始化堆大小，-Xms最大堆大小。</li>
+<li><strong>策略5</strong>：如果满足下面的指标，则一般不需要进行GC优化：<ul>
+<li>MinorGC执行时间不到50ms</li>
+<li>MinorGC执行不频繁，约10秒一次</li>
+<li>Full GC执行时间不到1s</li>
+<li>Full GC执行频率不算频繁，不低于10分钟1次。</li>
+</ul>
+</li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://mp.weixin.qq.com/s/2p0Pw6rB2onQDDUQL8kcGA" target="_blank" rel="noopener">Java应用如何调优</a></p>
+
       
     </div>
     
@@ -481,12 +691,21 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">Cking</p>
+              <p class="site-author-name" itemprop="name">Ckin</p>
               <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
           </div>
 
@@ -497,7 +716,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-count">46</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -519,7 +738,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
@@ -543,6 +762,22 @@
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM配置常用参数"><span class="nav-number">1.</span> <span class="nav-text">JVM配置常用参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#堆参数"><span class="nav-number">1.1.</span> <span class="nav-text">堆参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#回收器参数"><span class="nav-number">1.2.</span> <span class="nav-text">回收器参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目中常用配置"><span class="nav-number">1.3.</span> <span class="nav-text">项目中常用配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用组合"><span class="nav-number">1.4.</span> <span class="nav-text">常用组合</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用GC调优策略"><span class="nav-number">2.</span> <span class="nav-text">常用GC调优策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GC调优原则"><span class="nav-number">2.1.</span> <span class="nav-text">GC调优原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC调优目的"><span class="nav-number">2.2.</span> <span class="nav-text">GC调优目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC调优策略"><span class="nav-number">2.3.</span> <span class="nav-text">GC调优策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
 
@@ -560,7 +795,7 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">Cking</span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
 
   
 </div>
