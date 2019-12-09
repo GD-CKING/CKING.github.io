@@ -5,6 +5,10 @@ tags: 消息队列
 categories: 消息队列
 ---
 
+> 本节思维导图
+
+![RabbitMQ](消息队列之RabbitMQ/RabbitMQ.png)
+
 ​		RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息在传输过程中的安全。
 
 ## 基础概念
@@ -73,7 +77,7 @@ categories: 消息队列
 
 ### 公用Connection而不是Channel
 
-​		公用Connection的理由在上面已经提过，那为什么不建议功能Channel呢？
+​		公用Connection的理由在上面已经提过，那为什么不建议公用Channel呢？
 
 ​		计算机网络传输信息的时候，本质上都是二进制传输，而传输的数据经过一定的处理，最终变成我们可读可处理的数据，Channel已经是复用了TCP连接的，此时如果我们再进行并行的数据传输，很有可能会导致某一帧数据的异常。
 
@@ -167,3 +171,16 @@ channel.txCommit
 
 ![消息传输解决方案](消息队列之RabbitMQ\消息传输解决方案.png)
 
+## RabbitMQ的消息顺序性
+
+​		举个例子，一个mysql binlog同步的系统，日同步数据要达到上亿，就是说数据从一个mysql库原封不动同步到另一个mysql库里面去（mysql -> mysql）。然后你在mysql里增删改一条数据，对应出来增删改3条`binlog`日志，接着这三条`binlog`发送到MQ里面，再消费出来依次执行，要保证是按顺序执行的。否则本来是：增加、修改、删除，最后换了顺序给执行成删除、修改、增加。这就错了。
+
+​		先看看RabbitMQ消息会错乱的场景：在RabbitMQ中，一个queue，多个consumer、比如生产者向RabbitMQ里发送了三条数据，顺序依次是data1/data2/data3，压入的是RabbitMQ的一个内存队列。有三个消费者分别从MQ中消费这三条数据中的一条，结果消费者2先执行完操作，把data2存入数据库，然后是data1/data3，这样就乱了。
+
+![消息错乱](消息队列之RabbitMQ/消息错乱.png)
+
+### 解决方案
+
+​		拆分多个queue，每个queue一个consumer，就是多一些queue而已；或者就一个queue但是对应一个consumer，然后这个consumer内部用内存队列做排队，然胡分发给不同的worker来处理。
+
+![消息顺序](消息队列之RabbitMQ/消息顺序.png)
