@@ -425,3 +425,8 @@ Bootstrap（客户端引导）需要一个EventLoopGroup，但是ServerBootstrap
 ​		ByteBuf作为Netty的数据容器，通过字节数组的方式存储数据，并且通过读索引和写索引来引导读写操作。
 
 ​		上述的核心组件都是通过Bootstrap来配置并且引导启动的，Bootstrap启动方式虽然一致，但是针对客户端和服务端有些许的区别。
+
+## 参考资料
+
+[Netty底层架构原理](https://mp.weixin.qq.com/s/Sldln-i580LJusQd_YW06w)
+
