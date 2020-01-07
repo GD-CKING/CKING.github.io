@@ -191,29 +191,94 @@ public class Singleton {
 
 ​		那volatile是如何保证有序性的呢？它是如何避免指令重排的呢？这就涉及了Java中的一个原则，叫做**happens-before原则**。在编译器对代码进行代码重排序之前，要遵守happens-before原则。如果符合happens-before原则，那么就不能胡乱重排，如果不符合这些规则，那就可以自己排序。happens-before规则包括以下几个：
 
-程序次序规则：一个线程内，按照代码顺序，书写前面的操作先行发生于书写后面的操作。准确地说，应该是控制流顺序而不是程序代码顺序，因为要考虑分支、循环等结构。
+- **程序次序规则**：一个线程内，按照代码顺序，书写前面的操作先行发生于书写后面的操作。准确地说，应该是控制流顺序而不是程序代码顺序，因为要考虑分支、循环等结构。
 
-锁定规则：一个unlock操作先行发生于后面对同一个锁的lock操作。比如说在代码里对一个锁的lock.lock()、lock.unlock()、lock.lock()操作，第二个unlock操作要先行发生于第三个的lock操作，而不能重排序成lock.lock()、lock.lock()、lock.unlock()。
+- **锁定规则**：一个unlock操作先行发生于后面对同一个锁的lock操作。比如说在代码里对一个锁的lock.lock()、lock.unlock()、lock.lock()操作，第二个unlock操作要先行发生于第三个的lock操作，而不能重排序成lock.lock()、lock.lock()、lock.unlock()。
 
-volatile变量规则：对一个volatile变量的写操作先行发生于后面对这个volatile变量的读操作。volatile变量写，再读，必须保证是先写，再读。
+- **volatile变量规则**：对一个volatile变量的写操作先行发生于后面对这个volatile变量的读操作。volatile变量写，再读，必须保证是先写，再读。
 
-​		volatile经常用于以下场景：状态标记变量、Double Check、一个线程写多个线程读。
+- **传递规则**：如果操作A先行发生于操作B，而操作B又先行发生于操作C，则可以得出操作A先行发生于操作C。
 
-## 参考资料
+- **线程启动规则**：Thread对象的start()方法先行发生于此线程的每一个动作。例如thread.start()要先行发生于thread.interrupt()，而不能将thread.interrupt()重排序到thread.start()前面。
 
-[Java并发之原子性、有序性、可见性](https://juejin.im/post/5c7dfc925188251b8c769f69)
+- **线程中断规则**：对线程interrupt()方法的调用先行发生于被中断线程的代码检测到中断事件的发生。
 
+- **线程终结原则**：线程中所有的操作都先行发生于线程的终止检测。我们可以通过thread.join()方法结束、thread.isAlive()的返回值手段检测到线程已经终止执行。
 
+- **对象终结规则**：一个对象的初始化完成先行发生于它的finalize()方法的开始。
 
+  ​		这8条规则是避免出现乱七八糟扰乱秩序的指令重排，要求是这几个重要的场景下，要按照顺序来执行。这8条规则之外，可以重排指令。这happens-before规则也说明了为什么volatile为什么能保证它的有序性。因为volatile要求的是，volatile前面的代码一定不能指令重排到volatile变量操作后面，volatile后面的代码也不能指令重排到volatile前面。
 
+  ​		volatile在底层是如何保证可见性和有序性的呢？
 
+  （1）lock指令：volatile保证可见性
 
+  ​		对volatile修饰的变量，执行写操作的话，JVM会发送一条lock前缀指令给CPU，CPU在计算完之后会立即将这个值写会主内存，因为同时有MESI缓存一致性协议，所以各个CPU都会对总线进行嗅探，自己本地缓存中的数据是否被别人修改。
 
+  ​		如果发现别人修改了某个缓存的数据，那么CPU就会将自己本地缓存的数据过期掉，然后这个CPU上执行的线程在读取这个变量的时候，就会从主内存重新加载最新的数据了。
 
+  ​		lock前缀指令+ MESI缓存一致性协议
 
+  （2）内存屏障：volatile禁止指令重排序
 
+  ​		先简单了解两个指令：
 
+  Store：将处理器缓存的数据刷新到内存中
 
+  Load：将内存存储的数据拷贝到处理器的缓存中
 
-
-
+  | 屏障类型   | 指令示例                 | 说明                                                         |
+| ---------- | ------------------------ | ------------------------------------------------------------ |
+  | LoadLoad   | Load1;LoadLoad;Load2     | 该屏障确保Load1数据的装载先于Load2及其后所有装载指令的操作   |
+  | StoreStore | Store1;StoreStore;Store2 | 该屏障确保Store立刻刷新数据到内存（使其对其它处理器可见）的操作先于Store2及其后所有存储指令的操作 |
+  | LoadStore  | Load1;LoadStore;Store2   | 确保Load1的数据装载先于Store2及其后所有的存储指令刷新数据到内存的操作 |
+  | StoreLoad  | Store1;StoreLoad;Load2   | 该屏障确保Store1立刻刷新到内存的操作先于Load2及其后所有装载指令的操作。它会使屏障之前的所有内存访问指令（存储指令和访问指令）完成之后，才执行改屏障之后的内存访问指令 |
+  
+  ```java
+  Load1:
+  int localVar = this.variable
+  LoadLoad屏障
+  int localVar = this.variable2
+  ```
+  
+  ```java
+  Store1:
+  this.variable = 1
+  StoreStore屏障
+  Store2:
+  this.variable = 2
+  ```
+  
+  ​		那么volatile的作用是什么呢？
+  
+  ```java
+  volatile variable = 1
+  this.variable = 2	// store操作
+  int localVariable = this.variable	// load操作
+  ```
+  
+  ​		**每个volatile写操作前面，加StoreStore屏障，禁止上面的普通写和他重排；每个volatile写操作后面，加StoreLoad屏障，禁止跟下面的volatile读/写重排。**
+  
+  ​		**每个volatile读操作后面，加LoadLoad屏障，禁止下面的普通读和volatile读重排；每个volatile读操作后面，加LoadStore屏障，禁止下面的普通写和volatile读重排。**
+  
+  ​		volatile经常用于以下场景：状态标记变量、Double Check、一个线程写多个线程读。
+  
+  ## 参考资料
+  
+  [Java并发之原子性、有序性、可见性](https://juejin.im/post/5c7dfc925188251b8c769f69)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
