@@ -645,6 +645,515 @@ server {
 
 实现效果：使用 Nginx 反向代理，根据访问的路径跳转到不同端口的服务中：
 
+- 访问 http://127.0.0.1/java/ 直接跳转到 127.0.0.1:8080
+
+- 访问 http://127.0.0.1/egg/ 直接跳转到 127.0.0.1:8081
+
+
+
+先启动两个 springboot 项目，其中 8080 端口的项目返回 “Hello java”，8081 的端口返回 “Hello egg”。
+
+
+
+修改 nginx.conf，在 HTTP 块中添加 server{} :
+
+```nginx
+server {
+	listen 80;
+	server_name localhost;
+	
+	location ~ /java/ {
+		proxy_pass http://127.0.0.1:8080;
+	}
+	
+	location ~ /egg/ {
+		proxy_pass http://127.0.0.1:8081;
+	}
+}
+```
+
+重启 nginx，验证结果：
+
+![demo2-java](Nginx详解/demo2-java.png)
+
+![demo2-egg](Nginx详解/demo2-egg.png)
+
+### Nginx 配置：负载均衡
+
+随着互联网信息的爆炸性增长，负载均衡已经不再是一个陌生的话题。顾名思义，负载均衡是将负载分摊到不同的服务单元，既保证服务的可用性，又保证相应足够块，给用户很好的体验。Nginx 的负载均衡是 Proxy 模块和 Upstream 模块搭配实现的。Upstream 模块将会启用一个新的配置区段，在改区段定义了一组上游服务器。
+
+#### 实现效果：配置负载均衡
+
+还是使用上次两个 springboot 的项目，其中 8080 端口 返回 "Hello java"，而 8081 端口返回 "Hello egg"。
+
+
+
+接着，修改 nginx.conf：
+
+```nginx
+http {
+    upstream myserver {
+        server localhost:8080;
+        server localhost:8081;
+    }
+    server {
+        listen 80;
+        location / {
+            proxy_pass http://myserver;
+        }
+    }
+}
+```
+
+重启 Nginx，验证结果（默认轮询的方式，每次打开新窗口，8080 和 8081 会交替出现，同一个窗口的话需要关闭浏览器缓存）。
+
+
+
+Nginx 分配策略：
+
+- 轮询（默认）：每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器 Down 掉，能自动剔除。
+
+
+- Weight ：代表权重，默认为 1，权重越高被分配的客户端越多，指定轮询几率，Weight 和访问比率成正比，用于后端服务器性能不均的情况。例如：
+
+
+```nginx
+upstream server_pool {
+	server 192.168.0.1 weight=10;
+	server 192.168.0.2 weigth=10;
+}
+```
+
+- ip_hash：每个请求按访问 IP 的 Hash 结构分配，这样每个访客固定访问一个后端服务器，可以解决 session 的问题。例如：
+
+
+```nginx
+upstream server_pool {
+	ip_hash;
+	server 192.168.0.1:80;
+	server 192.168.0.2:80;
+}
+```
+
+- fair（第三方）：按后端服务器的相应时间来分配请求，相应时间短的优先分配。
+
+
+```nginx
+upstream server_pool {
+	server 192.068.0.1:80;
+	server 192.168.0.2:80;
+	fair;
+}
+```
+
+### Nginx 配置：动静分离
+
+Nginx 动静分离简单说就是把动态和静态请求分开，不能理解成只是单纯地把动态页面和静态页面物理分离。严格意义上说应该是动态跟静态请求分开，可以理解成使用 Nginx 处理静态页面，Tomcat 处理动态页面。
+
+
+
+动静分离从目前实现角度来说大致分为两种：
+
+- 纯粹把静态文件独立成单独的域名，放在独立的服务器上，也是目前主流推崇的方案；
+
+- 动态跟静态文件混合在一起发布，通过 Nginx 来分开。
+
+
+
+通过 Location 指定不同的后缀名实现不同的请求转发。通过 Expires 参数设置，可以使浏览器缓存过期时间，减少与服务器之间的请求和流量。
+
+
+
+**具体 Expires 定义**：是给一个资源设定一个过期时间，也就是说无须去服务端验证，直接通过浏览器自身确认是否过期，所以不会产生额外的流量。此种方法非常适合不经常变动的资源（如经常更新的文件，不建议使用 Expires 来缓存）
+
+
+
+我这里设置 3d，表示在这 3 天之内访问这个 URL，发送一个请求，比对服务器该文件最后更新时间没有变化，则不会从服务器抓取，返回状态码 304，如果有修改，则直接从服务器重启下载，返回状态码 200。
+
+![动静](Nginx详解/动静.png)
+
+服务器找个目录存放自己的静态文件：
+
+![静态文件目录](Nginx详解/静态文件目录.png)
+
+配置 Nginx：
+
+```nginx
+server {  
+        listen       80;#端口号  
+        server_name  localhost;#本机  
+  
+        charset utf-8;  
+  
+        #access_log  logs/host.access.log  main;  
+  
+    location ~ .*\.(gif|jpg|jpeg|png)$ {  
+        expires 24h;  
+            root /usr/data/image/;#指定图片存放路径  
+            access_log /usr/local/websrv/nginx-1.9.4/logs/images.log;#日志存放路径  
+            proxy_store on;  
+            proxy_store_access user:rw group:rw all:rw;  
+            proxy_temp_path         /usr/data/image/;#图片访问路径  
+            proxy_redirect          off;  
+            proxy_set_header        Host 127.0.0.1;  
+            client_max_body_size    10m;  
+            client_body_buffer_size 1280k;  
+            proxy_connect_timeout   900;  
+            proxy_send_timeout      900;  
+            proxy_read_timeout      900;  
+            proxy_buffer_size       40k;  
+            proxy_buffers           40 320k;  
+            proxy_busy_buffers_size 640k;  
+            proxy_temp_file_write_size 640k;  
+            if ( !-e $request_filename)  
+            {  
+                 proxy_pass  http://127.0.0.1;#默认80端口  
+            }  
+    }    
+  
+        location / {  
+           root   /home/html; #html访问路径
+           index  index.html index2.htm; #html文件名称
+
+        }
+}
+```
+
+重启 Nginx，验证结果：
+
+![动静结果](Nginx详解/动静结果.png)
+
+### Nginx 的 Rewrite
+
+Rewrite 是 Nginx 服务器提供的一个重要的功能，它可以实现 URL 重写和重定向功能。
+
+
+
+场景如下：
+
+- URL 访问跳转，支持开发设计。页面跳转、兼容性支持（新旧版本更迭）、展示效果（网址精简）等
+
+- SEO 优化（Nginx 伪静态的支持）
+
+- 后台维护、流量转发
+
+- 安全（动态界面进行伪装）
+
+
+
+该指令是通过正则表达式的使用来改变 URI。可以同时存在一个或多个指令。需要按照顺序依次对 URI 进行匹配和处理。
+
+
+
+采用反向代理 Demo2 中的例子，修改 nginx.conf（只多加一行 rewrite）
+
+```nginx
+server {
+	listen 80;
+	server_name localhost;
+	
+	location /java/ {
+		proxy_pass http://127.0.0.1:8080;
+		rewrite ^/java /egg/ redirect;
+	}
+	
+	location /egg/ {
+		proxy_pass http://127.0.0.1:8081;
+	}
+}
+```
+
+重启 nginx，验证结果（输入 ip/java/ 被重定向到 egg）：
+
+![rewrite结果](Nginx详解/rewrite结果.png)
+
+Rewrite 指令可以在 Server 块或 Location 块中配置，其基本语法结构如下：
+
+```nginx
+rewrite regex replacement [flag];
+```
+
+- rewrite 的含义：该指令是实现 URL 重写的指令。
+
+- regex 的含义：用于匹配 URI 的正则表达式。
+
+- replacement：将 regex 正则匹配到的内容替换成 replacement。
+
+- flag：flag 标记
+
+
+
+flag 有如下值：
+
+- last：本条规则匹配完成后，继续向下匹配新的 Location URI 规则（不常用）。
+
+- break：本条规则匹配完成即终止，不再匹配后面的任何规则（不常用）。
+
+- redirect：返回 302 临时重定向，浏览器地址会显示新的 URL地址。
+
+- permanent：返回 301 永久重定向。浏览器会显示跳转新的 URL 地址。
+
+
+
+```nginx
+rewrite ^/(.*) http://www.360.cn/$1 permanent;
+```
+
+## Nginx 高可用
+
+如果将 Web 服务器集群当做一个城池，那么负载均衡服务器就相当于城门。如果“城门”关闭了，与外界的通道就断了。如果只有一台 Nginx 复制均衡器，当故障宕机的时候，就会导致整个网站无法访问。所以我们需要两台以上的 Nginx 来实现故障转移和高可用。那么如何实现？
+
+### 双机热备方案
+
+这种方案是国内企业中最为普遍的一种高可用方案，双机热备其实就是指一台服务器在提供服务，另一台为某服务的备用状态，当一台服务器不可用时另一台就会顶替上去。
+
+
+
+Keepalived 是什么？Keepalived 软件起初是转为 LVS 负载均衡软件设计的，用来管理并监控 LVS 集群系统中各个服务节点的状态。后来又加入了可以实现高可用的 VRRP（Virtual Router Redundancy Protocol，虚拟路由器冗余协议）功能。因此，Keepalived 高可用服务之间的故障切换转移，是通过 VRRP 来实现的。
+
+### 故障转移机制
+
+Keepalived 高可用服务之间的故障切换转移，是通过 VRRP 来实现的。
+
+
+
+在 Keepalived 服务正常工作时，主 Master 节点会不断地向备节点发送（多播的方式）心跳消息，用以告诉 Backup 节点自己还活着。
+
+
+
+当主 Master 节点发生故障时，就无法发送心跳消息，备节点也就因此无法继续检测到来自主 Master 节点的心跳了，于是调用自身的接管程序，接管主 Master 节点的 IP 资源及服务。
+
+
+
+而当主 Master 节点恢复时，背 Backup 节点又会释放主节点故障时自身接管的 IP 资源及服务，恢复到原来的备用角色。
+
+
+
+实现方法如下：
+
+准备两台安装 Nginx 和 Keepaliver（yum install keepalived -y）的服务器
+
+修改两台服务器上的 `/etc/keepalived/keepalived.conf`
+
+```nginx
+#主机
+#检测脚本
+vrrp_script chk_http_port {
+    script "/usr/local/src/check_nginx.sh" #心跳执行的脚本，检测nginx是否启动
+    interval 2                          #（检测脚本执行的间隔，单位是秒）
+    weight 2                            #权重
+}
+#vrrp 实例定义部分
+vrrp_instance VI_1 {
+    state MASTER            # 指定keepalived的角色，MASTER为主，BACKUP为备
+    interface ens33         # 当前进行vrrp通讯的网络接口卡(当前centos的网卡) 用ifconfig查看你具体的网卡
+    virtual_router_id 66    # 虚拟路由编号，主从要一直
+    priority 100            # 优先级，数值越大，获取处理请求的优先级越高
+    advert_int 1            # 检查间隔，默认为1s(vrrp组播周期秒数)
+    #授权访问
+    authentication {
+        auth_type PASS #设置验证类型和密码，MASTER和BACKUP必须使用相同的密码才能正常通信
+        auth_pass 1111
+    }
+    track_script {
+        chk_http_port            #（调用检测脚本）
+    }
+    virtual_ipaddress {
+        192.168.16.150            # 定义虚拟ip(VIP)，可多设，每行一个
+    }
+}
+```
+
+```nginx
+# 备机
+#检测脚本
+vrrp_script chk_http_port {
+    script "/usr/local/src/check_nginx.sh" #心跳执行的脚本，检测nginx是否启动
+    interval 2                          #（检测脚本执行的间隔）
+    weight 2                            #权重
+}
+#vrrp 实例定义部分
+vrrp_instance VI_1 {
+    state BACKUP                        # 指定keepalived的角色，MASTER为主，BACKUP为备
+    interface ens33                      # 当前进行vrrp通讯的网络接口卡(当前centos的网卡) 用ifconfig查看你具体的网卡
+    virtual_router_id 66                # 虚拟路由编号，主从要一直
+    priority 99                         # 优先级，数值越大，获取处理请求的优先级越高
+    advert_int 1                        # 检查间隔，默认为1s(vrrp组播周期秒数)
+    #授权访问
+    authentication {
+        auth_type PASS #设置验证类型和密码，MASTER和BACKUP必须使用相同的密码才能正常通信
+        auth_pass 1111
+    }
+    track_script {
+        chk_http_port                   #（调用检测脚本）
+    }
+    virtual_ipaddress {
+        192.168.16.150                   # 定义虚拟ip(VIP)，可多设，每行一个
+    }
+}
+```
+
+新建检测脚本（chmod 775 check_nginx.sh）：
+
+```sh
+#!/bin/bash
+#检测nginx是否启动了
+A=`ps -C nginx --no-header |wc -l`        
+if [ $A -eq 0 ];then    #如果nginx没有启动就启动nginx                        
+      systemctl start nginx                #重启nginx
+      if [ `ps -C nginx --no-header |wc -l` -eq 0 ];then    #nginx重启失败，则停掉keepalived服务，进行VIP转移
+              killall keepalived                    
+      fi
+fi
+```
+
+启动 Nginx 和 Keepalived（systemctl start keepalived.service）
+
+模拟 Nginx 故障（关闭主服务器 Nginx），验证，仍可以通过配置的虚拟 IP 访问，OK
+
+## Nginx 原理与优化参数配置
+
+Nginx 默认采用多进程工作方式，Nginx 启动后，会运行一个 Master 进程和多个 Worker 进程。
+
+
+
+其中 Master 充当整个进程组与用户的交互接口，同时对进程进行监护，管理 Worker 进程来实现重复服务、平滑升级、更护日志文件、配置文件实时生效等功能。
+
+
+
+Worker 用来处理基本的网络事件，Worker 之间是平等的，他们共同竞争来处理来自客户端的请求。
+
+
+
+master-worker 的机制的好处：
+
+- 可以使用 `nginx -s reload` 热部署
+
+
+- 每个 Worker是独立的进程，不需要加锁，省掉了锁带来的开销。采用独立的进程，可以让互相之间不会影响。一个进程退出后，其他进程还在工作，服务不会中断，Master 进程则很快启动新的 Worker 进程。
+
+
+
+
+需要设置多少个 Worker？Nginx 同 Redis 类似都采用了 IO 多路复用机制，每个 Worker 都是独立的进程，但每个进程里只有一个主线程，通过异常非阻塞的方式来处理请求，即使是成千上万个请求也不在话下。
+
+
+
+每个 Worker 的线程可以把一个 CPU 的性能发挥到极致。所以 Worker 数和服务器的 CPU 数相等是最为适宜的。设少了浪费 CPU，设多了会造成 CPU 频繁切换上下文带来的损耗。
+
+```nginx
+#设置 worker 数量。
+ worker_processes 4 
+#work 绑定 cpu(4 work 绑定 4cpu)。 
+ worker_cpu_affinity 0001 0010 0100 1000 
+#work 绑定 cpu (4 work 绑定 8cpu 中的 4 个) 。 
+ worker_cpu_affinity 0000001 00000010 00000100 00001000
+```
+
+连接数 worker_connection：这个值是表示每个 Worker 进程所能建立连接的最大值。所以，一个 Nginx 能建立的最大连接数，应该是 worker_connections * worker_processes。
+
+
+
+当然这里说的是最大连接数，对于 HTTP 请求本地资源来说，能够支持的最大并发数量是 worker_connections * worker_process，如果是支持 http1.1 的浏览器，每次访问要占两个连接，所以普通的静态访问最大并发数是：worker_connections * worker_processes / 2。
+
+
+
+而如果是 HTTP 作为反向代理来说，最大并发数量应该是 worker_connections * worker_processes / 4，因为作为反向代理服务器，每个并发会建立与客户端的连接和与后端服务的连接，会占用两个连接。
+
+## Nginx 总结
+
+### Nginx 在项目中的作用
+
+反向代理服务器
+
+实现负载均衡
+
+做静态资源服务器
+
+作为 HTTP Server
+
+### Nginx 常用的命令
+
+```sh
+启动nginx    ./sbin/nginx
+停止nginx    ./sbin/nginx -s stop   ./sbin/nginx -s quit
+重载配置      ./sbin/nginx -s reload(平滑重启) service nginx reload
+重载指定配置文件    ./sbin/nginx -c  /usr/local/nginx/conf/nginx.conf
+查看nginx版本  ./sbin/nginx -v
+检查配置文件是否正确  ./sbin/nginx -t
+显示帮助信息  ./sbin/nginx  -h
+```
+
+### Nginx 如何实现高并发
+
+Nginx 采用的是多进程（单线程）& 多路 IO 复用模型，异步，非阻塞。
+
+
+
+一个主进程 Master，多个工作进程 Worker，每个工作进程可以处理多个请求，Master 进程主要负责收集、分发请求。每当一个请求过来时，Master 就会拉起一个 Worker 进程负责处理这个请求。同时Master进程也复制监控Work的状态，保证高可用性。
+
+
+
+在 Nginx 中的 Work 进程中，为了应对高并发场景，采取了 Reactor 模型（也就是 I/O 多路复用，NIO）。
+
+
+
+I/O 多路复用模型：在 I/O 多路复用模型中，最重要的就是系统调用 Select 函数。该方法能够同时监控多个文件描述符的可读可写情况（每一个网络连接其实都对应一个文件描述符），当其中的某些文件描述符可读可写时，Select 方法就会返回可读以及可写的文件描述符个数。
+
+
+
+Nginx Work 进程使用 I/O 多路复用模块同时监听多个 FD（文件描述符）。当 Accept、Read、Write 和 Close 事件产生时，操作系统就会回调 FD 绑定的事件处理器。这时候 Work 进程再去处理相应事件，而不是阻塞在某个请求连接上等待。这样就可以实现一个进程同时处理多个连接。每一个 Worker 进程通过 I/O 多路复用处理多个连接请求。
+
+
+
+为了减少进程切换（需要系统调用）的性能损耗，一般设置 Worker 进程数量和 CPU 数量一致。
+
+
+
+### Nginx 和 Apache 的区别
+
+轻量级，同样是 Web 服务，比 Apache 占用更少的内存及资源抗并发，Nginx 处理请求是异步非阻塞的，而 Apache 则是阻塞型的。
+
+
+
+在高并发下 Nginx 能保持低资源低消耗高性能高度模块化的设计，编写相对简单，最核心的区别在于 Apache 是同步多线程模型，一个连接对应一个进程；Nginx 是异步的，多个连接（万级别）可以对应一个进程。
+
+### Nginx 的 upstream 支持的负载均衡模式
+
+- 轮询
+
+- weight：指定权重
+
+- ip_hash：每个请求按访问 ip 的 hash 结果分配，这样每个访问固定访问一个后台服务器
+
+- 第三方：fair、url_hash
+
+### Nginx 常见的优化配置
+
+- **调整 worker_processes**：指 Nginx 要生成的 Worker 数量。最佳实践是每个 CPU 运行 1 个工作进程。
+
+- **最大化 worker_connections**。
+
+- **启用 Gzip**：压缩文件大小，减少客户端 HTTP 的传输带宽，因此提高了页面加载速度。
+
+- **为静态文件启用缓存**。
+
+- **禁用 access_logs**：访问日志记录，它记录每个 Nginx 请求，因此消耗了大量 CPU 资源，从而降低了 Nginx 性能。
+
+## 参考资料
+
+[Nginx 的这些妙用，你都 get 到了吗](https://mp.weixin.qq.com/s/wC_TURy_zpLUdA0gIcJD3w)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
