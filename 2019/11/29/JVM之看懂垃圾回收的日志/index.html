@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="JVM,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="打印JVM的GC日志​        如果想打印GC日志，需要在系统的JVM参数中加入GC日志的打印选型，如下： 123-XX:+PrintGCDetail #打印详细的gc日志-XX:+PrintGCTimeStamps #打印出每次GC发生的时间-Xloggc:log	#设置将gc日志写入一个磁盘文件  示例示例程序代码12345678910111213public class Demo1 &amp;">
+<meta name="keywords" content="JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM之看懂垃圾回收的日志">
+<meta property="og:url" content="https://github.com/2019/11/29/JVM之看懂垃圾回收的日志/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="打印JVM的GC日志​        如果想打印GC日志，需要在系统的JVM参数中加入GC日志的打印选型，如下： 123-XX:+PrintGCDetail #打印详细的gc日志-XX:+PrintGCTimeStamps #打印出每次GC发生的时间-Xloggc:log	#设置将gc日志写入一个磁盘文件  示例示例程序代码12345678910111213public class Demo1 &amp;">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E5%A0%86%E5%86%85%E5%AD%98.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E8%BF%90%E8%A1%8C1.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E8%BF%90%E8%A1%8C2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E8%BF%90%E8%A1%8C3.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E8%BF%90%E8%A1%8C4.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/gc1.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/gc2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/gc3.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/gc%E5%90%8E.png">
+<meta property="og:updated_time" content="2019-12-07T06:19:22.667Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM之看懂垃圾回收的日志">
+<meta name="twitter:description" content="打印JVM的GC日志​        如果想打印GC日志，需要在系统的JVM参数中加入GC日志的打印选型，如下： 123-XX:+PrintGCDetail #打印详细的gc日志-XX:+PrintGCTimeStamps #打印出每次GC发生的时间-Xloggc:log	#设置将gc日志写入一个磁盘文件  示例示例程序代码12345678910111213public class Demo1 &amp;">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E5%A0%86%E5%86%85%E5%AD%98.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2019/11/29/JVM之看懂垃圾回收的日志/">
+
+
+
+
+
+  <title>JVM之看懂垃圾回收的日志 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JVM之看懂垃圾回收的日志</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-29T15:04:01+08:00">
+                2019-11-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="打印JVM的GC日志"><a href="#打印JVM的GC日志" class="headerlink" title="打印JVM的GC日志"></a>打印JVM的GC日志</h2><p>​        如果想打印GC日志，需要在系统的JVM参数中加入GC日志的打印选型，如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">-XX:</span><span class="string">+PrintGCDetail</span> <span class="comment">#打印详细的gc日志</span></span><br><span class="line"><span class="attr">-XX:</span><span class="string">+PrintGCTimeStamps</span> <span class="comment">#打印出每次GC发生的时间</span></span><br><span class="line"><span class="attr">-Xloggc:</span><span class="string">log</span>	<span class="comment">#设置将gc日志写入一个磁盘文件</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><h3 id="示例程序代码"><a href="#示例程序代码" class="headerlink" title="示例程序代码"></a>示例程序代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] array1 = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">        array1 = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">        array1 = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">        array1 = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] array2 = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">2</span> * <span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        给上述程序配置一下JVM参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:NewSize=5242880 -XX:MaxNewSize=5242880 -XX:InitialHeapSize=10485760 -XX:MaxHeapSize=10485760 -XX:SurvivorRatio=8 -XX:PretenureSizeThreshold=10485760 -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:gc.log</span><br></pre></td></tr></table></figure>
+
+<p>​        这些JVM参数的意思是给堆内存分配10MB内存空间，其中新生代是5MB内存空间，其中Eden区占4MB，每个Survivor区占0.5MB，大对象必须超过10MB才会直接进入老年低，年轻代使用ParNew垃圾回收器，老年代使用CMS垃圾回收器，如图所示：</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E5%A0%86%E5%86%85%E5%AD%98.png" alt="堆内存"></p>
+<h3 id="对象如何分配在Eden区内的"><a href="#对象如何分配在Eden区内的" class="headerlink" title="对象如何分配在Eden区内的"></a>对象如何分配在Eden区内的</h3><p>​        上面的代码比较简单。先通过“new byte[1024 * 1024]”这样的代码连续分配了3个数组，每个数组都是1MB。然后通过array1这个局部变量依次引用这三个对象，最后还把array1这个局部变量指向了null。那么在JVM中上述代码如何运行？</p>
+<p>​        首先第一行代码：<code>byte[] array1 = new byte[1024 * 1024]</code>。这个代码一运行，会在JVM的Eden区内放一个1MB的对象，同时在main线程的虚拟机栈中会压入一个main()方法的桢栈，在main()方法桢栈内部，会有一个“array1”变量，这个变量是指向堆内存Eden区的那个1MB的数组，如下图：</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E8%BF%90%E8%A1%8C1.png" alt="运行1"></p>
+<p>​        接着第二行代码：<code>array1 = new byte[1024 * 1024]</code>。此时会在堆内存的Eden区中创建第二个数组，并且让局部变量指向第二个数组，然后第一个数组就没人引用了，此时第一个数据就变了没人引用的“垃圾对象”，如图所示：</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E8%BF%90%E8%A1%8C2.png" alt="运行2"></p>
+<p>​        然后第三行代码：<code>byte[] array1 = new byte[1024 * 1024]</code>。这行代码在堆内存的Eden区内创建了第三个数组，同时让array1变量指向了第三个数组，此时前面两个数组都没有引用了，变成了垃圾对象。</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E8%BF%90%E8%A1%8C3.png" alt="运行3"></p>
+<p>​        第四行代码：<code>array1 = null</code>。这行代码一执行，就让array1这个变量什么都不指向，此时会导致之前创建的3个数组全部变成垃圾对象，如图：</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/%E8%BF%90%E8%A1%8C4.png" alt="运行4"></p>
+<p>​        最后第五行代码：<code>byte[] array2 = new byte[2 * 1024 * 1024]</code>。此时会分配一个2MB大小的数组，尝试放入Eden区中。但这是不行的，因为Eden区总共就4MB大小，而且里面已经放入了3个1MB的数组，所以剩余空间只有1MB，此时放一个2MB的的数组是放不下的。这个时候就会触发年轻代的Young GC。</p>
+<h3 id="讲解GC日志"><a href="#讲解GC日志" class="headerlink" title="讲解GC日志"></a>讲解GC日志</h3><p>​        当我们以指定的JVM参数运行，会在根目录生成一个文件<code>gc.log</code>。打开gc.log文件，会看到如下内容：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Java HotSpot(TM) <span class="number">64</span>-Bit Server VM (<span class="number">25</span><span class="variable">.151</span>-b12) <span class="keyword">for</span> windows-amd64 JRE (<span class="number">1</span><span class="variable">.8</span><span class="variable">.0_151</span>-b12), built on Sep  <span class="number">5</span> <span class="number">2017</span> <span class="number">19</span>:<span class="number">33</span>:<span class="number">46</span> by <span class="string">"java_re"</span> <span class="keyword">with</span> MS VC++ <span class="number">10</span><span class="variable">.0</span> (VS2010)</span><br><span class="line"></span><br><span class="line">Memory: <span class="number">4</span>k page, physical <span class="number">33450456</span>k(<span class="number">25709200</span>k free), swap <span class="number">38431192</span>k(<span class="number">29814656</span>k free)</span><br><span class="line"></span><br><span class="line">CommandLine flags: -XX:InitialHeapSize=<span class="number">10485760</span> -XX:MaxHeapSize=<span class="number">10485760</span> -XX:MaxNewSize=<span class="number">5242880</span> -XX:NewSize=<span class="number">5242880</span> -XX:OldPLABSize=<span class="number">16</span> -XX:PretenureSizeThreshold=<span class="number">10485760</span> -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:SurvivorRatio=<span class="number">8</span> -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:-UseLargePagesIndividualAllocation -XX:+UseParNewGC</span><br><span class="line"></span><br><span class="line"><span class="number">0</span><span class="variable">.268</span>: [GC (Allocation Failure) <span class="number">0</span><span class="variable">.269</span>: [ParNew: <span class="number">4030</span>K-&gt;<span class="number">512</span>K(<span class="number">4608</span>K), <span class="number">0</span><span class="variable">.0015734</span> secs] <span class="number">4030</span>K-&gt;<span class="number">574</span>K(<span class="number">9728</span>K), <span class="number">0</span><span class="variable">.0017518</span> secs] [Times: user=<span class="number">0</span><span class="variable">.00</span> sys=<span class="number">0</span><span class="variable">.00</span>, <span class="keyword">real</span>=<span class="number">0</span><span class="variable">.00</span> secs]</span><br><span class="line"></span><br><span class="line">Heap</span><br><span class="line"></span><br><span class="line">par <span class="keyword">new</span> generation   total <span class="number">4608</span>K, used <span class="number">2601</span>K [<span class="number">0</span>x00000000ff600000, <span class="number">0</span>x00000000ffb00000, <span class="number">0</span>x00000000ffb00000)</span><br><span class="line"></span><br><span class="line"> eden space <span class="number">4096</span>K,  <span class="number">51</span>% used [<span class="number">0</span>x00000000ff600000, <span class="number">0</span>x00000000ff80a558, <span class="number">0</span>x00000000ffa00000)</span><br><span class="line"></span><br><span class="line"> from space <span class="number">512</span>K, <span class="number">100</span>% used [<span class="number">0</span>x00000000ffa80000, <span class="number">0</span>x00000000ffb00000, <span class="number">0</span>x00000000ffb00000)</span><br><span class="line"></span><br><span class="line"> to   space <span class="number">512</span>K,   <span class="number">0</span>% used [<span class="number">0</span>x00000000ffa00000, <span class="number">0</span>x00000000ffa00000, <span class="number">0</span>x00000000ffa80000)</span><br><span class="line"></span><br><span class="line">concurrent mark-sweep generation total <span class="number">5120</span>K, used <span class="number">62</span>K [<span class="number">0</span>x00000000ffb00000, <span class="number">0</span>x0000000100000000, <span class="number">0</span>x0000000100000000)</span><br><span class="line"></span><br><span class="line">Metaspace       used <span class="number">2782</span>K, capacity <span class="number">4486</span>K, committed <span class="number">4864</span>K, reserved <span class="number">1056768</span>K</span><br><span class="line"></span><br><span class="line"> <span class="keyword">class</span> space    used <span class="number">300</span>K, capacity <span class="number">386</span>K, committed <span class="number">512</span>K, reserved <span class="number">1048576</span>K</span><br></pre></td></tr></table></figure>
+
+<p>​        现在让我们来讲解一下这个日志。</p>
+<p>​        首先在GC日志中，可以看到以下内容：</p>
+<p><code>CommandLine flags: -XX:InitialHeapSize=10485760 -XX:MaxHeapSize=10485760 -XX:MaxNewSize=5242880 .........</code></p>
+<p>​        这是说明这次运行程序采取的JVM参数是什么，基本是我们设置的，同时还有一些参数默认就给设置了，不过一般关系不大。</p>
+<p>​        接着看GC日志中的如下一行：</p>
+<p><code>0.268: [GC (Allocation Failure) 0.269: [ParNew: 4030K-&gt;512K(4608K), 0.0015734 secs] 4030K-&gt;574K(9728K), 0.0017518 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</code></p>
+<p>​        这个就是概要说明了本次GC的执行情况。<code>GC (Allocation Failure)</code>是发生GC的原因，我们要分配一个2MB的数组，结果Eden区内存不够，所以就出现了“Allocation Failure”，即对象分配失败。所以此时就要触发一次Young GC。</p>
+<p>​        那这次GC什么时候发生呢？通过上面的一个数字<code>0.268</code>，这个意思是说你的系统运行以后过了多少秒发生了本次的GC，比如这里就是大概系统运行之后大概200多毫秒，发生了本次GC。</p>
+<p><code>ParNew: 4030K-&gt;512K(4608K), 0.0015734 secs</code></p>
+<p>​        这个<code>ParNew</code>。我们触发的是年轻代的Young GC，所以用我们指定的ParNew垃圾回收器执行GC的。而<code>4030K -&gt; 512K(4608K)</code>，这个代表的意思是年轻代可用的空间是4608KB，也就是4.5MB。因为上面的例子中，Eden区是4MB，两个Survivor中只有一个是可以放存活对象的，另外一个必须一致保持空闲，所以它考虑年轻代的可用空间，就是Eden + 1个Survivor的大小，也就是4.5MB。</p>
+<p>​        然后<code>4030K -&gt; 512K</code>。意思是对年轻代执行了一次GC，GC之前都使用了4030KB，但是GC之后只有512KB的对象存活了下来。而<code>0.0015734 secs</code>这个是本次GC耗费的时间。这里大概是1.5ms，仅仅是回收3MB的对象而已。</p>
+<p>​        <code>4030K-&gt;574K(9728K), 0.0017518 secs</code>，这段话指的是整个Java堆内存的情况。意思是整个Java堆内存是总可用空间9728KB（9.5MB），其实就是4.5MB + 老年代5MB，然后GC前整个Java堆内存里使用了4030KB，GC之后Java堆内存使用了574KB。</p>
+<p><code>[Times: user=0.00 sys=0.00, real=0.00 secs]</code></p>
+<p>​        这个意思就是本次GC消耗的时间。这里最小单位是小数点之后两位，但是这里全部是0.00 secs，也就是说本次gc就耗费了几毫秒。所以从秒为单位来看，几乎是0。</p>
+<h3 id="图解GC执行过程"><a href="#图解GC执行过程" class="headerlink" title="图解GC执行过程"></a>图解GC执行过程</h3><p>​        第一个问题，<code>ParNew: 4030K-&gt;512K(4608K), 0.0015734 secs</code>。在GC之前，明明在Eden区域里放了3个1MB的数组，一共是3MB，也就是3072KB的对象，那么GC之前年轻代应该是使用了3072KB的内存，为什么是4030KB的内存？其实要明白两点：</p>
+<ul>
+<li><p>虽然你创建的数组本身是1MB，但是为了存储这个数组，JVM内置还会附带一些其他信息，所以每个数组实际占用的内存是大于1MB的；</p>
+</li>
+<li><p>除了你自己创建的对象以外，可能还有一些你看不见的对象在Eden区里。</p>
+</li>
+</ul>
+<p>​        如图所以，GC之前，三个数组和其他一些未知对象加起来，就是占据了4030KB的内存：</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/gc1.png" alt="gc1"></p>
+<p>​        接着你要在Eden分配一个2MB的数组，此时肯定触发了“Allocation Failure”，对象分配失败，就触发了Young GC，然后ParNew执行垃圾回收，回收掉之前我们创建的三个数组，此时因为它们都没人引用了，一定是垃圾对象，如图：</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/gc2.png" alt="gc2"></p>
+<p>​        继续看gc日志：ParNew: 4030K-&gt;512K(4608K), 0.0015734 secs。gc回收之后，从4030KB内存使用降低到了512KB的内存使用，也就是说这次gc日志有512KB的对象存活了下来，从Eden区转移到了Survivor1区。或者我们改一下称呼，叫做Survivor From区，另外一个叫做Survivor To区。</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/gc3.png" alt="gc3"></p>
+<p>​        结合GC日志日志就能看出，这就是本次GC的全过程。</p>
+<h3 id="GC过后的堆内存使用情况"><a href="#GC过后的堆内存使用情况" class="headerlink" title="GC过后的堆内存使用情况"></a>GC过后的堆内存使用情况</h3><p>​        接着我们看下面的GC日志：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Heap</span><br><span class="line"></span><br><span class="line">par <span class="keyword">new</span> generation   total <span class="number">4608</span>K, used <span class="number">2601</span>K [<span class="number">0</span>x00000000ff600000, <span class="number">0</span>x00000000ffb00000, <span class="number">0</span>x00000000ffb00000)</span><br><span class="line"></span><br><span class="line"> eden space <span class="number">4096</span>K,  <span class="number">51</span>% used [<span class="number">0</span>x00000000ff600000, <span class="number">0</span>x00000000ff80a558, <span class="number">0</span>x00000000ffa00000)</span><br><span class="line"></span><br><span class="line"> from space <span class="number">512</span>K, <span class="number">100</span>% used [<span class="number">0</span>x00000000ffa80000, <span class="number">0</span>x00000000ffb00000, <span class="number">0</span>x00000000ffb00000)</span><br><span class="line"></span><br><span class="line"> to   space <span class="number">512</span>K,   <span class="number">0</span>% used [<span class="number">0</span>x00000000ffa00000, <span class="number">0</span>x00000000ffa00000, <span class="number">0</span>x00000000ffa80000)</span><br><span class="line"></span><br><span class="line">concurrent mark-sweep generation total <span class="number">5120</span>K, used <span class="number">62</span>K [<span class="number">0</span>x00000000ffb00000, <span class="number">0</span>x0000000100000000, <span class="number">0</span>x0000000100000000)</span><br><span class="line"></span><br><span class="line">Metaspace       used <span class="number">2782</span>K, capacity <span class="number">4486</span>K, committed <span class="number">4864</span>K, reserved <span class="number">1056768</span>K</span><br><span class="line"></span><br><span class="line"> <span class="keyword">class</span> space    used <span class="number">300</span>K, capacity <span class="number">386</span>K, committed <span class="number">512</span>K, reserved <span class="number">1048576</span>K</span><br></pre></td></tr></table></figure>
+
+<p>​        这段日志是在JVM退出的时候打印出来的当前堆内存的使用情况，其实也很简单。先看这段：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">par <span class="keyword">new</span> generation   total <span class="number">4608</span>K, used <span class="number">2601</span>K [<span class="number">0</span>x00000000ff600000, <span class="number">0</span>x00000000ffb00000, <span class="number">0</span>x00000000ffb00000)</span><br><span class="line"></span><br><span class="line"> eden space <span class="number">4096</span>K,  <span class="number">51</span>% used [<span class="number">0</span>x00000000ff600000, <span class="number">0</span>x00000000ff80a558, <span class="number">0</span>x00000000ffa00000)</span><br><span class="line"></span><br><span class="line"> from space <span class="number">512</span>K, <span class="number">100</span>% used [<span class="number">0</span>x00000000ffa80000, <span class="number">0</span>x00000000ffb00000, <span class="number">0</span>x00000000ffb00000)</span><br><span class="line"></span><br><span class="line"> to   space <span class="number">512</span>K,   <span class="number">0</span>% used [<span class="number">0</span>x00000000ffa00000, <span class="number">0</span>x00000000ffa00000, <span class="number">0</span>x00000000ffa80000)</span><br></pre></td></tr></table></figure>
+
+<p>​        <code>par new generation total 4608K,used 2601K</code>，就是说“ParNew”垃圾回收器复制的年轻代共有4608KB（4.5MB）可用内存，目前是使用了2601KB（2.5MB）。为什么JVM退出之前，年轻代占用了2.5MB的内存？因为在gc之后，我们有通过了代码<code>byte[] array2 = new byte[2 * 1024 * 1024]</code>分配了一个2MB的数组，所以此时Eden区中会有一个2MB的数组，也就是2048KB，然后上次gc之后在From Survivor区中存活了一个512KB的对象。但2048 + 512 = 2560KB，为什么年轻代使用了2601KB？因为之前说过每个数组会额外占据一些内存来存放一些自己这个对象的元数据，所以你可以认为多出来的41KB可以是数组对象额外使用的空间。如图：</p>
+<p><img src="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/gc%E5%90%8E.png" alt="gc后"></p>
+<p>​        继续看日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">eden space 4096K,  51% used [0x00000000ff600000, 0x00000000ff80a558, 0x00000000ffa00000)</span><br><span class="line"></span><br><span class="line"> from space 512K, 100% used [0x00000000ffa80000, 0x00000000ffb00000, 0x00000000ffb00000)</span><br><span class="line"></span><br><span class="line"> to   space 512K,   0% used [0x00000000ffa00000, 0x00000000ffa00000, 0x00000000ffa80000)</span><br></pre></td></tr></table></figure>
+
+<p>​        通过GC日志可以验证我们的推测是正确的，这里说的很清楚，Eden区此时4MB的内存被使用了51%，就是因为有一个2MB的数组在里面，然后From Survivor区，512KB是100%的使用率，此时被之前gc后的512KB的未知对象占据了。</p>
+<p>​        后面的日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">concurrent mark-sweep generation total 5120K, used 62K [0x00000000ffb00000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line"></span><br><span class="line">Metaspace       used 2782K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line"></span><br><span class="line"> class space    used 300K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+
+<p>​        <code>concurrent mark-sweep generation total 5120K, used 62K</code>这就是CMS垃圾回收器，管理的老年代内存空间一共是5MB。此时使用了62KB的空间。而下面两段日志也很简单，就是Metaspace元数据空间和Class空间，存放一些类信息、常量池之类的东西，此时他们的总容量和使用内存等等。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/JVM/" rel="tag"># JVM</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2019/11/05/JVM垃圾回收器之G1回收器/" rel="next" title="JVM垃圾回收器之G1回收器">
+                <i class="fa fa-chevron-left"></i> JVM垃圾回收器之G1回收器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2019/12/02/JVM工具使用-使用jstat了解线上系统的JVM运行状况/" rel="prev" title="JVM工具使用-使用jstat了解线上系统的JVM运行状况">
+                JVM工具使用-使用jstat了解线上系统的JVM运行状况 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#打印JVM的GC日志"><span class="nav-number">1.</span> <span class="nav-text">打印JVM的GC日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例"><span class="nav-number">2.</span> <span class="nav-text">示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例程序代码"><span class="nav-number">2.1.</span> <span class="nav-text">示例程序代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象如何分配在Eden区内的"><span class="nav-number">2.2.</span> <span class="nav-text">对象如何分配在Eden区内的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#讲解GC日志"><span class="nav-number">2.3.</span> <span class="nav-text">讲解GC日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图解GC执行过程"><span class="nav-number">2.4.</span> <span class="nav-text">图解GC执行过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC过后的堆内存使用情况"><span class="nav-number">2.5.</span> <span class="nav-text">GC过后的堆内存使用情况</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="网络编程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本节思维导图   ​        对于高性能的RPC框架，Netty作为异步通信框架，几乎成了必需品。例如Dubbo框架中通信组件，还有RocketMQ中生产者和消费者的通信，都是用了Netty。现在让我们开简单看一下Netty的基本架构和原理。 Netty的特点与NIO​        Netty是一个异步的、基于事件驱动的网络应用框架，它可以用来开发高性能服务端和客户端。以前编写网络调用程">
+<meta name="keywords" content="网络编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈Netty底层架构原理">
+<meta property="og:url" content="https://github.com/2019/12/13/浅谈Netty底层架构原理/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="本节思维导图   ​        对于高性能的RPC框架，Netty作为异步通信框架，几乎成了必需品。例如Dubbo框架中通信组件，还有RocketMQ中生产者和消费者的通信，都是用了Netty。现在让我们开简单看一下Netty的基本架构和原理。 Netty的特点与NIO​        Netty是一个异步的、基于事件驱动的网络应用框架，它可以用来开发高性能服务端和客户端。以前编写网络调用程">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/Netty.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9E.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/NIO.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/EventL.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/EventLoopG.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/ChannelHandler.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/ChannelPipeline.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/ChannelHandlerContext.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/Netty%E7%BB%84%E4%BB%B6.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/byteBuf.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/bootstrap.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/clientBootstrap.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/ServerBootstrap.png">
+<meta property="og:updated_time" content="2020-01-22T01:08:35.201Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈Netty底层架构原理">
+<meta name="twitter:description" content="本节思维导图   ​        对于高性能的RPC框架，Netty作为异步通信框架，几乎成了必需品。例如Dubbo框架中通信组件，还有RocketMQ中生产者和消费者的通信，都是用了Netty。现在让我们开简单看一下Netty的基本架构和原理。 Netty的特点与NIO​        Netty是一个异步的、基于事件驱动的网络应用框架，它可以用来开发高性能服务端和客户端。以前编写网络调用程">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/Netty.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2019/12/13/浅谈Netty底层架构原理/">
+
+
+
+
+
+  <title>浅谈Netty底层架构原理 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">浅谈Netty底层架构原理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-13T09:49:35+08:00">
+                2019-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>本节思维导图</p>
+</blockquote>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/Netty.png" alt="Netty"></p>
+<p>​        对于高性能的RPC框架，Netty作为异步通信框架，几乎成了必需品。例如Dubbo框架中通信组件，还有RocketMQ中生产者和消费者的通信，都是用了Netty。现在让我们开简单看一下Netty的基本架构和原理。</p>
+<h2 id="Netty的特点与NIO"><a href="#Netty的特点与NIO" class="headerlink" title="Netty的特点与NIO"></a>Netty的特点与NIO</h2><p>​        Netty是一个异步的、基于事件驱动的网络应用框架，它可以用来开发高性能服务端和客户端。以前编写网络调用程序的时候，我们都会在客户端创建一个Socket，通过这个Socket连接到服务端。服务端根据这个Socket创建一个Thread，用来发出请求。客户端在发起调用以后，需要等待服务端处理完成，才能继续后面的操作。这样线程会出现等待的状态。</p>
+<p>​        如果客户端请求数越多，服务端创建的处理线程也会越多，JVM管理如此多的线程并不是容易的事。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9E.png" alt="同步阻塞"></p>
+<p>​        为了解决上述问题，退出了NIO的概念，就是（Non-blocking I/O）。其中Selector机制就是NIO的核心。当每次客户端请求时，会创建一个Socket Channel，并将其注册到Selector上（多路复用器），然后Selector关注服务端IO读写事件，此时客户端并不用等待IO事件完成，可以继续做接下来的工作。一旦服务端完成了IO读写操作，Selector会接到通知，同时告诉客户端IO操作已经完成。接到通知的客户端，就可以通过SocketChannel获取需要的数据了。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/NIO.png" alt="NIO"></p>
+<p>​        上面描述的过程有异步的意思，不过，Selector实现的并不是真正意义上的异步操作。因为Selector需要通过线程阻塞的方式监听IO事件变更，只是这种方式没有让客户端等待，是Selector在等待IO返回，并且通知客户端去获取数据。</p>
+<p>​        谈好了NIO再来谈谈Netty。Netty作为NIO的实现，它适用于服务器/客户端通讯的场景，以及针对于TCP协议下的高并发应用。对于开发者来说，它具有以下特点：</p>
+<ul>
+<li><p>对NIO进行封装，开发者不需要关注NIO的底层原理，只需要调用Netty组件就能完成工作。</p>
+</li>
+<li><p>对网络调用透明，从Socket建立TCP连接到网络异常的处理都做了包装</p>
+</li>
+<li><p>对数据处理灵活，Netty支持多种序列化框架，通过<code>ChannelHandler</code>机制，可以自定义“编/解码器”</p>
+</li>
+<li><p>对性能调优友好，Netty提供了线程池模式以及Buffer的重用机制（对象池化），不需要构件复制的多线程模型和操作队列。</p>
+</li>
+</ul>
+<h2 id="从一个简单的例子开始"><a href="#从一个简单的例子开始" class="headerlink" title="从一个简单的例子开始"></a>从一个简单的例子开始</h2><p>​        现在通过一个例子来讲解。假设有一个客户端去调用一个服务端，假设服务端叫做EchoServer，客户端叫做EchoClient，用Netty架构实现代码如下。</p>
+<h3 id="服务端代码"><a href="#服务端代码" class="headerlink" title="服务端代码"></a>服务端代码</h3><p>​        构建服务器端，假设服务器接受客户端传来的信息，然后在控制台打印。首先，生成EchoServer，在构件函数中传入需要监听的端口号。然后再编写服务的启动方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> server;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> io.netty.bootstrap.ServerBootstrap;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelFuture;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelInitializer;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.EventLoopGroup;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.nio.NioEventLoopGroup;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.socket.SocketChannel;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.socket.nio.NioServerSocketChannel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.net.InetSocketAddress;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoServer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> port;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">EchoServer</span><span class="params">(<span class="keyword">int</span> port)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.port = port;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        <span class="keyword">final</span> EchoServerHandler serverHandler = <span class="keyword">new</span> EchoServerHandler();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 1、创建EventLoopGroup</span></span><br><span class="line">        EventLoopGroup group = <span class="keyword">new</span> NioEventLoopGroup();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 2、创建ServerBootstrap</span></span><br><span class="line">            ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();</span><br><span class="line">            b.group(group)</span><br><span class="line">                    <span class="comment">// 3、指定所使用的 NIO 传输 Channel</span></span><br><span class="line">                    .channel(NioServerSocketChannel.class)</span><br><span class="line">                    <span class="comment">// 4、使用指定的端口设置套接字地址</span></span><br><span class="line">                    .localAddress(<span class="keyword">new</span> InetSocketAddress(port))</span><br><span class="line">                    <span class="comment">// 5、添加一个 EchoServerHandler 到 Channel 的 ChannelPipeline</span></span><br><span class="line">                    .childHandler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() &#123;</span><br><span class="line">                        <span class="meta">@Override</span></span><br><span class="line">                        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel socketChannel)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                            socketChannel.pipeline().addLast(serverHandler);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;);</span><br><span class="line">            <span class="comment">// 6、异步绑定服务器：调用sync()方法阻塞等到直到绑定完成</span></span><br><span class="line">            ChannelFuture f = b.bind().sync();</span><br><span class="line"></span><br><span class="line">            System.out.println(EchoServer.class.getName() +</span><br><span class="line">                    <span class="string">"started and listening for connections on "</span> + f.channel().localAddress());</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 7、获取Channel 的 CloseFuture，并且阻塞当前线程直到它完成</span></span><br><span class="line">            f.channel().closeFuture().sync();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 8、关闭EventLoopGroup，释放所有的资源</span></span><br><span class="line">            group.shutdownGracefully().sync();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        Server的启动方法涉及到了一些组件的使用，例如EventLoopGroup、Channel。这些后面会讲解，这里有个大概的印象就好：</p>
+<ul>
+<li><p>创建EventLoopGroup。</p>
+</li>
+<li><p>创建ServerBootstrap。</p>
+</li>
+<li><p>指定所使用的NIO传输Channel。</p>
+</li>
+<li><p>使用指定的端口设置套接字地址。</p>
+</li>
+<li><p>添加一个ServerHandler到Channel的ChannelPipeline。</p>
+</li>
+<li><p>异步地绑定服务器，调用sync()方法阻塞等待直到绑定完成。</p>
+</li>
+<li><p>获取Channel的CloseFuture，并且阻塞当前线程直到它完成。</p>
+</li>
+<li><p>关闭EventLoopGroup，释放所有的资源。</p>
+</li>
+</ul>
+<p>​        NettyServer启动以后会监听某个端口的请求，当接收到了请求就需要处理了。在Netty中客户端请求服务端，被称为“入站”操作。可以通过<code>ChannelInboundHandlerAdapter</code>实现，具体内容如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> server;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> io.netty.buffer.ByteBuf;</span><br><span class="line"><span class="keyword">import</span> io.netty.buffer.Unpooled;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelFutureListener;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelHandler;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelHandlerContext;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelInboundHandlerAdapter;</span><br><span class="line"><span class="keyword">import</span> io.netty.util.CharsetUtil;</span><br><span class="line"></span><br><span class="line"><span class="meta">@ChannelHandler</span>.Sharable</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoServerHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInboundHandlerAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> </span>&#123;</span><br><span class="line">        ByteBuf in = (ByteBuf) msg;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//将消息记录到控制台</span></span><br><span class="line">        System.out.println(<span class="string">"Server received："</span> + in.toString(CharsetUtil.UTF_8));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//将接收到的消息写给发送者，而不冲刷出站消息</span></span><br><span class="line">        ctx.write(in);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelReadComplete</span><span class="params">(ChannelHandlerContext ctx)</span><span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//将未决消息冲刷到远程节点，并且关闭该 Channel</span></span><br><span class="line">        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER)</span><br><span class="line">                .addListener(ChannelFutureListener.CLOSE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//打印异常栈跟踪</span></span><br><span class="line">        cause.printStackTrace();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//关闭该Channel</span></span><br><span class="line">        ctx.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        从上面的代码可以看出，服务端处理的代码包含了三个方法。这三个方法是根据事件触发的。它们分别是：</p>
+<ul>
+<li><p>当接收到消息时的操作：channelRead。</p>
+</li>
+<li><p>消息读取完成时的方法：channelReadComplete。</p>
+</li>
+<li><p>出现异常时的方法：exceptionCaught</p>
+</li>
+</ul>
+<h3 id="客户端代码"><a href="#客户端代码" class="headerlink" title="客户端代码"></a>客户端代码</h3><p>​        客户端和服务端的代码基本相似，在初始化时需要输入服务端的IP和Port。整个客户端的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> client;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> io.netty.bootstrap.Bootstrap;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelFuture;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelInitializer;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.EventLoopGroup;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.nio.NioEventLoopGroup;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.socket.SocketChannel;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.socket.nio.NioSocketChannel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.net.InetSocketAddress;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoClient</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String host;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> port;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">EchoClient</span><span class="params">(String host, <span class="keyword">int</span> port)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.host = host;</span><br><span class="line">        <span class="keyword">this</span>.port = port;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        EventLoopGroup group = <span class="keyword">new</span> NioEventLoopGroup();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 创建 Bootstrap</span></span><br><span class="line">            Bootstrap b = <span class="keyword">new</span> Bootstrap();</span><br><span class="line">            <span class="comment">// 指定 EventLoopGroup以处理客户端事件：需要适用于NIO的实现</span></span><br><span class="line">            b.group(group)</span><br><span class="line">                    <span class="comment">// 适用于NIO传输的Channel 类型</span></span><br><span class="line">                    .channel(NioSocketChannel.class)</span><br><span class="line">                    <span class="comment">// 设置服务器的InetSocketAddress</span></span><br><span class="line">                    .remoteAddress(<span class="keyword">new</span> InetSocketAddress(host, port))</span><br><span class="line">                    <span class="comment">// 在创建C喊你了时，向ChannelPipeline中添加一个 EchoClientHandler实例</span></span><br><span class="line">                    .handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() &#123;</span><br><span class="line">                        <span class="meta">@Override</span></span><br><span class="line">                        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel socketChannel)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                            socketChannel.pipeline().addLast(<span class="keyword">new</span> EchoClientHandler());</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;);</span><br><span class="line">            <span class="comment">// 连接到远程节点，阻塞等待直到连接完成</span></span><br><span class="line">            ChannelFuture f = b.connect().sync();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//阻塞，直到Channel 关闭</span></span><br><span class="line">            f.channel().closeFuture().sync();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 关闭线程池并且释放所有的资源</span></span><br><span class="line">            group.shutdownGracefully().sync();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        客户端的启动程序的顺序：</p>
+<ul>
+<li><p>创建Bootstrap。</p>
+</li>
+<li><p>指定EventLoopGroup用来监听事件。</p>
+</li>
+<li><p>定义Channel的传输模式为NIO。</p>
+</li>
+<li><p>设置服务器的InetSocketAddress。</p>
+</li>
+<li><p>在创建Channel时，向ChannelPipeline中添加一个EchoClientHandler实例。</p>
+</li>
+<li><p>连接到远程节点，阻塞等待直到连接完成。</p>
+</li>
+<li><p>阻塞，直到Channel关闭。</p>
+</li>
+<li><p>关闭线程池并且释放所有的资源。</p>
+</li>
+</ul>
+<p>​        客户端在完成以上操作以后，会与服务端建立连接从而传输数据。同样在接受到Channel中触发的事件时，客户端会触发对应事件的操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> client;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> io.netty.buffer.ByteBuf;</span><br><span class="line"><span class="keyword">import</span> io.netty.buffer.Unpooled;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelHandlerContext;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.SimpleChannelInboundHandler;</span><br><span class="line"><span class="keyword">import</span> io.netty.util.CharsetUtil;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoClientHandler</span> <span class="keyword">extends</span> <span class="title">SimpleChannelInboundHandler</span>&lt;<span class="title">ByteBuf</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span><span class="params">(ChannelHandlerContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 当被通知 Channel是活跃的时候，发送一条信息</span></span><br><span class="line">        ctx.writeAndFlush(Unpooled.copiedBuffer(<span class="string">"Netty rocks!"</span>, CharsetUtil.UTF_8));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead0</span><span class="params">(ChannelHandlerContext ctx, ByteBuf in)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//记录已接收信息的转储</span></span><br><span class="line">        System.out.println(<span class="string">"Client received："</span> + in.toString(CharsetUtil.UTF_8));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在发生异常时，记录错误并关闭Channel</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> </span>&#123;</span><br><span class="line">        cause.printStackTrace();</span><br><span class="line">        ctx.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        例如Channel激活，客户端接受到服务端的消息，或者发生异常的捕获。</p>
+<h2 id="Netty核心组件"><a href="#Netty核心组件" class="headerlink" title="Netty核心组件"></a>Netty核心组件</h2><p>​        通过上面的例子，发现有些Netty组件在服务初始化以及通讯时被用到，下面就来介绍这些组件的用途和关系。</p>
+<h3 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h3><p>​        上面的例子可以看出，当客户端和服务端连接的时候会建立一个Channel。这个Channel可以理解为Socket连接，它负责基本的IO操作，例如：bind()、connect()、read()和write()等等。简单理解就是，Channel就是代表连接，实体之间的连接，程序之间的连接，文件之间的连接，设备之间的连接。同时它也是数据入站和出站的载体。</p>
+<h3 id="EventLoop和EventLoopGroup"><a href="#EventLoop和EventLoopGroup" class="headerlink" title="EventLoop和EventLoopGroup"></a>EventLoop和EventLoopGroup</h3><p>​        既然有了Channel连接服务，让信息之间可以流动。如果服务发出的消息称作“出站”消息，服务接受的消息称作“入站”消息，那么消息的“出站”/“入站”就会产生事件（Event）。例如：连接已激活；数据读取；用户事件；异常事件；打开链接；关闭链接等待。</p>
+<p>​        顺着这个思路往下想，有了数据，数据的流动产生事件，那么就有一个机制去监控和协调事件。这个机制（组件）就是EventLoop。在Netty中每个Channel都会被分配到一个EventLoop，而一个EventLoop可以服务多个Channel。而每个EventLoop会占用一个Thread，同时这个Thread会处理EventLoop上面发生的所有IO操作和事件（Netty 4.0）。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/EventL.png" alt="EventL"></p>
+<p>​        理解了EventLoop，理解EventLoopGroup就容量了。EventLoopGroup是用来生成EventLoop的。上面的例子代码中第一行就new了<code>EventLoopGroup</code>对象。一个EventLoopGroup包含了多个EventLoop对象，而EventLoopGroup要做的就是创建一个新的Channel，并且给他分配一个EventLoop。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/EventLoopG.png" alt="EventLoopG"></p>
+<p>​        在异步传输的情况下，一个EventLoop是可以处理多个Channel中产生的事件的，它主要的工作就是事件的发现以及通知。相对于以前一个Channel就占用一个Thread的情况，Netty的方式要合理多了。</p>
+<p>​        客户端发送消息到服务端，EventLoop发现以后会告诉服务端：“你去获取消息”，同时客户端进行其他的工作；当EventLoop检测到服务端返回的消息，也会通知客户端：“消息返回了，你去取吧”。客户端再去获取消息。整个过程EventLoop就是监视器 + 传声筒。</p>
+<h3 id="ChannelHandler，ChannelPipeline和ChannelHandlerContext"><a href="#ChannelHandler，ChannelPipeline和ChannelHandlerContext" class="headerlink" title="ChannelHandler，ChannelPipeline和ChannelHandlerContext"></a>ChannelHandler，ChannelPipeline和ChannelHandlerContext</h3><p>​        如果说EventLoop是事件的通知者，那么ChannelHandler就是事件的处理者。在ChannelHandler中可以添加一些业务代码，例如数据转换，逻辑运算等等。正如上面的例子中展示的，Server和Client分别都有一个ChannelHandler来处理，读取信息，网络可用，网络异常之类的信息。并且，<strong>针对出站和入站的事件，有不同的ChannelHandler</strong>，分别是：</p>
+<ul>
+<li><p>ChannelInBoundHandler（入站事件处理器）</p>
+</li>
+<li><p>ChannelOutBoundHandler（出站事件处理器）</p>
+</li>
+</ul>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/ChannelHandler.png" alt="ChannelHandler"></p>
+<p>​        假设每次请求都会触发事件，而由ChannelHandler来处理这些事件，这个事件的处理顺序是由ChannelPileLine来决定的。</p>
+<p>​        ChannelPipeline为ChannelHandler链提供了容器，到Channel被创建的时候，会被Netty框架自动分配到ChannelPipeline上。ChannelPipeline保证了ChannelHandler按照一定顺序处理事件，当事件触发以后，会将数据通过ChannelPipeline按照一定的顺序通过ChannelHandler。级，ChannelPipeline是复制“排队”的。这里的“排队”是处理事件的顺序。同时，ChannelPipeline也可以添加或者删除ChannelHandler，管理这个队列。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/ChannelPipeline.png" alt="ChannelPipeline"></p>
+<p>​        如上图，ChannelPipeline使ChannelHandler按照先后顺序排列，信息按照箭头所示方向流动并且被ChannelHandler处理。</p>
+<p>​        说完了ChannelPipeline和ChannelHandler，前者管理后者的排列顺序。那么它们之间的关联就有ChannelHandlerContext来表示了。每当有ChannelHandler添加到ChannelPipeline时，同时会创建ChannelHandlerContext。ChannelHandlerContext的主要功能就是管理ChannelHandler和ChannelPipeline的交互。</p>
+<p>​        上面的例子中，几乎ChannelHandler中每个处理事件函数，传入的参数就ChannelHandlerContext。ChannelHandlerContext参数贯穿ChannelPipeline，将信息传递给每个ChannelHandler，是个合格的“通讯员”。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/ChannelHandlerContext.png" alt="ChannelHandlerContext"></p>
+<p>​        把上面提到的几个核心组件归纳一下，用下图表示方便记忆它们之间的关系：</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/Netty%E7%BB%84%E4%BB%B6.png" alt="Netty组件"></p>
+<h2 id="Netty的数据容器"><a href="#Netty的数据容器" class="headerlink" title="Netty的数据容器"></a>Netty的数据容器</h2><p>​        前面介绍了Netty的几个核心组件，服务器在数据传输的时候，产生事件，并且对事件进行监控和处理。接下来看数据是如何存放以及读写的。Netty将ByteBuf作为数据容器，来存放数据。</p>
+<h3 id="ByteBuf工作原理"><a href="#ByteBuf工作原理" class="headerlink" title="ByteBuf工作原理"></a>ByteBuf工作原理</h3><p>​        从结构上来说，ByteBuf由一串字节数组构成。数组中每个字节用来存放信息。ByteBuf提供了两个索引，一个用于读取数据，一个用于写入数据，这两个索引通过在字节数组中移动，来定位需要或者读写信息的位置。当从ByteBuf读取时，它的readerIndex（读索引）将会根据读取的字节数递增。同样，当写ByteBuf时，它的writeIndex也会根据写入的字节数进行递增。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/byteBuf.png" alt="byteBuf"></p>
+<p>​        需要注意的是极限的情况是readerIndex刚好读到了writeIndex写入的地方。如果readerIndex超过了writeIndex的时候，Netty会抛出IndexOutOfBoundsException异常。</p>
+<h3 id="ByteBuf使用模式"><a href="#ByteBuf使用模式" class="headerlink" title="ByteBuf使用模式"></a>ByteBuf使用模式</h3><p>​        说了ByteBuf的工作原理后，再来看它的使用模式。根据存放缓冲区的不同分为三类：</p>
+<ul>
+<li><p><strong>堆缓冲区</strong>：ByteBuf将数据存储在JVM的堆中，通过数组实现，可以做到快速分配。由于在堆上被JVM管理，在不被使用时可以快速释放。可以通过ByteBuf.array()来获取byte[]数据。</p>
+</li>
+<li><p><strong>直接缓冲区</strong>：在JVM的堆之外直接分配内存，用来存储数据。其不占用堆空间，使用时需要考虑内存容量。它在使用Socket传递时性能较好，因为间接从缓冲区发送数据，在发送之前JVM会先将数据复制到直接缓冲区再进行发送。由于直接缓冲区的数据分配在堆之外，通过JVM进行垃圾回收，并且分配时也需要做复制的操作，因此使用成本较高。</p>
+</li>
+<li><p><strong>复合缓冲区</strong>：顾名思义就是将上述两类缓冲区聚合在一起。Netty提供了一个CompsiteByteBuf，可以将堆缓冲区和直接缓冲区的数据放在一起，让使用更加方便。</p>
+</li>
+</ul>
+<h3 id="ByteBuf的分配"><a href="#ByteBuf的分配" class="headerlink" title="ByteBuf的分配"></a>ByteBuf的分配</h3><p>​        接下来看看ByteBuf如何分配缓冲区的数据。<strong>Netty提供了两种ByteBufAllocator的实现</strong>，他们分别是：</p>
+<ul>
+<li><p><strong>PooledByteBufAllocator</strong>：实现了ByteBuf的对象的池化，提高性能减少内存碎片。</p>
+</li>
+<li><p><strong>UnpooledByteBufAllocator</strong>：没有实现对象的池化，每次会生成新的对象实例。</p>
+</li>
+</ul>
+<p>​        对象池化的技术和线程池比较相似，主要目的是提高内存的使用率。池化的简单实现思路，是在JVM堆内存上构建一层内存池，通过allocate方法获取内存池中的空间，通过release方法将空间归还给内存池。</p>
+<p>​        对象的生成和销毁，会大量地调用allocate和release方法，因此内存池面临碎片空间回收的问题，在频繁申请和释放空间后，内存池需要保证连续的内存空间，用于对象的分配。基于这个需求，有两种算法用于优化这一块的内存分配：伙伴系统和slab系统。</p>
+<p>​        伙伴系统，用完全二叉树管理内存区域，左右节点互为伙伴，每个节点代表一个内存块。内存分配将大块内存不断二分，直到找到满足所需的最小内存分片。内存释放会判断释放内存分片的伙伴（左右节点）是否空闲，如果空闲则将左右节点合成更大快内存。</p>
+<p>​        slab系统，主要解决内存碎片问题，将大块内存按照一定内存大小进行等分，形成相等大小的内存片构成的内存集。按照内存申请空间的大小，申请尽量小块内存或者其整数倍的内存。释放内存时，也是将内存分片归还给内存集。</p>
+<p>​        Netty内存池管理以Allocate对象的形式出现。一个Allocate对象由多个Arena组成，每个Arena能执行内存块的分配和回收。Arena内有三类内存管理单元：</p>
+<ul>
+<li><p>TinySubPage</p>
+</li>
+<li><p>SmallSubPage</p>
+</li>
+<li><p>ChunkList</p>
+</li>
+</ul>
+<p>​        Tiny和Small符合Slab系统的管理策略，ChunkList符合伙伴系统的管理策略。当用户申请内存介于tingSize和smallSize之间时，从tinySubPage中获取内存块；申请内存介于smallSize和pageSize之间时，从smallSubPage中获取内存块；介于pageSize和chunkSize之间时，从ChunkList中获取内存；大于ChunkSize（不知道分配内存的大小）的内存块不通过池化分配。</p>
+<h2 id="Netty的Bootstrap"><a href="#Netty的Bootstrap" class="headerlink" title="Netty的Bootstrap"></a>Netty的Bootstrap</h2><p>​        说完了Netty的核心组件以及数据存储。回到最开始的例子程序，在程序最开始的时候会new一个Bootstrap对象，后面所有的配置都是基于这个对象展开的。Boosttrap的作用就是将Netty核心组件配置到程序中，并且让他们运行起来。</p>
+<p>​        从Bootstrap的继承结构来看，分为两类，分别是Bootstrap和ServerBootstrap，一个对应客户端的引导，一个对应服务端的引导。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/bootstrap.png" alt="bootstrap"></p>
+<p>​        客户端引导Bootstrap，主要有两个方法：bind()和connetct()。Bootstrap通过bind()方法创建一个Channel。在bind()之后，通过调用connect()方法来创建Channel连接。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/clientBootstrap.png" alt="clientBootstrap"></p>
+<p>​        服务端引导ServerBootstrap，与客户端不同的是在bind()方法之后会创建一个ServerChannel，它不仅会创建新的Channel，还会管理已经存在的Channel。</p>
+<p><img src="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/ServerBootstrap.png" alt="ServerBootstrap"></p>
+<p>​        通过上面的描述，服务端和客户端的引导存在两个区别：</p>
+<p>ServerBootstrap（服务端引导）绑定一个端口，用来监听客户端的连接请求。而Bootstrap（客户端引导）只要知道服务端IP和Port建立连接就可以了。</p>
+<p>Bootstrap（客户端引导）需要一个EventLoopGroup，但是ServerBootstrap（服务端引导）则需要两个EventLoopGroup。因为服务器需要两组不同的Channel。第一组ServerChannel自身监听本地端口的套接字，第二组用于监听客户端请求的套接字。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​        我们从NIO入手，谈到了Selector的核心机制。然后通过介绍Netty客户端和服务端的代码运行流程。让大家对Netty编写代码有基本的认识。</p>
+<p>​        在Netty的核心组件中，Channel提供Socket的连接通道，EventLoop会对应Channel监听其产生的事件，并且通知执行者。EventLoopGroup负责生成和管理EventLoop。</p>
+<p>​        ChannelPipeline作为ChannelHandler的容器会绑定到Channel上，然后由ChannelHandler提供具体事件处理。另外，ChannelHandlerContext为ChannelHandler和ChannelPipeline提供信息共享。</p>
+<p>​        ByteBuf作为Netty的数据容器，通过字节数组的方式存储数据，并且通过读索引和写索引来引导读写操作。</p>
+<p>​        上述的核心组件都是通过Bootstrap来配置并且引导启动的，Bootstrap启动方式虽然一致，但是针对客户端和服务端有些许的区别。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://mp.weixin.qq.com/s/Sldln-i580LJusQd_YW06w" target="_blank" rel="noopener">Netty底层架构原理</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/网络编程/" rel="tag"># 网络编程</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2019/12/10/RocketMQ详解/" rel="next" title="RocketMQ详解">
+                <i class="fa fa-chevron-left"></i> RocketMQ详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/" rel="prev" title="捋一遍MySQL索引结构">
+                捋一遍MySQL索引结构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Netty的特点与NIO"><span class="nav-number">1.</span> <span class="nav-text">Netty的特点与NIO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从一个简单的例子开始"><span class="nav-number">2.</span> <span class="nav-text">从一个简单的例子开始</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端代码"><span class="nav-number">2.1.</span> <span class="nav-text">服务端代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端代码"><span class="nav-number">2.2.</span> <span class="nav-text">客户端代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Netty核心组件"><span class="nav-number">3.</span> <span class="nav-text">Netty核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel"><span class="nav-number">3.1.</span> <span class="nav-text">Channel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EventLoop和EventLoopGroup"><span class="nav-number">3.2.</span> <span class="nav-text">EventLoop和EventLoopGroup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ChannelHandler，ChannelPipeline和ChannelHandlerContext"><span class="nav-number">3.3.</span> <span class="nav-text">ChannelHandler，ChannelPipeline和ChannelHandlerContext</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Netty的数据容器"><span class="nav-number">4.</span> <span class="nav-text">Netty的数据容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf工作原理"><span class="nav-number">4.1.</span> <span class="nav-text">ByteBuf工作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf使用模式"><span class="nav-number">4.2.</span> <span class="nav-text">ByteBuf使用模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf的分配"><span class="nav-number">4.3.</span> <span class="nav-text">ByteBuf的分配</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Netty的Bootstrap"><span class="nav-number">5.</span> <span class="nav-text">Netty的Bootstrap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
