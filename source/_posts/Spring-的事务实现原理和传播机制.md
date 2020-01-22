@@ -215,3 +215,8 @@ Spring 事务传播机制总共有 7 种，其中使用最多的应该是 PROPAG
 
 
 如果方法 A 调用方法 B，如果出错，方法 B 只能回滚它自己，方法 A 可以带着方法 B 一起回滚。那这种情况可以给方法 B 加上 NESTED 嵌套事务。
+
+## 参考资料
+
+[Spring Boot 中使用 @Transactional 注解配置事务管理](https://blog.csdn.net/nextyu/article/details/78669997)
+
