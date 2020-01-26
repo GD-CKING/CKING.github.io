@@ -316,6 +316,28 @@
           </span>
 
           
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -345,8 +367,12 @@
       
         
           
-          
-          
+          我们知道，MySQL 最常用的就是 InnoDB 存储引擎，那么我们今天借助一条更新语句的执行，来初步地了解一下 InnoDB 存储引擎的架构设计。
+首先假设我们一条 SQL 语句：
+1UPDATE users SET name = &apos;xxx&apos; WHERE id = 10
+
+首先我们的系统通过一个数据库连接发送到 MySQL 上，然后经过 SQL 接口、解析器、优化器、执行器几
+          ...
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/#more" rel="contents">
