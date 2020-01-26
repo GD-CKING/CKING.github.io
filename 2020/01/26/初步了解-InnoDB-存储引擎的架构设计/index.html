@@ -91,7 +91,10 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/%E7%BC%93%E5%86%B2%E6%B1%A0.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/undo%E6%97%A5%E5%BF%97.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE.png">
-<meta property="og:updated_time" content="2020-01-26T11:47:42.710Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/redoLogBuffer.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/redo%E6%97%A5%E5%BF%97.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/osCache.png">
+<meta property="og:updated_time" content="2020-01-26T12:56:16.735Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初步了解 InnoDB 存储引擎的架构设计">
 <meta name="twitter:description" content="我们知道，MySQL 最常用的就是 InnoDB 存储引擎，那么我们今天借助一条更新语句的执行，来初步地了解一下 InnoDB 存储引擎的架构设计。 首先假设我们一条 SQL 语句： 1UPDATE users SET name = &amp;apos;xxx&amp;apos; WHERE id = 10  首先我们的系统通过一个数据库连接发送到 MySQL 上，然后经过 SQL 接口、解析器、优化器、执行器几">
@@ -392,7 +395,7 @@
 <p><img src="/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE.png" alt="更新数据"></p>
 <h2 id="Redo-Log-Buffer：万一系统宕机，如何避免数据丢失"><a href="#Redo-Log-Buffer：万一系统宕机，如何避免数据丢失" class="headerlink" title="Redo Log Buffer：万一系统宕机，如何避免数据丢失"></a>Redo Log Buffer：万一系统宕机，如何避免数据丢失</h2><p>接下来，按照上图的说明，现在已经把内存里的数据进行修改，但是磁盘上的数据还没修改。那么此时万一 MySQL 所在的机器宕机了，必然会导致内存里修改过的数据丢失，这怎么解决？这个时候，就必须把对内存所做的修改写入到一个 Redo Log Buffer 里去，这也是内存里的一个缓冲区，是用来存放 redo 日志的。</p>
 <p>所谓的 redo 日志，就是记录下来你对数据做了什么修改，比如对 “id = 10” 这行数据修改了 name 字段的值为 “xxx”，这就是一个日志。</p>
-<p>![redo log buffer](初步了解-InnoDB-存储引擎的架构设计/redo log buffer.png)</p>
+<p><img src="/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/redoLogBuffer.png" alt="redo log buffer"></p>
 <p>这个 redo 日志是用来在 MySQL 突然宕机的时候，用来恢复你更新过的数据的。</p>
 <h2 id="如果还没提交事务，MySQL-宕机了怎么办"><a href="#如果还没提交事务，MySQL-宕机了怎么办" class="headerlink" title="如果还没提交事务，MySQL 宕机了怎么办"></a>如果还没提交事务，MySQL 宕机了怎么办</h2><p>一般情况下，在数据库中，哪怕执行一条 SQL 语句，其实也可以是一个独立的事务，只有当你提交事务之后，SQL 语句才算执行结束。所以到目前为止，其实还没有提交事务，那么此时如果 MySQL 崩溃，必然导致内存里 Buffer Pool 中的修改过的数据丢失，同时你写入 Redo Log Buffer 中的 redo 日志也会丢失。</p>
 <p>那么此时数据丢失要紧吗？其实不要紧，因为你一条更新语句，没提交事务，就代表它没执行成功，此时 MySQL 宕机虽然导致内存里的数据都丢失了，但是磁盘上的数据依然还停留在原样子。也就是说，”id = 1” 的那行数据的 name 字段的值还是老的值 “zhangsan”，所以此时你的这个事务就是执行失败了，没能成功完成更新，你会收到一个数据库的异常。然后当 mysql 重启之后，你会发现你的数据没有任何变化。</p>
@@ -400,12 +403,12 @@
 <h2 id="提交事务的时候将-redo-日志写入磁盘中"><a href="#提交事务的时候将-redo-日志写入磁盘中" class="headerlink" title="提交事务的时候将 redo 日志写入磁盘中"></a>提交事务的时候将 redo 日志写入磁盘中</h2><p>接着我们要提交一个事务了，此时就会根据一定的策略把 redo 日志从 redo log buffer 里刷入到磁盘文件里去。此时这个策略是通过 <code>innodb_flush_log_at_trx_commit</code> 来配置的，它又几个选项：</p>
 <p>当这个参数的值为0时，你提交事务的时候，不会把 redo log buffer 里的数据刷入磁盘文件，此时可能你都提交事务了，结果 MySQL 宕机了，然后此时内存里的数据全部丢失。相当于你提交事务成功了，但是由于 MySQL 突然宕机了，导致内存中的数据和 redo 日志都丢失了。</p>
 <p>当这个参数的值为1时，你提交事务的时候，就必须把 redo log 从内存刷入到磁盘文件里去，只要事务提交成功，那么 redo log 就必然在磁盘里了。</p>
-<p>![redo 日志](初步了解-InnoDB-存储引擎的架构设计/redo 日志.png)</p>
+<p><img src="/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/redo%E6%97%A5%E5%BF%97.png" alt="redo 日志"></p>
 <p>那么只要提交事务成功之后，redo 日志一定在磁盘文件里，此时你肯定会有一条 redo 日志说“我此时对哪个数据做了哪些修改，比如 name 字段 修改为了 xxx 了”。</p>
 <p>然后哪怕此时 buffer pool 中更新过的数据还没刷新到磁盘里去，此时内存里的数据是已经更新过的 “name = xxx”，然后磁盘上的数据是还没更新的 “name = zhangsan”。然后此时 MySQL 系统突然崩溃了，此时会丢失数据吗？答案是不会，因为虽然内存里的修改成 name = xxx 的数据会丢失，但是 redo 日志里已经说了，对某某数据做了修改 name=xxx，所以此时 MySQL 重启之后，它可以根据 redo 日志去恢复之前做过的修改。</p>
 <p>最后来看看，如果 <code>innodb_flush_log_at_trx_commit</code> 的值是 2，那么提交事务的时候，把redo 日志写入磁盘文件对应的 os cache 缓存里去，而不是直接进入磁盘文件，可能 1 秒后才会把 os cache 里的数据写入到磁盘文件里去。</p>
 <p>这种模式下，你提交事务之后，redo log 可能仅仅停留在 os cache 内存缓存里，没实际进入磁盘文件，万一此时你要是机器宕机了，那么 os cache 里的 redo log 就会丢失，同样会让你感觉提交事务了，结果数据丢失了。</p>
-<p>![os cache](初步了解-InnoDB-存储引擎的架构设计/os cache.png)</p>
+<p><img src="/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/osCache.png" alt="os cache"></p>
 
       
     </div>
