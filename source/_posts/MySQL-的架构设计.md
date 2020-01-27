@@ -7,7 +7,7 @@ categories: MySQL
 
 一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。
 
-![MySQL 连接](MySQL-的架构设计/MySQL 连接.png)
+![MySQL 连接](MySQL-的架构设计/MySQL连接.png)
 
 
 
@@ -31,7 +31,7 @@ categories: MySQL
 
 因此 MySQL 的工作线程接收到 SQL 语句之后，就会转交给 SQL 接口去执行，如图：
 
-![SQL 接口](MySQL-的架构设计/SQL 接口.png)
+![SQL 接口](MySQL-的架构设计/SQL接口.png)
 
 ## 查询解析器：让 MySQL 能看懂 SQL 语句
 

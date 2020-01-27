@@ -67,7 +67,7 @@ Tomcat 在启动的时候，会直接启动 spring 容器。而 spring 容器，
 
 Spring IOC，最大的好处就是让系统的类与类之间彻底的解耦合。
 
-![spring ioc](Spring-IOC-和-Spring-AOP/spring ioc.png)
+![spring ioc](Spring-IOC-和-Spring-AOP/springIoc.png)
 
 ## Spring AOP
 
