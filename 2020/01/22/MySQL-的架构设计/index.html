@@ -79,25 +79,27 @@
 
 
 
-<meta name="description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。 ![MySQL 连接](MySQL-的架构设计/MySQL 连接.png) 当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句">
+<meta name="description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个黑">
 <meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL 的架构设计">
 <meta property="og:url" content="https://github.com/2020/01/22/MySQL-的架构设计/index.html">
 <meta property="og:site_name" content="Ckin&#39;s Blog">
-<meta property="og:description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。 ![MySQL 连接](MySQL-的架构设计/MySQL 连接.png) 当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句">
+<meta property="og:description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个黑">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/MySQL%E8%BF%9E%E6%8E%A5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E7%BA%BF%E7%A8%8B%E5%A4%84%E7%90%86.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/SQL%E6%8E%A5%E5%8F%A3.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%9F%A5%E8%AF%A2%E8%A7%A3%E6%9E%90%E5%99%A8.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%99%A8.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%89%A7%E8%A1%8C%E5%99%A8.png">
-<meta property="og:updated_time" content="2020-01-26T02:57:22.565Z">
+<meta property="og:updated_time" content="2020-01-26T13:00:20.693Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL 的架构设计">
-<meta name="twitter:description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。 ![MySQL 连接](MySQL-的架构设计/MySQL 连接.png) 当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E7%BA%BF%E7%A8%8B%E5%A4%84%E7%90%86.png">
+<meta name="twitter:description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个黑">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/MySQL%E8%BF%9E%E6%8E%A5.png">
 
 
 
@@ -377,14 +379,14 @@
 
       
         <p>一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。</p>
-<p>![MySQL 连接](MySQL-的架构设计/MySQL 连接.png)</p>
+<p><img src="/CKING.github.io/2020/01/22/MySQL-的架构设计/MySQL%E8%BF%9E%E6%8E%A5.png" alt="MySQL 连接"></p>
 <p>当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个黑盒子，来建表以及执行 SQL 语句。</p>
 <p>接下来我们就要深入底层，去探索数据库的工作原理以及生产问题的优化手段。</p>
 <h2 id="网络连接必须让线程来处理"><a href="#网络连接必须让线程来处理" class="headerlink" title="网络连接必须让线程来处理"></a>网络连接必须让线程来处理</h2><p>假设我们的数据库服务器的连接池中的某个连接接收到了网络请求，假设就是一条 SQL 语句，那么由谁负责从这个连接中去监听网络请求？谁负责从网络连接里把请求数据读取出来？大家应该或多或少都知道一点，那就是网络连接必须得分配给一个线程去处理，由一个线程来监听请求以及读取请求数据，比如从网络连接中读取和解析出来一条我们的系统发送过去的 SQL 语句。如图：</p>
 <p><img src="/CKING.github.io/2020/01/22/MySQL-的架构设计/%E7%BA%BF%E7%A8%8B%E5%A4%84%E7%90%86.png" alt="线程处理"></p>
 <h2 id="SQL-接口：负责处理接收到的-SQL-语句"><a href="#SQL-接口：负责处理接收到的-SQL-语句" class="headerlink" title="SQL 接口：负责处理接收到的 SQL 语句"></a>SQL 接口：负责处理接收到的 SQL 语句</h2><p>当 MySQL 内部的工作线程从一个网络连接中读取出来一个 SQL 语句之后，此时会如何执行这个 SQL 语句呢？为了执行这些 SQL 语句，去完成底层数据的增删改查，MySQL 内部提供了一个组件，就是 SQL 接口（SQL Interface），它是一套执行 SQL 语句的接口，专门用于执行我们发送给 MySQL 的那些增删改查的 SQL 语句。</p>
 <p>因此 MySQL 的工作线程接收到 SQL 语句之后，就会转交给 SQL 接口去执行，如图：</p>
-<p>![SQL 接口](MySQL-的架构设计/SQL 接口.png)</p>
+<p><img src="/CKING.github.io/2020/01/22/MySQL-的架构设计/SQL%E6%8E%A5%E5%8F%A3.png" alt="SQL 接口"></p>
 <h2 id="查询解析器：让-MySQL-能看懂-SQL-语句"><a href="#查询解析器：让-MySQL-能看懂-SQL-语句" class="headerlink" title="查询解析器：让 MySQL 能看懂 SQL 语句"></a>查询解析器：让 MySQL 能看懂 SQL 语句</h2><p>当工作线程将 SQL 语句交给 SQL 接口去执行，那么 SQL 接口怎么执行 SQL 语句呢？直接把 SQL 语句交给 MySQL，它能看懂和理解这些 SQL 语句吗？</p>
 <p>例如有这么一个 SQL 语句：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT id, name, age FROM users WHERE id = 1</span><br></pre></td></tr></table></figure>
@@ -558,7 +560,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">64</span>
+                  <span class="site-state-item-count">65</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
