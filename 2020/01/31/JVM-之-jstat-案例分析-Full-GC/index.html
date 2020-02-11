@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="JVM,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="案例分析日处理上亿数据的计算系统假设有这么一个数据计算系统，日处理数据量在上亿的规模。简单来说，这个系统就是会不停地从 MySQL 数据库以及其他数据源里大量地加载数据到自己的 JVM 内存里来进行计算，一般情况下的生产负载是每分钟大概需要执行 500 次数据提取和计算的任务。 但这是一套分布式运行的系统，所以生产环境部署了多台机器，每台机器大概每分钟负责执行 100 次数据提取和计算的任务，每次">
+<meta name="keywords" content="JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM 之 jstat 案例分析 - Full GC">
+<meta property="og:url" content="https://github.com/2020/01/31/JVM-之-jstat-案例分析-Full-GC/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="案例分析日处理上亿数据的计算系统假设有这么一个数据计算系统，日处理数据量在上亿的规模。简单来说，这个系统就是会不停地从 MySQL 数据库以及其他数据源里大量地加载数据到自己的 JVM 内存里来进行计算，一般情况下的生产负载是每分钟大概需要执行 500 次数据提取和计算的任务。 但这是一套分布式运行的系统，所以生产环境部署了多台机器，每台机器大概每分钟负责执行 100 次数据提取和计算的任务，每次">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/minorGC.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/7%E6%AC%A1.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/minorGC.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/JVM%E4%BC%98%E5%8C%96.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E4%BC%98%E5%8C%962.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/jstat%E7%BB%93%E6%9E%9C.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E7%BB%93%E6%9E%9C2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E7%BB%93%E6%9E%9C3.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E7%BB%93%E6%9E%9C4.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/JVM%E4%BC%98%E5%8C%961.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/JVM%E4%BC%98%E5%8C%962.png">
+<meta property="og:updated_time" content="2020-01-31T08:15:16.015Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM 之 jstat 案例分析 - Full GC">
+<meta name="twitter:description" content="案例分析日处理上亿数据的计算系统假设有这么一个数据计算系统，日处理数据量在上亿的规模。简单来说，这个系统就是会不停地从 MySQL 数据库以及其他数据源里大量地加载数据到自己的 JVM 内存里来进行计算，一般情况下的生产负载是每分钟大概需要执行 500 次数据提取和计算的任务。 但这是一套分布式运行的系统，所以生产环境部署了多台机器，每台机器大概每分钟负责执行 100 次数据提取和计算的任务，每次">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/01/31/JVM-之-jstat-案例分析-Full-GC/">
+
+
+
+
+
+  <title>JVM 之 jstat 案例分析 - Full GC | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JVM 之 jstat 案例分析 - Full GC</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-31T12:28:41+08:00">
+                2020-01-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="案例分析"><a href="#案例分析" class="headerlink" title="案例分析"></a>案例分析</h2><h3 id="日处理上亿数据的计算系统"><a href="#日处理上亿数据的计算系统" class="headerlink" title="日处理上亿数据的计算系统"></a>日处理上亿数据的计算系统</h3><p>假设有这么一个数据计算系统，日处理数据量在上亿的规模。简单来说，这个系统就是会不停地从 MySQL 数据库以及其他数据源里大量地加载数据到自己的 JVM 内存里来进行计算，一般情况下的生产负载是每分钟大概需要执行 500 次数据提取和计算的任务。</p>
+<p>但这是一套分布式运行的系统，所以生产环境部署了多台机器，每台机器大概每分钟负责执行 100 次数据提取和计算的任务，每次会提取大概 1 万条左右的数据到内存里来计算，平均每次计算大概需要耗费 10 秒左右的时间。然后每台机器是 4 核 8G 的配置，JVM 内存给了 4G，其中新生代和老年代分别是 1.5G 的内存空间。如图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F.png" alt="计算系统"></p>
+<h3 id="这个系统何时塞满新生代"><a href="#这个系统何时塞满新生代" class="headerlink" title="这个系统何时塞满新生代"></a>这个系统何时塞满新生代</h3><p>既然这个系统每台机器上部署的实例，每分钟会执行 100 次数据计算任务，每次是 1 万条数据计算需要计算 10 秒的时间，那么每次 1 万条数据大概会占用多大的内存空间呢？</p>
+<p>假设平均每条数据在 1KB 左右的大小，那么每次计算任务的 1 万条数据就对应了 10MB 的大小。如果新生代是按照 8 : 1 : 1 的比例来分配 Eden 和两块 Survivor 的区域，那么大体上来说，Eden 区就是 1.2GB，每块 Survivor 区域在 100MB 左右。如图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D.png" alt="内存分配"></p>
+<p>按照上面的内存大小，基本执行一个计算任务，就会在 Eden 区里分配 10MB 左右的对象，一分钟大概对应 100 次计算，基本上一分钟过后，Eden 区里就全是对象，基本就全满了。</p>
+<h3 id="触发-Minor-GC-的时候会有多少对象进入老年代"><a href="#触发-Minor-GC-的时候会有多少对象进入老年代" class="headerlink" title="触发 Minor GC 的时候会有多少对象进入老年代"></a>触发 Minor GC 的时候会有多少对象进入老年代</h3><p>此时假设新声代的 Eden 区在 1 分钟后都塞满对象了，然后接着继续执行计算任务的时候，势必会导致需要进行 Minor GC 回收一部分的垃圾对象。</p>
+<p>之前说过执行 Minor GC 之前会先进行检查。那么首先第一步，先看看老年代的可用内存空间是否大于新生代。此时老年代是空的，大概有 1.5G 的可用内存空间，新生代的 Eden 区大概算他有 1.2G 的对象好了，此时会发现老年代的可用内存空间有 1.5GB，新生代的对象总共有 1.2GB，即使一次 Minor GC 过后，全部对象都存活，老年代也能放得下，那么此时就直接执行 Minor GC 了。</p>
+<p>之前说过每个计算任务 1 万条数据需要计算 10 秒钟，所以假设此时的 80 个计算任务都执行结束了，但是还有 20 个计算任务共计 200MB 的数据还在计算中，那么此时就是 200MB 的对象是存活的，不能被垃圾回收掉，然后有 1GB 的对象是可以垃圾回收的。</p>
+<p>但是因为剩余的存活对象 200MB 大于 Survivor 区的 100MB 的空间。此时就会通过空间担保机制，让这 200MB 直接进入老年代去，占用里面 200MB 内存空间，然后 Eden就清空了。</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/minorGC.png" alt="minorGC"></p>
+<h3 id="系统运行多久，老年代大概会填满"><a href="#系统运行多久，老年代大概会填满" class="headerlink" title="系统运行多久，老年代大概会填满"></a>系统运行多久，老年代大概会填满</h3><p>按照上述计算，每分钟都是一个轮回，大概算下来是每分钟都会把新生代的 Eden 区填满，然后触发一次 Minor GC，然后大概会有 200MB 左右的数据进入老年代。假设现在 2 分钟运行过去了，此时老年代已经有 400MB 内存被占用，只有 1.1GB 的内存可用，此时如果第 3 分钟运行完毕，又要进行 Minor GC 会做什么检查呢？</p>
+<p>此时会先检查老年代可用空间是否大于新生代全部对象，此时老年代可用空间 1.1GB，新生代对象有 1.2GB，那么此时假设一次 Minor GC 过后新生代对象全部存活，老年代是放不下的，那么此时就得看另一个参数是否打开了。</p>
+<p>如果 <code>-XX:-HandlePromotionFailure</code> 参数被打开了，此时会进入第二步检查，就是看看老年代可用空间是否大于历次 Minor GC 过后进入老年代的对象的平均大小。我们己经计算过了，每次大概 200MB 对象进入老年代。</p>
+<p>那么此时老年代是 1.1GB 空间，是大于每次 Minor GC 后平均 200MB 对象进入老年代的大小的，所以基本可以推测，本次 Minor GC 后大概率还是有 200MB 对象进入老年代，1.1G 可用空间是足够的。所以此时就会放心执行一次 Minor GC，然后又是 200MB 对象进入老年代。</p>
+<p>转折点大概在运行了 7 分钟后，7 次 Minor GC 执行过后，大概 1.4G 对象进入老年代，老年代空间就不到 100MB了，几乎快满了。</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/7%E6%AC%A1.png" alt="7次"></p>
+<h3 id="这个系统运行多久会触发一次-Full-GC"><a href="#这个系统运行多久会触发一次-Full-GC" class="headerlink" title="这个系统运行多久会触发一次 Full GC"></a>这个系统运行多久会触发一次 Full GC</h3><p>大概在第 8 分钟运行结束的时候，新生代又满了，执行 Minor GC 之前进行检查，此时发现老年代只有 100MB 内存空间了，比之前每次 Minor GC 后进入老年代的 200MB 要小，此时就会触发一次 Full GC。Full GC 会把老年代的垃圾对象都回收了，假设此时老年代被占据的 1.4G 空间里，全部都是可以回收的对象，那么此时一次性就会把这些对象都给回收了。</p>
+<p>然后接着就会执行 Minor GC，此时 Eden 区情况，200MB 对象再次进入老年代，之前的 Full GC 就是为这些新生代本次 Minor GC 要进入老年代的对象准备的。如图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/minorGC.png" alt="minorGC"></p>
+<p>按照这个运行模型，基本上平均就是七八分钟一次 Full GC，这个频率就相当高了，因为每次 Full GC 速度都是很慢的，性能很差。</p>
+<h3 id="该案例如何进行-JVM-优化"><a href="#该案例如何进行-JVM-优化" class="headerlink" title="该案例如何进行 JVM 优化"></a>该案例如何进行 JVM 优化</h3><p>这个系统，其实要优化也是很简单的，因为这个系统是数据计算系统，每次 Minor GC 的时候，必然会有一批数据没计算完毕，但是按照现有的内存模型，最大的问题，就是每次 Survivor 区域放不下存活对象。</p>
+<p>所以可以这么优化，增加新生代的内存比例，3GB 左右的堆内存，其中 2GB 分配给新生代，1GB 留给老年代。这样 Survivor 区大概就是 200MB，每次刚好能放得下 Minor GC 过后存活的对象。</p>
+<p>只要每次 Minor GC 过后 200MB 存活对象可以放 Survivor 区域，那么等下一次 Minor GC 的时候，这个 Survivor 区的对象对应的计算任务早就结束了，都是可以回收的了。例如此时 Eden 区里的 1.6GB 空间被占满了，然后 Survivor1 区里有 200MB 上一轮 Minor GC 后存活的对象吗，如图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/JVM%E4%BC%98%E5%8C%96.png" alt="JVM优化"></p>
+<p>此时执行 Minor GC，就会把 Eden 区里 1.4GB 对象回收掉，Survivor1 区里的 200MB 对象也会回收掉，然后 Eden 区里剩余的 200MB 存活对象会放入 Survivor2 区里，如图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E4%BC%98%E5%8C%962.png" alt="优化2"></p>
+<p>以此类推，基本上就很少对象会进入老年代中，老年代里的对象也不会太多。通过分析和优化，我们成功把系统的老年代 Full GC 的频率从几分钟一次降低到了几个小时一次，大幅度提升了系统的性能，避免了频繁 Full GC 对系统运行的影响。</p>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><h3 id="运行程序用的示例-JVM-参数"><a href="#运行程序用的示例-JVM-参数" class="headerlink" title="运行程序用的示例 JVM 参数"></a>运行程序用的示例 JVM 参数</h3><p>使用下面的 JVM 参数运行程序：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:NewSize=<span class="number">104857600</span> -XX:MaxNewSize=<span class="number">104857600</span> -XX:InitialHeapSize=<span class="number">209715200</span> -XX:MaxHeapSize=<span class="number">209715200</span> -XX:SurvivorRatio=<span class="number">8</span> -XX:MaxTenuringThreshold=<span class="number">15</span> -XX:PretenureSizeThreshold=<span class="number">20971520</span> -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimesStamps -Xloggc:gc<span class="variable">.log</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的参数需要注意的是 <code>-XX:PretenureSizeThreshold</code>，把大对象阈值修改为了 20MB，避免我们程序里分配的大对象直接进入老年代。</p>
+<h3 id="示例程序"><a href="#示例程序" class="headerlink" title="示例程序"></a>示例程序</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		Thread.sleep(<span class="number">30000</span>);</span><br><span class="line">		<span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">			loadData();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">loadData</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		<span class="keyword">byte</span>[] data = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) &#123;</span><br><span class="line">			data = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">		&#125;</span><br><span class="line">		data = <span class="keyword">null</span>;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">byte</span>[] data1 = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">10</span> * <span class="number">1204</span> * <span class="number">1024</span>];</span><br><span class="line">		<span class="keyword">byte</span>[] data2 = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">byte</span>[] data3 = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">		data3 = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">		</span><br><span class="line">		Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>j简单解释上面的程序，大概意思就是，每秒钟都会执行一次 loadData() 方法，它会分配 4 个 10MB 的数组，但是都立马成了垃圾。但是会有 data1 和 data2 两个 10MB 的数组时被变量引用必须存活的，此时 Eden 区已经占用了六七十 MB 空间了，接着是 data3 变量依次指向了两个 10MB 的数组，这是为了在 1s 内触发 Young GC 的。</p>
+<h3 id="基于-jstat-分析程序运行的状态"><a href="#基于-jstat-分析程序运行的状态" class="headerlink" title="基于 jstat 分析程序运行的状态"></a>基于 jstat 分析程序运行的状态</h3><p>接着我们基于 jstat 分析程序运行的状态，启动程序后立马采用 jstat 监控其运行状态可以看到如下的信息：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/jstat%E7%BB%93%E6%9E%9C.png" alt="jstat结果"></p>
+<p>我们一点一点来分析这个 JVM 的运行状态。首先先看如下这一行截图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E7%BB%93%E6%9E%9C2.png" alt="结果2"></p>
+<p>在这里的最后一行，可以看到，程序运行起来之后，在一秒内就发生一次 Young GC，因为按照我们上述的代码，它一定会在一秒内触发一次 Young GC 的。</p>
+<p>Young GC 过后，我们发现 S1U，也就是一个 Survivor 区中有 587KB 的存活对象，这应该就是那些未知对象了。然后我们明显看到在 OU 中多出来了 30MB 左右的对象，因此可以确定，在这次 Young GC 的时候，有 30MB 的对象存活了，此时因为 Survivor 区域放不下，所以直接进入老年代了。</p>
+<p>接着看下面的图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E7%BB%93%E6%9E%9C3.png" alt="结果3"></p>
+<p>看红圈的部分，很明显每秒会发生一次 Young GC，都是导致 20MB ~ 30MB 左右的对象进入老年代。因为每次 Young GC 都会存活下来这么多对象，但是 Survivor 区域是放不下的，所以会直接进入老年代。此时看到老年代的对象占用从 30KB 一路到 60MB 左右，此时突然在 60MB 之后下一秒，明显发生了一次 Full GC，对老年代进行了垃圾回收，因为此时老年代重新变成了 30MB 了。</p>
+<p>为什么会这样？因为老年代总共就 100MB 左右，已经占用了 60MB 了，此时如果发生一次 Young GC，有 30MB 存活对象要进入老年代的话。此时会进行 Full GC，回收掉之前那 60MB，然后再放进去新的 30MB 对象。</p>
+<p>所以按照我们的这段代码，几乎是每秒新增 80MB 左右，触发每秒 1 次 Young GC，每次 Young GC 后存活下来 20MB ~ 30MB 的对象，老年代每秒新增 20MB ~ 30MB 的对象，触发老年代几乎三秒一次 Full GC，是不是跟我们上面的案例分析的场景很类似？Young GC 太频繁了，而且每次 GC 后存活对象太多，频繁进入老年代，频繁触发 Full GC。</p>
+<p>继续看下图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/%E7%BB%93%E6%9E%9C4.png" alt="结果4"></p>
+<p>大家看上图，发现 28 次 Young GC，结果耗费了 180 毫秒，平均下来一次 Young GC 要 6 毫秒左右。但是 14 次 Full GC 才耗费 34 毫秒，平均下来一次 Full GC 才耗费两三毫秒。这是为什么？道理是这样，按照上述程序，每次 Full GC 都是由 Young GC 触发的，因为 Young GC 过后存活对象太多要放入老年代，老年代内存不够触发 Full GC，所以必须等 Full GC 执行完毕了，Young GC 才能把存活对象放入老年代才算结束。这就导致 Young GC 也是速度非常慢。</p>
+<h3 id="对-JVM-性能进行优化"><a href="#对-JVM-性能进行优化" class="headerlink" title="对 JVM 性能进行优化"></a>对 JVM 性能进行优化</h3><p>我们只需要调大年轻代的内存空间，增加 Survivor 的内存即可。看如下参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:NewSize=209715200 -XX:MaxNewSize=209715200 -XX:InitialHeapSize=314572800 -XX:MaxHeapSize=314572800 -XX:SurvivorRatio=2 -XX:MaxTenuringThreshold=15 -XX:PretenureSizeThreshold=20971520 -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:gc.log</span><br></pre></td></tr></table></figure>
+
+<p>我们把堆大小调整为 300MB，年轻代给了 200MB，同时 <code>-XX:SurvivorRatio=2</code> 表明，Eden : Survivor 的比例为 2 : 1 : 1，所以 Eden 区是 100MB，每个 Survivor 区是 50MB，老年代是 100MB。</p>
+<p>接着我们用这个 JVM 参数运行程序，用 jstat 来监控其运行状态如下：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/JVM%E4%BC%98%E5%8C%961.png" alt="优化1"></p>
+<p>在上图可以看到，每秒的 Young GC 过后，都会有 20MB 左右的存活对象进入 Survivor，但是每个 Survivor 区都是 50MB 的大小，因此可以轻松容纳，而且一般不会超过 50% 的动态年龄判定的阈值。</p>
+<p>我们可以清楚地看到每秒触发 Young GC 过后，几乎就没有对象会进入老年代，最终 600KB 的对象进入了老年代里。在看下面的截图：</p>
+<p><img src="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/JVM%E4%BC%98%E5%8C%962.png" alt="JVM优化2"></p>
+<p>我们可以看到，只有 Young GC，没有 Full GC，而且 11 次 Young GC 才不过 9 毫秒，平均一次 GC 1 毫秒都不到，没有 Full GC 干扰之后，Young GC 的性能极高。</p>
+<p>所以这个案例的优化就成功了，同样的程序，仅仅是调整了内存分配比例，立马就大幅度提升了 JVM 的性能，几乎把 Full GC 消灭了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/JVM/" rel="tag"># JVM</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/01/27/Spring-杂记/" rel="next" title="Spring 杂记">
+                <i class="fa fa-chevron-left"></i> Spring 杂记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/02/09/TCP-IP-四层网络模型和-OSI-七层网络模型/" rel="prev" title="TCP/IP 四层网络模型和 OSI 七层网络模型">
+                TCP/IP 四层网络模型和 OSI 七层网络模型 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">68</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#案例分析"><span class="nav-number">1.</span> <span class="nav-text">案例分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#日处理上亿数据的计算系统"><span class="nav-number">1.1.</span> <span class="nav-text">日处理上亿数据的计算系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#这个系统何时塞满新生代"><span class="nav-number">1.2.</span> <span class="nav-text">这个系统何时塞满新生代</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#触发-Minor-GC-的时候会有多少对象进入老年代"><span class="nav-number">1.3.</span> <span class="nav-text">触发 Minor GC 的时候会有多少对象进入老年代</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统运行多久，老年代大概会填满"><span class="nav-number">1.4.</span> <span class="nav-text">系统运行多久，老年代大概会填满</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#这个系统运行多久会触发一次-Full-GC"><span class="nav-number">1.5.</span> <span class="nav-text">这个系统运行多久会触发一次 Full GC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#该案例如何进行-JVM-优化"><span class="nav-number">1.6.</span> <span class="nav-text">该案例如何进行 JVM 优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码示例"><span class="nav-number">2.</span> <span class="nav-text">代码示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#运行程序用的示例-JVM-参数"><span class="nav-number">2.1.</span> <span class="nav-text">运行程序用的示例 JVM 参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例程序"><span class="nav-number">2.2.</span> <span class="nav-text">示例程序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于-jstat-分析程序运行的状态"><span class="nav-number">2.3.</span> <span class="nav-text">基于 jstat 分析程序运行的状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对-JVM-性能进行优化"><span class="nav-number">2.4.</span> <span class="nav-text">对 JVM 性能进行优化</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

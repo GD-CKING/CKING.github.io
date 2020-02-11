@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机网络,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="其实，四层模型和七层模型，是可以一块儿讲的。首先先思考一个问题，为什么要有协议？ 如果各个电脑厂商，像 IBM，苹果和联想，都弄自己的协议，结果就是苹果电脑和苹果电脑可以通信，但和其它厂商的电脑就可能无法通信，因为各自的协议不一样。所以就弄了一个国际通行的协议，大家都按照这个来，所有电脑就可以通信了。 此时就要搞一个标准的网络模型出来，大家都按照这个来走，都遵守统一的规范。这就是所谓的 OSI 七">
+<meta name="keywords" content="计算机网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCP&#x2F;IP 四层网络模型和 OSI 七层网络模型">
+<meta property="og:url" content="https://github.com/2020/02/09/TCP-IP-四层网络模型和-OSI-七层网络模型/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="其实，四层模型和七层模型，是可以一块儿讲的。首先先思考一个问题，为什么要有协议？ 如果各个电脑厂商，像 IBM，苹果和联想，都弄自己的协议，结果就是苹果电脑和苹果电脑可以通信，但和其它厂商的电脑就可能无法通信，因为各自的协议不一样。所以就弄了一个国际通行的协议，大家都按照这个来，所有电脑就可以通信了。 此时就要搞一个标准的网络模型出来，大家都按照这个来走，都遵守统一的规范。这就是所谓的 OSI 七">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/02/09/TCP-IP-四层网络模型和-OSI-七层网络模型/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.png">
+<meta property="og:updated_time" content="2020-02-10T10:01:54.016Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TCP&#x2F;IP 四层网络模型和 OSI 七层网络模型">
+<meta name="twitter:description" content="其实，四层模型和七层模型，是可以一块儿讲的。首先先思考一个问题，为什么要有协议？ 如果各个电脑厂商，像 IBM，苹果和联想，都弄自己的协议，结果就是苹果电脑和苹果电脑可以通信，但和其它厂商的电脑就可能无法通信，因为各自的协议不一样。所以就弄了一个国际通行的协议，大家都按照这个来，所有电脑就可以通信了。 此时就要搞一个标准的网络模型出来，大家都按照这个来走，都遵守统一的规范。这就是所谓的 OSI 七">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/02/09/TCP-IP-四层网络模型和-OSI-七层网络模型/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/02/09/TCP-IP-四层网络模型和-OSI-七层网络模型/">
+
+
+
+
+
+  <title>TCP/IP 四层网络模型和 OSI 七层网络模型 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/02/09/TCP-IP-四层网络模型和-OSI-七层网络模型/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TCP/IP 四层网络模型和 OSI 七层网络模型</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-09T15:18:46+08:00">
+                2020-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/计算机网络/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>其实，四层模型和七层模型，是可以一块儿讲的。首先先思考一个问题，为什么要有协议？</p>
+<p>如果各个电脑厂商，像 IBM，苹果和联想，都弄自己的协议，结果就是苹果电脑和苹果电脑可以通信，但和其它厂商的电脑就可能无法通信，因为各自的协议不一样。所以就弄了一个国际通行的协议，大家都按照这个来，所有电脑就可以通信了。</p>
+<p>此时就要搞一个标准的网络模型出来，大家都按照这个来走，都遵守统一的规范。这就是所谓的 OSI 七层模型。它们分别是：<strong>物理层、数据链路层、网络层、传输层、会话层、表示层、应用层</strong>。在这个基础上，又简化出了 TCP/IP 四层模型：<strong>数据链路层、网络层、传输层、应用层</strong>。</p>
+<h2 id="从底向上的网络分层"><a href="#从底向上的网络分层" class="headerlink" title="从底向上的网络分层"></a>从底向上的网络分层</h2><h3 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h3><p>如果电脑要联网，怎么联？可以在电脑上插根网线，或者联个 WIFI，就可以上网。往大了说就还有中国和美国之间的海底光缆。所以物理层指的就是这个，就是怎么把各个电脑联结起来，形成一个网络，这就是物理层的含义。物理层复制传输 0 和 1 的电路信号，因为计算机最底层都是用 0 1 来表示数据的。</p>
+<h3 id="数据链路层"><a href="#数据链路层" class="headerlink" title="数据链路层"></a>数据链路层</h3><p>物理层将各个电脑连接起来了，还传输最底层的 0 和 1 电路信号。但这样还不行。你得定义清楚哪些 0 和 1 分为一组，这些信号啥意思，这样才能进行通信、所以数据链路层就是做这种事，定义一下电路信号怎么分组。例如：</p>
+<ul>
+<li><p>00000011（从电脑 1 出发，要到电脑 2 去）</p>
+</li>
+<li><p>00101（从电脑 1 出发，要到电脑 3 去）</p>
+</li>
+</ul>
+<p>以前，每个公司都定义自己的电路信号分组方式，但是后来出来了以太网协议。以太网，一组电路信号就是一个数据包，叫一个帧（frame），每个帧分为两个部分，标头（head）和数据（data），标头包含一些说明性的东西，比如发送者、接受者和数据类型之类的。</p>
+<p>每台电脑要往另一台电脑发送数据，一堆 0/1 信号，封装成数据包，包含头和数据，头里包含了从哪儿来到哪儿去，必须从一台电脑的一个网卡，发送到另外一个电脑的一个网卡，所以以太网的数据包必须指定<code>目标电脑的 mac 地址</code>。</p>
+<p>以太网规定了，每个网卡必须包含一个 mac 地址，mac 地址就是这个网卡的唯一标识。接入网络里的所有设备，都得有个网卡。以太网协议里的那个数据包，在数据链路层传输的数据包，必须从一个电脑的网卡传输到另外一个电脑的网卡，而这个网卡的地址就叫 mac 地址。</p>
+<p>每个网卡出厂的时候，就有一个唯一的 mac 地址，48 位的二进制，但是一般使用 12 个 16 进制数字表示，前 6 个 16 进制是厂商编号，后 6 个 16 进制是网卡的流水号。在 Windows 系统中，可以通过命令 <code>ipconfig /all</code> 查看物理地址，就是 mac 地址。</p>
+<p>所以在以太网里传输数据包的时候，必须指定接受者的 mac 地址才能传输数据。但是以太网的数据包怎么从一个 mac 地址发送到另一个 mac 地址？这个不是精准推送的。以太网里面，如果一个电脑发个数据包出去，会广播给局域网内的所有电脑设备的网卡，然后每台电脑都从数据包里获取接收者的 mac 地址，跟自己的 mac 地址对比一下，如果一样，就说明这是给自己的数据包。</p>
+<p>但是上面这种广播的方式。仅仅针对一个子网（局域网）内的电脑才会广播，否则一个电脑不能广播数据包给全世界所有的其他电脑吧，仅仅只是广播给一个子网里面的电脑。</p>
+<p><img src="/CKING.github.io/2020/02/09/TCP-IP-四层网络模型和-OSI-七层网络模型/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.png" alt="数据链路层"></p>
+<h3 id="网络层"><a href="#网络层" class="headerlink" title="网络层"></a>网络层</h3><p>上面说到，子网内的电脑，通过以太网发个数据包，对局域网内的电脑，是广播出去的。那么怎么知道哪些电脑在一个子网内呢？这就得靠网络层了，这里有一套 IP 地址，IP 地址就可以让我们区分哪些电脑是一个子网的。</p>
+<p>网络层里有个 IP 协议，IP协议定义的地址就叫做 IP 地址。IP地址有 IPv4 和 IPv6 两个版本，目前广泛使用的是 IPv4，是 32 个二进制数字组成的，但是一般用 4 个十进制数字表示，范围从 0.0.0.0 到 255.255.255.255 之间。</p>
+<p>每台计算机，都会分配一个 ip 地址，ip 地址的前 24 位（就是前面 3 个十进制数字），代表了网络，后 8 位（最后 1 个十进制数字），代表了主机。如果几台电脑是一个子网的，那么前面的 3 个十进制数字一定是一样的。举个例子，像平时我们在自己 Windows 上开几个 Linux 虚拟机，你会发现，Win 上的 ip 地址可能是 192.168.0.103，然后几个虚拟机的 ip 地址是 192.168.0.182，192.168.0.125 类似这样的。</p>
+<p>这个 Win 机器和几个虚拟机，前面 3 个十进制数字都是 192.168.0，就代表大家是一个子网内的，最后一个数字是这个子网的不同主机的编号。但是实际上这就是举个例子，单单从 ip 地址是看不出哪些机器是一个子网的，因为从 10 进制是判断不出来的，需要通过 ip 地址的二进制来判断，结合一个概念来判断，叫做：<strong>子网掩码</strong>。</p>
+<p>比如说 ip 地址是 192.168.56.1，子网掩码是 255.255.255.0。知道子网掩码之后，如果要判断两个 ip 地址是不是一个子网的，就分别把两个 ip 地址和自己的子网掩码进行<strong>二进制的与运算</strong>，与运算之后，比较一下代表网络的那部分。</p>
+<p>例如 192.168.53.1 和 192.168.32.7，判断是不是一个子网的，拿子网掩码 255.255.255.0，跟两个 ip 地址的二进制做与运算，通过二进制来比较网络部分的地址是不是一模一样的。</p>
+<p>11000000.10101000.00111000.00000001</p>
+<p>11111111.11111111.11111111.00000000</p>
+<p>有了网络层的 ip 地址之后，两台在子网内的电脑终于可以通过广播 + mac 地址判断来传输数据包进行通信 了。但是如果发现要接收数据包的计算机不在子网内，那么就不能通过广播来发送数据包，需要通过路由来发送数据包。</p>
+<p>看到路由，就想到了路由器。说到路由器，相信大家会比较熟悉，基本家里上网都会弄个路由器。路由器负责将多个子网进行连接，因为你在自己家里，其实你就只是你自己的一个子网，你要是访问网站啥的，是跟那个网站机器所在的子网进行通信。</p>
+<p>每个电脑都可以有多个网卡，不是只有一个网卡。一般笔记本都会有以太网网卡和 WiFi 网卡，发送数据包的时候决定走哪个网卡。路由器，其实就是配置了多个网卡的一个专用设备，可以通过不同的网卡接入不同的网络。</p>
+<p>网关其实就是路由器的一种，运作在网络层，这个概念不多解释，大家看可以把路由器上的 ip 地址认为是网关。路由器上每个网卡都有 mac 地址和对应的 ip 地址，路由器虽然有 mac 地址，但是不能通过 mac 地址寻址，必须通过 ip 地址寻址，所以路由器其实是工作在网络层的设置。</p>
+<p>网络交换机，也是一种设备，是工作在数据链路层的，路由器是工作在网络层的。网络交换机是通过 mac 地址来寻址和传输数据包的；但是路由器是通过 ip 地址寻址和传输数据包的。网络交换机用在局域网的通信，一般你架设一个局域网，里面的电脑通信是通过数据链路层发送数据包，通过 mac 地址来广播的，广播的时候就是通过网络交换机这个设备来把数据广播到局域网内的其他机器上去的。而路由器一般用来让你连入英特网。</p>
+<p>LAN，就是 local area network，就是局域网；WAN，就是 wide area network，就是广域网。WLAN 是 wireless local area network，就是无限局域网，也就是 WiFi，在局域网内，可以直接通过 WiFi 无线联网。家里的路由器就是包含了交换机和路由的两个功能，如果是连接到局域网内的设备就把线插到 LAN 那儿，如果是连接到因特网，就把线插在 WAN 上。</p>
+<p>举个例子，就是两个局域网之间，如果是通过一个路由器进行通信的话，要怎么进行。大概过程就是，路由器配置了两块网卡，每个网卡可以连到一个局域网内。局域网 1 内的电脑，要发送数据包到局域网 2 内的电脑，在数据包上写上自己的 ip 地址和对方的 ip 地址。但是它们不在一个局域网内，于是局域网 1 内的电脑，先通过交换机将数据包发送到路由器，这个过程需要将路由器的一块网卡的 ip 地址对应的 mac 地址写到数据包的头部，然后才能通过交换机广播出去，路由器接收到之后比较自己一块网卡的 mac 地址，就知道是来找自己的。</p>
+<p>接着路由器收到数据包之后，就会在局域网 2 内，将目标机器的 ip 地址对应的 mac 地址写入头部，接着再次通过交换机发送广播通知，发送给局域网 2 的电脑。</p>
+<p>一个局域网内的每台机器都有自己的 ARP cache，这个 ARP 就是用来在一个局域网内让各个设备都知道每个设备的 ip 地址和 mac 地址的对应关系的，一般就是某个机器发送广播通知自己的 ip 地址和 mac 地址的对应关系，然后每个机器给他一个回应。以此类推，大家都互相这样广播一把，ip 地址和 mac 地址的对应关系，大家就都知道了。</p>
+<p>总结来说就是，一个子网内的机器之间通信，就是在数据包里写上对方的 mac 地址，然后交换机广播出去就 OK 了；但是如果是跨子网的通信，就是写上对方的 ip 地址，然后先通过 mac 地址广播到路由器，让路由器再根据另外一个子网的 ip 地址转换为 mac 地址，通过另外一个子网的交换机广播过去。</p>
+<h3 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h3><p>上面我们大概明白了通过网络层的 ip地址怎么划分出一个一个的子网，然后在子网内部怎么通过 mac 地址广播通信；跨子网的时候，怎么通过 <code>ip 地址 -&gt; mac 地址 -&gt; 交换机 -&gt; 路由器 -&gt; ip 地址 -&gt; mac 地址 -&gt; 交换机</code>的形式来通过路由器进行通信。</p>
+<p>但是还有一个问题，就是一台机器上，是很多程序用一个网卡进行网络通信的，比如说浏览器、QQ、视频直播等等，这些软件都用了一个网卡往外面发送数据，然后从网卡接收数据。</p>
+<p>所以还需要一个端口号的概念，就是你得发送数据包到某个机器的一个网卡的某个端口号上去，然后那个机器上监听那个端口的程序，就可以提取发送到这个端口的数据，知道是自己的数据。端口号是 <code>0 ~ 65536</code> 的范围内，其中 0 ~ 1023 被系统占用，别的应用程序就用 1024 以上的端口号。</p>
+<p>电脑 1，是在端口号 48632 监听的，通过网卡发送了一条数据 -&gt; 电脑 2 的 ip 地址的 20386 这个端口 -&gt; 电脑 2 的上面的某个 QQ，监听着 20386 的端口 -&gt; 电脑 2 的网卡接收到一条数据之后，发现人家找的是 20386 这个端口，就去找谁在监听 203836，发现 QQ 在监听，我就把这个网卡过来的数据，传递给 QQ，通过端口知道，哪条数据是给你的。</p>
+<p>所以大家会发现，网络层，是基于 ip 协议，进行主机和主机间的寻址和通信的，然后传输层，是建立某个主机的某个端口，到另外一个主机的某个端口的连接和通信的。这个通信，就是通过 socket 来实现的，通过 socket 就可以基于 tcp/ip 协议完成上面说的一系列的比如基于 ip 寻址 和 mac 地址转换和寻址，通过路由通信之类的，而且会建立一个端口到另外一个端口的连接。</p>
+<p>UDP 和 TCP 都是传输层的协议，作用就是在数据包里加入端口号，可以通过端口号进行点对点的通信了。UDP 是不可靠的，发出去人家收到没有就不知道了；TCP 协议是可靠的，要求三次握手，而且要求人家接收到数据必须回复你。</p>
+<p>传输层的 TCP 协议，仅仅只是规定了一套基于端口的点对点的通信协议，包括如何建立连接，如果发送和读取消息，但是实际上如果你要基于 TCP 协议来开发，一般使用 socket，java socket，netty开进行网络编程。</p>
+<h3 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h3><p>通过传输层的 TCP 协议可以传输数据，但是人家收到数据之后，怎么来解释？比如收到个邮件你要怎么处理，收到个网页呢。所以针对不同的应用，邮件、网页之类的，都是定义不同的应用层协议的。这个应用层，我们就假设综合了会话层、表示层和应用层了。比如最常见的，应用层的协议就是 HTTP 协议。</p>
+<p>电脑 1 走 TCP 协议发送了一段东西过来，发送到电脑 2 的 20386 端口：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET http://localhost:8080/ http/1.1</span><br><span class="line"></span><br><span class="line"><span class="attribute">key:value1</span></span><br><span class="line"><span class="attribute">key:value</span></span><br></pre></td></tr></table></figure>
+
+<p>电脑 2 走 TCP 协议读取到了属于自己这个 20386 端口的一段数据，并发送了一段相应</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">200</span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line"><span class="attribute">key:value</span></span><br><span class="line"><span class="attribute">key:value</span></span><br></pre></td></tr></table></figure>
+
+<p>又是通过底层的 TCP 发了出去，电脑 1 的 30987 端口，ip</p>
+<p>电脑 1，网卡，走以太网协议收到一个数据包</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">200</span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line"><span class="attribute">key:value</span></span><br><span class="line"><span class="attribute">key:value</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>我们看一下自己的网络设置，一般包含了 ip 地址、子网掩码、网关地址、DNS 地址。前面 3 个我们都知道什么意思了。ip 地址和子网掩码用来划分子网的，判断哪些 ip 地址在一个子网内，同时你的 ip 地址和 mac 地址关联起来，唯一定位了你的网关。网关地址，你就认为是路由器上的那个网卡的 ip 地址吧。路由器的网卡也有 mac 地址，mac 地址对应一个 ip 地址。</p>
+<p>DNS地址是啥呢？Domain Name System。因为我们一般定位是通过ip地址+mac地址+端口号来定位一个通信目标的，但是如果在浏览器上输入一个<a href="http://www.baidu.com，咋整？这个时候是先把www.baidu.com发给DNS服务器，然后DNS服务器告诉你www.baidu.com对应的ip地址的" target="_blank" rel="noopener">www.baidu.com，咋整？这个时候是先把www.baidu.com发给DNS服务器，然后DNS服务器告诉你www.baidu.com对应的ip地址的</a></p>
+<p>参考资料</p>
+<p><a href="https://mp.weixin.qq.com/s/MV1-UeiOzwKm_xWlNSFUvA" target="_blank" rel="noopener">网络模型</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/计算机网络/" rel="tag"># 计算机网络</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/01/31/JVM-之-jstat-案例分析-Full-GC/" rel="next" title="JVM 之 jstat 案例分析 - Full GC">
+                <i class="fa fa-chevron-left"></i> JVM 之 jstat 案例分析 - Full GC
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/02/11/浏览器请求一个网址时，都干了什么/" rel="prev" title="浏览器请求一个网址时，都干了什么">
+                浏览器请求一个网址时，都干了什么 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">68</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#从底向上的网络分层"><span class="nav-number">1.</span> <span class="nav-text">从底向上的网络分层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#物理层"><span class="nav-number">1.1.</span> <span class="nav-text">物理层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据链路层"><span class="nav-number">1.2.</span> <span class="nav-text">数据链路层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络层"><span class="nav-number">1.3.</span> <span class="nav-text">网络层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#传输层"><span class="nav-number">1.4.</span> <span class="nav-text">传输层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用层"><span class="nav-number">1.5.</span> <span class="nav-text">应用层</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
