@@ -96,7 +96,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/page.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/%E6%95%B0%E6%8D%AE.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/B+%E6%A0%91%E6%95%B0%E6%8D%AE.png">
-<meta property="og:updated_time" content="2020-01-22T01:08:35.195Z">
+<meta property="og:updated_time" content="2020-03-09T03:24:25.211Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="捋一遍MySQL索引结构">
 <meta name="twitter:description" content="从一个简单的表开始​        首先我们先建一个表，语句如下： 1234567create table user(    id int primary key,    age int,    height int,    weight int,    name varchar(32))engine = innoDb;  ​        然后往这个表中插入一些数据： 12345INSERT I">
@@ -391,7 +391,7 @@
 <p>​        结果如下：</p>
 <p><img src="/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C.png" alt="查询结果"></p>
 <p>​        可以看到，数据已经完整地放到我们创建的user表中。但是有一个地方需要注意：<strong>我们插入的数据都是乱序的，但MySQL好像按照id给我们的数据排了序</strong>。为什么会出现MySQL在我们没有显式排序的情况下，默默帮我们排序了？它是在什么时候进行排序的？</p>
-<h2 id="页的引入"><a href="#页的引入" class="headerlink" title="页的引入"></a>页的引入</h2><p>​        在操作系统的概念中，当我们往磁盘中取数据，假设要取出的数据的大小是1KB，但是操作系统并不会只取出这1KB的数据，而是会取出4KB的数据，因为操作系统的一个页表项的大小是4KB。那为什么我们主需要1KB的数据，但是操作系统要取出4KB的数据呢？</p>
+<h2 id="页的引入"><a href="#页的引入" class="headerlink" title="页的引入"></a>页的引入</h2><p>​        在操作系统的概念中，当我们往磁盘中取数据，假设要取出的数据的大小是1KB，但是操作系统并不会只取出这1KB的数据，而是会取出4KB的数据，因为操作系统的一个页表项的大小是4KB。那为什么我们只需要1KB的数据，但是操作系统要取出4KB的数据呢？</p>
 <p>​        这就涉及到一个程序局部性的概念，大概就是“<strong>一个程序在访问了一条数据之后，在之后会有极大可能再次访问这条数据和访问这条数据的相邻数据</strong>”。所以索性直接加载4KB的数据到内存，下次要访问这一页的数据时，直接从内存中找，可以减少磁盘IO次数。因此磁盘IO是影响程序性能主要的因素，因为磁盘IO和内存IO的速度是不可同日而语的。</p>
 <p>​        我们回到数据库层面中，重新理解页的概念。假设还是我们刚才插入的那些数据，我们现在要找id=5的数据，依照最原始的方式，我们一定会想到的就是<code>遍历</code>。这也是我们刚开始学计算机的时候最常用的寻找数据的方式。我们来看看，以遍历的方式，我们找到id=5的数据，需要经历几次磁盘IO。</p>
 <blockquote>
@@ -422,11 +422,11 @@
 <p>​        那么第三个问题：在开头说页的概念的时候，我们有说过，MySQL中每一页的大小只有16KB，不会随着数据的插入而自动扩容，所以这16KB不可能存下我们所有的数据，那么必定会有多个页来存储数据。那么在多页的情况下，MySQL中又是怎么组织这些页的呢？</p>
 <p>​        针对这个问题，我们继续画出来我们现在多了解的多页的结构图：</p>
 <p><img src="/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/%E5%A4%9A%E9%A1%B5.png" alt="多页"></p>
-<p>​        可以看到，在数据不断变多的情况下，MySQL会再去开辟新的页来存放新的数据，而每个页都有指向下一页的指针和指向上一页的指针，将多有页组织起来（这里修改了数据，将每一列的数据都放到了数据区中，其中第一个空格之前的代表id）,第一页中存放id为1-5的数据，第二页存放id为6-10的数据，第三页存放id为11-15的数据。需要注意的是，<strong>在开辟新页的时候，我们插入的数据不一定是在新开辟的页上，而是要进行所有页的数据比较，来决定这条插入的数据放在哪一页上，而完成数据插入后，最终的多页结构会像上图中画的那样</strong>。</p>
+<p>​        可以看到，在数据不断变多的情况下，MySQL会再去开辟新的页来存放新的数据，而每个页都有指向下一页的指针和指向上一页的指针，将多个页组织起来（这里修改了数据，将每一列的数据都放到了数据区中，其中第一个空格之前的代表id）,第一页中存放id为1-5的数据，第二页存放id为6-10的数据，第三页存放id为11-15的数据。需要注意的是，<strong>在开辟新页的时候，我们插入的数据不一定是在新开辟的页上，而是要进行所有页的数据比较，来决定这条插入的数据放在哪一页上，而完成数据插入后，最终的多页结构会像上图中画的那样</strong>。</p>
 <h2 id="多页模式"><a href="#多页模式" class="headerlink" title="多页模式"></a>多页模式</h2><p>​        在多页模式下，MySQL终于完成多数据的存储，就是采用开辟新页的方式，将多条数据放在不同的页中，然后同样采用链表的数据结构，将每一页连接起来，那么可以思考第四个问题：<strong>多页情况下是否对查询效率有影响呢？</strong></p>
 <h3 id="多页模式对于查询效率的影响"><a href="#多页模式对于查询效率的影响" class="headerlink" title="多页模式对于查询效率的影响"></a>多页模式对于查询效率的影响</h3><p>​        答案是肯定的，多页会对查询效率产生一定的影响，影响主要就体现在，多页其本质也是一个链表结构，只要是链表结构，查询效率一定不会高。</p>
 <p>​        假设数据又非常多，数据库就会开辟非常多的新页，而这些新页就会像链表一样连接在一起，当我们要在这么多页中查询某条数据时，它还是会从头节点遍历到存在我们需要的那条数据所存在的页上。我们好不容易通过页目录优化了页中数据的查询效率，现在又出现了以页为单位的链表。</p>
-<h3 id="优化多页模式"><a href="#优化多页模式" class="headerlink" title="优化多页模式"></a>优化多页模式</h3><p>​        由于多页模式会影响查询的效率，那么肯定需要有一种方式来优化多页模式下的查询。既然我们可以用页目录的优化页内的数据区，那么我们也可以采取类似的方式来优化这种多页的情况。是的，页内数据区和多页模式本质上都是链表，的确可以采用相同的方式来对其进行优化，它就是目录页。</p>
+<h3 id="优化多页模式"><a href="#优化多页模式" class="headerlink" title="优化多页模式"></a>优化多页模式</h3><p>​        由于多页模式会影响查询的效率，那么肯定需要有一种方式来优化多页模式下的查询。既然我们可以用页目录来优化页内的数据区，那么我们也可以采取类似的方式来优化这种多页的情况。是的，页内数据区和多页模式本质上都是链表，的确可以采用相同的方式来对其进行优化，它就是目录页。</p>
 <p>​        我们对比页内数据区，来分析如何优化多页结构。在单页时，我们<strong>采用了页目录的目录项来指向一行数据，这条数据就是存在于这个目录项中的最小数据，那么就可以通过页目录来查找所需数据。</strong></p>
 <p>​        所以对于多页结构也可以采用这种方式，使用一个目录项来指向某一页，而这个目录项存放的就是这一页中存放的最小数据的索引值。和页目录不同的地方在于，<strong>这种目录管理的级别是页，而页目录管理的级别是行。</strong></p>
 <p>​        分析到这里，我们多页模式的结构就会是下图所示的那样：</p>
@@ -437,7 +437,7 @@
 <h2 id="B-树的引入"><a href="#B-树的引入" class="headerlink" title="B+树的引入"></a>B+树的引入</h2><p>​        接着往下说，我们将我们画的存在在目录页的多页模式图宏观化，可以形成下面的这张图：</p>
 <p><img src="/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/B+%E6%95%B0.png" alt="B+数"></p>
 <p>​        这就是我们兜兜转转由简到繁形成的一颗B+树。和常规B+树有些许不同，这是一棵MySQL意义上的B+树，MySQL上的一种索引结构，其中的每个节点就可以理解为是一个页，而叶子节点也就是数据页，除了叶子节点以外的节点就是目录页。</p>
-<p>​        这一点在图中也可以看出来，非叶子节点只存放了索引，而只有叶子节点存放了真是的数据，这也是符合B+树的特点。</p>
+<p>​        这一点在图中也可以看出来，非叶子节点只存放了索引，而只有叶子节点存放了真实的数据，这也是符合B+树的特点。</p>
 <h3 id="B-树的优势"><a href="#B-树的优势" class="headerlink" title="B+树的优势"></a>B+树的优势</h3><p>由于叶子节点上存放了所有的数据，并且有指针相连，每个叶子节点在逻辑上是相连的，所以对于查找范围比较友好。</p>
 <p>B+树的所有数据都在叶子节点上，所以B+树的查询效率稳定，一般都是查询3次。</p>
 <p>B+树有利于数据库的扫描。</p>
@@ -496,6 +496,14 @@
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> age=<span class="number">1</span> <span class="keyword">and</span> height&gt;<span class="number">2</span> <span class="keyword">and</span> weight=<span class="number">7</span></span><br></pre></td></tr></table></figure>
 
 <p>​        这条语句可以走索引的，因为它可以通过age进行比较，但是weight不会用到索引，因为height是范围查找，与第二条语句类似，如果有两页的height都大于2，那么MySQL会将两页的数据都加载进内存，然后再来通过weight匹配正确的数据。</p>
+<h3 id="索引的范围列匹配"><a href="#索引的范围列匹配" class="headerlink" title="索引的范围列匹配"></a>索引的范围列匹配</h3><p>假设创建索引 create index (shop_id,product_id,gmt_create)。如果你是范围查询，比如 &gt;=，&lt;=，between 操作，你只能是符合最左前缀的规则才可以范围，范围之后的列就不用索引了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM product WHERE shop_id &gt;= 1 AND product_id = 1</span><br></pre></td></tr></table></figure>
+
+<p>这里就只有 shop_id 走索引查询了，而 product_id 没有走索引。</p>
+<h3 id="索引的包含函数"><a href="#索引的包含函数" class="headerlink" title="索引的包含函数"></a>索引的包含函数</h3><p>如果你对某个列用了函数，比如 substring 之类的，那么那一列不用索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM product WHERE shop_id = 1 AND 函数(product_id) = 2</span><br></pre></td></tr></table></figure>
+
+<p>上面就只有 shop_id 在联合索引中走了索引。</p>
 <h3 id="为什么InnoDB只有一个聚簇索引，而不将所有索引都是用聚簇索引"><a href="#为什么InnoDB只有一个聚簇索引，而不将所有索引都是用聚簇索引" class="headerlink" title="为什么InnoDB只有一个聚簇索引，而不将所有索引都是用聚簇索引"></a>为什么InnoDB只有一个聚簇索引，而不将所有索引都是用聚簇索引</h3><p>​        因为聚簇索引是将索引和数据都存放在叶子节点中，如果所有的索引都是用聚簇索引，则每一个索引都将保存一份数据，会造成数据的冗余，在数据量很大的情况下，这种数据冗余是很消耗资源的。</p>
 <h3 id="补充两个索引的点"><a href="#补充两个索引的点" class="headerlink" title="补充两个索引的点"></a>补充两个索引的点</h3><p>​        <strong>1、什么情况下会发生明明创建了索引，但是执行的时候并没有通过索引呢？</strong></p>
 <p>​        查询优化器执行一条SQL语句的查询，可以有不同的执行方案，至于最终选择哪种方案，需要通过优化器进行选择，选择执行成本最低的方案。</p>
@@ -515,6 +523,10 @@
 <p>​        当一条查询语句符合覆盖索引条件时，MySQL只需要通过索引就可以返回查询所需要的数据，这样避免了查到索引后再返回表操作，减少I/O提高效率。</p>
 <p>​        例如，表<code>covering_index_sample</code>中有一个普通索引<code>idx_key1_key2(key1, key2)</code>。当我们通过SQL语句：<code>select key2 from covering_index_sample where key1 = &#39;keytest&#39;;</code>的时候，就可以通过覆盖索引查询，无需回表。</p>
 <p>​        例如上面的<code>SELECT age FROM user where age = 1</code>。这句话就不需要进行回表查询。</p>
+<h2 id="索引的缺点以及使用注意"><a href="#索引的缺点以及使用注意" class="headerlink" title="索引的缺点以及使用注意"></a>索引的缺点以及使用注意</h2><p>索引是有缺点的，常见的就是会增加磁盘消耗，因为要占用磁盘文件，同时高并发的时候频繁插入和修改索引，会导致性能消耗。我们给的建议是就是，尽量创建少的索引。比如一个表建两三个索引。</p>
+<p>某些字段只有两个值，例如 status、is_delete 等，就只有 0 和 1。这些建立索引就没有意义了，几乎跟全表扫描差不多。你有个 id 字段，每个 id 都不太一样，建立个索引，这个时候用索引效果就很好。比如定位到某个 id 的行，通过索引二分查找，可以大大减少要扫描的数据量，性能是非常好的。</p>
+<p>另外，InnoDB 下不要用 UUID 生成的超长字符串作为主键。因为这么搞会导致所有的索引的 data 都是那个主键值，最终导致索引会变得过大，浪费很多磁盘空间。</p>
+<p>还有，一般 InnoDB 表里，建议统一用 auto_increment 自增作为主键值，因为这样可以保持聚簇索引直接加记录就可以了。如果用那种不是单调递增的主键值，可能会导致 B+ 树分裂后重新组织，浪费时间。</p>
 <h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>​        本文着重讲解关于MySQL的索引结果，从零开始慢慢构建了一个B+树索引，并且根据这个过程谈了B+树是如何一步一步去优化查询效率的。简单地归纳一下就是：</p>
 <blockquote>
 <p>​        排序：优化查询的根本，插入时进行排序实际上就是为了优化查询的效率。</p>
@@ -664,7 +676,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">75</span>
+                  <span class="site-state-item-count">76</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -719,7 +731,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#从一个简单的表开始"><span class="nav-number">1.</span> <span class="nav-text">从一个简单的表开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页的引入"><span class="nav-number">2.</span> <span class="nav-text">页的引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#排序对性能的影响"><span class="nav-number">3.</span> <span class="nav-text">排序对性能的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于单页模式存储的查询流程"><span class="nav-number">4.</span> <span class="nav-text">基于单页模式存储的查询流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上述页模式可能带来的问题"><span class="nav-number">5.</span> <span class="nav-text">上述页模式可能带来的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页目录的引入"><span class="nav-number">6.</span> <span class="nav-text">页目录的引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页的扩展"><span class="nav-number">7.</span> <span class="nav-text">页的扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多页模式"><span class="nav-number">8.</span> <span class="nav-text">多页模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多页模式对于查询效率的影响"><span class="nav-number">8.1.</span> <span class="nav-text">多页模式对于查询效率的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化多页模式"><span class="nav-number">8.2.</span> <span class="nav-text">优化多页模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B-树的引入"><span class="nav-number">9.</span> <span class="nav-text">B+树的引入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#B-树的优势"><span class="nav-number">9.1.</span> <span class="nav-text">B+树的优势</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页的完整结构"><span class="nav-number">10.</span> <span class="nav-text">页的完整结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于B-树聊赖MySQL的其他知识点"><span class="nav-number">11.</span> <span class="nav-text">基于B+树聊赖MySQL的其他知识点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#聚簇索引和非聚簇索引"><span class="nav-number">11.1.</span> <span class="nav-text">聚簇索引和非聚簇索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#联合索引的最左前缀匹配原则"><span class="nav-number">11.2.</span> <span class="nav-text">联合索引的最左前缀匹配原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么InnoDB只有一个聚簇索引，而不将所有索引都是用聚簇索引"><span class="nav-number">11.3.</span> <span class="nav-text">为什么InnoDB只有一个聚簇索引，而不将所有索引都是用聚簇索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#补充两个索引的点"><span class="nav-number">11.4.</span> <span class="nav-text">补充两个索引的点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">12.</span> <span class="nav-text">结语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">13.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#从一个简单的表开始"><span class="nav-number">1.</span> <span class="nav-text">从一个简单的表开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页的引入"><span class="nav-number">2.</span> <span class="nav-text">页的引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#排序对性能的影响"><span class="nav-number">3.</span> <span class="nav-text">排序对性能的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于单页模式存储的查询流程"><span class="nav-number">4.</span> <span class="nav-text">基于单页模式存储的查询流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上述页模式可能带来的问题"><span class="nav-number">5.</span> <span class="nav-text">上述页模式可能带来的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页目录的引入"><span class="nav-number">6.</span> <span class="nav-text">页目录的引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页的扩展"><span class="nav-number">7.</span> <span class="nav-text">页的扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多页模式"><span class="nav-number">8.</span> <span class="nav-text">多页模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多页模式对于查询效率的影响"><span class="nav-number">8.1.</span> <span class="nav-text">多页模式对于查询效率的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化多页模式"><span class="nav-number">8.2.</span> <span class="nav-text">优化多页模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B-树的引入"><span class="nav-number">9.</span> <span class="nav-text">B+树的引入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#B-树的优势"><span class="nav-number">9.1.</span> <span class="nav-text">B+树的优势</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页的完整结构"><span class="nav-number">10.</span> <span class="nav-text">页的完整结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于B-树聊赖MySQL的其他知识点"><span class="nav-number">11.</span> <span class="nav-text">基于B+树聊赖MySQL的其他知识点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#聚簇索引和非聚簇索引"><span class="nav-number">11.1.</span> <span class="nav-text">聚簇索引和非聚簇索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#联合索引的最左前缀匹配原则"><span class="nav-number">11.2.</span> <span class="nav-text">联合索引的最左前缀匹配原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#索引的范围列匹配"><span class="nav-number">11.3.</span> <span class="nav-text">索引的范围列匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#索引的包含函数"><span class="nav-number">11.4.</span> <span class="nav-text">索引的包含函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么InnoDB只有一个聚簇索引，而不将所有索引都是用聚簇索引"><span class="nav-number">11.5.</span> <span class="nav-text">为什么InnoDB只有一个聚簇索引，而不将所有索引都是用聚簇索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#补充两个索引的点"><span class="nav-number">11.6.</span> <span class="nav-text">补充两个索引的点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引的缺点以及使用注意"><span class="nav-number">12.</span> <span class="nav-text">索引的缺点以及使用注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">13.</span> <span class="nav-text">结语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">14.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
