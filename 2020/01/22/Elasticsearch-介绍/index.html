@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="思维导图   Elasticsearch 简介Elasticsearch 是一个近实时的分布式存储、搜索、分析的引擎。它是专门做搜索的，接下来我们简单说说 Elasticsearch 的相关知识。 Elasticsearch 的数据结构一般来说，要想知道查询的时候大概花多少时间，就需要知道它的底层数据结构是怎么样的。例如：  树形的查找时间复杂度一般是 O(logn)  链表的查找时间复杂度一般">
+<meta name="keywords" content="分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch 介绍">
+<meta property="og:url" content="https://github.com/2020/01/22/Elasticsearch-介绍/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="思维导图   Elasticsearch 简介Elasticsearch 是一个近实时的分布式存储、搜索、分析的引擎。它是专门做搜索的，接下来我们简单说说 Elasticsearch 的相关知识。 Elasticsearch 的数据结构一般来说，要想知道查询的时候大概花多少时间，就需要知道它的底层数据结构是怎么样的。例如：  树形的查找时间复杂度一般是 O(logn)  链表的查找时间复杂度一般">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/Elasticsearch.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%88%86%E8%AF%8D.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/termindex.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/posting.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/posting%E5%8E%8B%E7%BC%A9.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/Elasticsearch%E9%9B%86%E7%BE%A4.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%88%86%E7%89%87.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E4%B8%BB%E5%89%AF%E5%88%86%E7%89%87.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%86%99%E6%95%B0%E6%8D%AE%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E6%9F%A5%E8%AF%A2%E6%B5%81%E7%A8%8B.png">
+<meta property="og:updated_time" content="2020-03-25T03:33:41.500Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Elasticsearch 介绍">
+<meta name="twitter:description" content="思维导图   Elasticsearch 简介Elasticsearch 是一个近实时的分布式存储、搜索、分析的引擎。它是专门做搜索的，接下来我们简单说说 Elasticsearch 的相关知识。 Elasticsearch 的数据结构一般来说，要想知道查询的时候大概花多少时间，就需要知道它的底层数据结构是怎么样的。例如：  树形的查找时间复杂度一般是 O(logn)  链表的查找时间复杂度一般">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/Elasticsearch.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/01/22/Elasticsearch-介绍/">
+
+
+
+
+
+  <title>Elasticsearch 介绍 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elasticsearch 介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-22T17:02:20+08:00">
+                2020-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>思维导图</p>
+</blockquote>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/Elasticsearch.png" alt="Elasticsearch"></p>
+<h2 id="Elasticsearch-简介"><a href="#Elasticsearch-简介" class="headerlink" title="Elasticsearch 简介"></a>Elasticsearch 简介</h2><p>Elasticsearch 是一个<strong>近实时</strong>的<strong>分布式存储、搜索、分析</strong>的引擎。它是专门做搜索的，接下来我们简单说说 Elasticsearch 的相关知识。</p>
+<h2 id="Elasticsearch-的数据结构"><a href="#Elasticsearch-的数据结构" class="headerlink" title="Elasticsearch 的数据结构"></a>Elasticsearch 的数据结构</h2><p>一般来说，要想知道查询的时候大概花多少时间，就需要知道它的底层数据结构是怎么样的。例如：</p>
+<ul>
+<li><p>树形的查找时间复杂度一般是 O(logn)</p>
+</li>
+<li><p>链表的查找时间复杂度一般是 O(n)</p>
+</li>
+<li><p>哈希表的查找时间复杂度一般是 O(1)</p>
+</li>
+</ul>
+<p>不同的数据结构所花的时间往往是不一样的，你要查找的时候快，就需要有底层的数据结构支持。而我们要想知道 Elasticsearch 为什么模糊查询速度快，就需要知道它的底层数据结构是什么。</p>
+<h3 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h3><p>Elasticsearch 最强大的就是为每个字段提供了倒排索引，当查询的时候不用担心没有索引可以利用，什么是倒排索引，举个简单例子：</p>
+<table>
+<thead>
+<tr>
+<th>文档id</th>
+<th>年龄</th>
+<th>性别</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>25</td>
+<td>女</td>
+</tr>
+<tr>
+<td>2</td>
+<td>32</td>
+<td>女</td>
+</tr>
+<tr>
+<td>3</td>
+<td>25</td>
+<td>男</td>
+</tr>
+</tbody></table>
+<p>每一行是一个文档（document），每个 document 都有一个文档 id，那么给这些文档建立的倒排索引就是：</p>
+<p>年龄的索引：</p>
+<table>
+<thead>
+<tr>
+<th>年龄</th>
+<th>文档 id</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>25</td>
+<td>[1,3]</td>
+</tr>
+<tr>
+<td>32</td>
+<td>[2]</td>
+</tr>
+</tbody></table>
+<p>性别的索引：</p>
+<table>
+<thead>
+<tr>
+<th>性别</th>
+<th>文档 id</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>女</td>
+<td>[1,2]</td>
+</tr>
+<tr>
+<td>男</td>
+<td>[3]</td>
+</tr>
+</tbody></table>
+<p>可以看到，倒排索引是针对每个字段的，每个字段都有自己的倒排索引，25、32 这些叫做 <code>term</code>，[1,3] 这种叫做 <code>posting list</code>。</p>
+<p>首先我们得知道为什么 Elasticsearch 为什么可以实现快速的“模糊查询”或者“相关性查询”，实际上是你写入数据到 Elasticsearch 的时候会进行<strong>分词</strong>。如图：</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%88%86%E8%AF%8D.png" alt="分词"></p>
+<p>它会根据文档内容进行分词，上面是分成四个单词，并统计每个单词的个数以及位置。当然这只是一个例子，并不是 Elasticsearch 真正的原理。</p>
+<p>我们都知道，世界上有很多语言，那 Elasticsearch 怎么切分这写词呢？其实 Elasticsearch 内置了一些分词器：</p>
+<ul>
+<li><p><strong>Standard Analyzer</strong>：按词切分，将词小写</p>
+</li>
+<li><p><strong>Simple Analyzer</strong>：按非字母过滤（符号被过滤掉），将词小写</p>
+</li>
+<li><p><strong>WhitespaceAnalyzer</strong>：按照空格切分，不转小写</p>
+</li>
+<li><p>等等等。。。</p>
+</li>
+</ul>
+<p>Elasticsearch 分词器主要由三部分组成：</p>
+<ul>
+<li><p><strong>Character Filter</strong>：文本过滤器，取出 HTML</p>
+</li>
+<li><p><strong>Tokenizer</strong>：按照规则切分，比如空格</p>
+</li>
+<li><p><strong>TokenFilter</strong>：将切分后的词进行处理，比如转小写</p>
+</li>
+</ul>
+<p>Elasticsearch 内置的分词器都是英文类的，而我们用户搜索的时候往往搜的是中文，现在中文分词器用的最多的就是 <strong>IK</strong>。</p>
+<p>说了那么多，那 Elasticsearch 的数据结构是怎么样的呢？如图：</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png" alt="数据结构"></p>
+<p>我们输入一段文字，Elasticsearch 会根据分词器对我们的那段文字进行分词（也就是图上看到的 Ada/Allen/Sara..），这些分词汇总起来我们叫做 <code>Term Dictionary</code>，而我们需要通过分词找到对应的记录，这些文档 ID 保存在 <code>PostingList</code></p>
+<p>在 <code>Term Dictionary</code> 中的词由于是非常非常多的，所以我们会为其进行<strong>排序</strong>，等要查找的时候就可以通过<strong>二分</strong>来查，不需要遍历整个 <code>Term Dictionary</code>。由于 <code>Term Dictionary</code> 的词实在太多，不可能把  <code>Term Dictionary</code> 都放在内存中，于是 Elasticsearch 还抽了一层叫做 <code>Term Index</code>，这层只存储部分<strong>词的前缀</strong>，<code>Term Index</code> 会存在内存中，检索会特别快。</p>
+<h3 id="Term-Dictionary"><a href="#Term-Dictionary" class="headerlink" title="Term Dictionary"></a>Term Dictionary</h3><p>Elasticsearch 为了能快速找到某个 term，将所有的 term 进行了排序，然后二分查找 term，类似于上学时候老师教我们的翻新华字典的方式，所以叫做 Term Dictionary，这种查询方式其实和传统关系型数据库的 B-Tree 的方式很相近，所以这并不是 Elasticsearch 快的原因。</p>
+<h3 id="Term-Index"><a href="#Term-Index" class="headerlink" title="Term Index"></a>Term Index</h3><p>如果说 <strong>Term Dictionary</strong> 是直接去二分法翻字典，那么 <strong>Term Index</strong> 就是字典的目录页，当然这比我们真的去翻字典目录快多了，假设我们的 term 如果全是英文，那么 Term Index  就是 26 个字母表，但是通常 term 未必都是英文，而可以是任意的 byte 数组。因为就算 26 个英文字符也不一定都有对应的 term。例如，a 来头的 term 只有一个，c 开头的 term 有一百万个，x 开头的 term 一个也没有，这样查询到 c 的时候又会很慢了。所以通常情况下 <strong>term index 是包含 term 的一些前缀的一棵树</strong>，例如这样的一个 Term Index：</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/termindex.png" alt="termindex"></p>
+<p>这样的情况下通过 term index 就可以根据快速定位到某个 offset（分支的开端），然后以此位置向下查找，再加上 FST（Finite-State-Transducer，Lucene4.0 开始使用该算法来查找 Term 在 Dictionary 中的位置）的压缩技术，将 Term Index 缓存到内存中，通过 Term Index 找到对应的 Term Dictionary 的 block，然后直接 去磁盘直接找到 term，减少磁盘的随机读写次数，大大地提升查询效率。</p>
+<h3 id="Posting-List-压缩技术-Roaring-Bitmap"><a href="#Posting-List-压缩技术-Roaring-Bitmap" class="headerlink" title="Posting List 压缩技术 Roaring Bitmap"></a>Posting List 压缩技术 Roaring Bitmap</h3><p>说到 roaring bitmaps 就要先了解 bitset 或者 bitmap。bitset 是一种数据结构，对应 posting list 如果是：[2, 3, 5, 7, 9]，那么对应的 bitset 就是：[0,1,1,0,1,0,1,0,1,0]。用 0 和 1 来表示该位置的数值的有无，这种做法就是一个 byte 可以代表 8 个文档。当大数据量时，仍然会消耗很多内存，所以直接将 bitset 结构存入内存不太理想。</p>
+<p>Elasticsearch 不仅压缩了 Term Index，还对 posting list 进行了压缩。posting list 虽然只存储了文档 id，但是文档 id 很大的时候，可以达到 PB 级的数据，所以 Elasticsearch 对 posting List 的压缩做了两件事：排序和大数变小数。如图：</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/posting.png" alt="posting"></p>
+<p>简单解读一下这种压缩技巧：</p>
+<ul>
+<li>step1：在对 posting list 进行压缩时进行了正序排序。</li>
+</ul>
+<ul>
+<li>step2：通过增量将 73 后面的大数变成小数存储增量值。例如 300 - 73 = 227、302 - 300 = 2</li>
+</ul>
+<ul>
+<li>step3：转换成二进制，取占最大位的数，227 占 8 位，前三个占八位，30 占五位，后三个数每个占五位。</li>
+</ul>
+<p>从第三步可以看出，这种压缩方式仍然不够高效，所以 Lucene 使用的数据结构叫做 <strong>Roaring Bitmap</strong>，其压缩原理可以理解为：与其保存 100 个 0，占用 100 个 bit，还不如保存 0 一次，然后声明这个 0 有 100 个，它以两个自己可以表示的最大数 65535 为界，将 posting list 分块。比如第一块是 0 - 65535，第二块是 65535 - 131071，如图：</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/posting%E5%8E%8B%E7%BC%A9.png" alt="posting压缩"></p>
+<p>压缩技巧解读：</p>
+<ul>
+<li><p>step1：从小到大进行排序</p>
+</li>
+<li><p>step2：将大数除以 65536，用除得的结果和余数来表示这个大数</p>
+</li>
+<li><p>step3：以 65535 为界进行分块</p>
+</li>
+</ul>
+<h2 id="Elasticsearch-的术语和架构"><a href="#Elasticsearch-的术语和架构" class="headerlink" title="Elasticsearch 的术语和架构"></a>Elasticsearch 的术语和架构</h2><p>在讲解 Elasticsearch 的架构之前，首先我们得了解一下 Elasticsearch 的一些常见术语：</p>
+<ul>
+<li><p><strong>Index</strong>：Elasticsearch 的 Index 相当于数据库的 Table</p>
+</li>
+<li><p><strong>Type</strong>：这个在新的 Elasticsearch 版本已经废除（在以前的 Elasticsearch 版本，一个 Index 下支持多个 Type，有点类似消息队列一个 topic 下多个 group 的概念）</p>
+</li>
+<li><p><strong>Document</strong>：Document 相当于数据库的一行记录</p>
+</li>
+<li><p><strong>Field</strong>：相当于数据库的 Column 的概念</p>
+</li>
+<li><p><strong>Mapping</strong>：相当于数据库的 Schema 的概念</p>
+</li>
+<li><p><strong>DSL</strong>：相当于数据库的 SQL（给我们读取 Elasticsearch 数据的 API）</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>RDBMS</th>
+<th>Elasticsearch</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TABLE</td>
+<td>Index(Type)</td>
+</tr>
+<tr>
+<td>Row</td>
+<td>Document</td>
+</tr>
+<tr>
+<td>Column</td>
+<td>Field</td>
+</tr>
+<tr>
+<td>Schema</td>
+<td>Mapping</td>
+</tr>
+<tr>
+<td>SQL</td>
+<td>DSL</td>
+</tr>
+</tbody></table>
+<p>说完 Elasticsearch 的相关术语，我们看一下 Elasticsearch 的架构。一个 Elasticsearch 集群会有多个 Elasticsearch 节点，所谓节点实际上就是运行着 Elasticsearch 进程上的机器。</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/Elasticsearch%E9%9B%86%E7%BE%A4.png" alt="Elasticsearch集群"></p>
+<p>在众多节点中，会有一个 <code>Master Node</code>，它主要负责维护索引元数据、负责切换主分片和副分片本身等工作，如果主节点挂了，会选举出一个新的主节点。</p>
+<p>Elasticsearch 最外层的是 Index（相当于数据库 表的概念），一个 Index 的数据我们可以分发到不同的 Node 上进行存储，这个操作就叫做分片。比如说我集群里有4个节点，我现在有一个 Index，想将这个 Index 在 4 个节点上存储，那我们可以设置 4 个分片，这 4 个分片的数据<strong>合起来</strong>就是 Index 的数据。</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%88%86%E7%89%87.png" alt="分片"></p>
+<p>使用分片的原因：</p>
+<ul>
+<li><p>如果一个 Index 的数据量太大，只有一个分片，那只会在一个节点上存储，随着数据量的增长，一个节点未必能把一个 Index 存储下来。</p>
+</li>
+<li><p>多个分片，在写入或查询的时候就可以进行并行操作，从各个节点中读写数据，提高吞吐量</p>
+</li>
+</ul>
+<p>如果某个节点挂了，那部分数据就丢了吗？为了解决这个问题，Elasticsearch 分片有主分片和副分片之分，为了实现<strong>高可用</strong>。数据写入的时候<strong>写到主分片</strong>，副本分片<strong>复制</strong>主分片的数据，读取的时候<strong>主分片和副本分片都可以读</strong>。</p>
+<p>Index 需要分为多少个分片和副本分片都是可以 通过配置设置的。</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E4%B8%BB%E5%89%AF%E5%88%86%E7%89%87.png" alt="主副分片"></p>
+<p>如果某个节点挂了，<code>Master Node</code> 就会把对应的副本分片提拔为主分片，这样即便节点挂了，数据就不会丢失了。</p>
+<h2 id="Elasticsearch-写入流程"><a href="#Elasticsearch-写入流程" class="headerlink" title="Elasticsearch 写入流程"></a>Elasticsearch 写入流程</h2><p>上面我们说过当我们向 Elasticsearch 写入数据的时候，是写到主分片上的，我们可以了解更多的细节。</p>
+<p>客户端写入一条数据，到 Elasticsearch 集群里边就是由<strong>节点</strong>来处理这次请求：</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE.png" alt="写入数据"></p>
+<p>集群上的每个节点都是 <code>coordinating node</code>（协调节点），协调节点表明这个节点可以做<strong>路由</strong>。比如节点 1 收到了请求，但发现这个请求的数据应该是由节点 2 处理（因为主分片在节点 2 上），所以会把请求转发到节点 2 上。coordinate（协调）节点通过 hash 算法可以计算出在哪个主分片上，然后路由到对应的节点。<code>shard = hash(document_id) % (num_of_primary_shards)</code></p>
+<p>路由到对应的节点以及对应的主分片时，会做以下的事：</p>
+<ol>
+<li>将数据写到内存缓冲区</li>
+<li>然后将数据写到 translog 缓冲区.</li>
+<li>每隔 1s 数据从 buffer 中 refresh 到 FileSystemCache 中，生成 segment 文件，一旦生成 segment 文件，就能通过索引查询到了</li>
+<li>refresh 完，memory buffer 就清空了</li>
+<li>每隔 5s，translog 从 buffer flush 到磁盘中</li>
+<li>定期/定量 从 FileSystemCache 中，结合 translog 内容 flush index 到磁盘中</li>
+</ol>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%86%99%E6%95%B0%E6%8D%AE%E6%B5%81%E7%A8%8B.png" alt="写数据流程"></p>
+<p>其中：</p>
+<ul>
+<li><p>Elasticsearch 会把数据先放入内存缓冲区，然后每隔 1s 刷新到文件系统缓存区（当数据被刷新到文件系统缓冲区以后，数据才可以被检索到）。所以，Elasticsearch 写入的数据需要 1s 才能查询到。</p>
+</li>
+<li><p>为了防止节点宕机，内存中的数据丢失，Elasticsearch 会另写一份数据到日志文件上。但最开始的还是写入到内存缓冲区，每隔 5s 才会将缓冲区的数据刷到磁盘中。所以，Elasticsearch 某个节点如果挂了，可能会造成 5s 的数据丢失。</p>
+</li>
+<li><p>等到磁盘上的 translog 文件打到一定程度或者超过了 30 分钟，会触发 <strong>commit</strong> 操作，将内存中的 segment 文件异步刷到磁盘中，完成持久化操作。</p>
+</li>
+</ul>
+<p>说白了就是，写内存缓冲区（<strong>定时</strong>去生成 segment，生成 translog），能够<strong>让数据被索引、被持久化</strong>。最后通过 commit 完成一次的持久化。</p>
+<p>等主分片写完了以后，会将数据并行发送到副本节点上，等到所有的节点写入成功就返回 ack 给协调节点，协调节点返回 ack 给客户端，完成一次的写入。</p>
+<h2 id="Elasticsearch-更新和删除"><a href="#Elasticsearch-更新和删除" class="headerlink" title="Elasticsearch 更新和删除"></a>Elasticsearch 更新和删除</h2><p>Elasticsearch 的更新和删除操作流程：</p>
+<p>给对应的 <code>doc</code> 记录打上 <code>.del</code> 标识，如果是删除操作就打上 <code>delete</code> 状态，如果是更新操作就把原来的 <code>doc</code> 标志为 <code>delete</code>，然后重新写入一条数据。</p>
+<p>前面讲到，每隔 1s 会生成一个 segment 文件，那 segment 文件会越来越多。Elasticsearch 会有一个 <strong>merge</strong> 任务，会将多个 segment 文件合并成一个 segment 文件。在合并的过程中，会把带有 <code>delete</code> 状态的 <code>doc</code> 给<strong>物理删除</strong>掉。</p>
+<h2 id="Elasticsearch-查询"><a href="#Elasticsearch-查询" class="headerlink" title="Elasticsearch 查询"></a>Elasticsearch 查询</h2><p>查询我们最简单的方式可以分为两种：</p>
+<ul>
+<li><p>根据 ID 查询 doc</p>
+</li>
+<li><p>根据 query（搜索词）去查询匹配的 doc</p>
+</li>
+</ul>
+<p>根据 <strong>ID</strong> 去查询具体的 doc 的流程是：</p>
+<ul>
+<li><p>检索内存的 Translog 文件</p>
+</li>
+<li><p>检索硬盘的 Translog 文件</p>
+</li>
+<li><p>检索硬盘的 Segment 文件</p>
+</li>
+</ul>
+<p>根据 <strong>query</strong> 去匹配 doc 的流程是：同时去查询内存和硬盘的 segment 文件</p>
+<p><img src="/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E6%9F%A5%E8%AF%A2%E6%B5%81%E7%A8%8B.png" alt="查询流程"></p>
+<p>Elasticsearch 查询又可以分为五种搜索类型：</p>
+<ul>
+<li><p><strong>QUERY_AND_FETCH</strong>：向索引的所有分片（shard）都发出请求，各分片返回的时候把文档（document）和计算后的排名信息一起返回。这种搜索方式是最快的。因为相比下面的几种搜索方式，这种查询方法只需要去 shard 查询一次。但是各个 shard 返回的结果的数量之和可能是用户要求的 size 的 n 倍。</p>
+</li>
+<li><p><strong>QUERY_THEN_FETCH</strong>：如果你搜索时，没有指定搜索方式，那默认就是使用这种方式。这种搜索方式，大概分为两个步骤。第一步，先向所有的 shard 发出请求，各分片只返回排序和排名相关的信息（注意，不包括文档 document），然后按照各分片返回的分数进行重新排序和排名，取前 size 个文档。然后第二步，去相关的 shard 取 document。这种方式返回的 document 与用户要求的 size 是相等的。</p>
+</li>
+<li><p><strong>DFS_QUERY_AND_FETCH</strong>：这种方式比第一步多了一个初始化散发（initial scatter）步骤。有这一步，可以更精确控制搜索打分和排名。</p>
+</li>
+<li><p><strong>DFS_QUERY_THEN_FETCH</strong>：比第二种多了一个初始化散发步骤。</p>
+</li>
+<li><p><strong>COUNT</strong>：这种一种特殊的搜索类型，只返回匹配查询的文档数目。</p>
+</li>
+</ul>
+<p>初始化散发其实就是在进行真正的查询之前，先把各个分片的词频率和文档频率收集一下，然后进行词搜索的时候，各分片依据全局的词频率和文档频率进行搜索和排名。显然如果使用 DFS_QUERY_THEN_FETCH 这种查询方式，效率是最低的，因为一个搜索，可能要查询 3 次分片，但使用 DFS 方法，搜索精度应该是最高的。</p>
+<p>一般我们用得最多的就是 QUERY_THEN_FETCH，第一种查询完就返回这个 doc 内容（QUERY_AND_FETCH）只适合于只需要查一个分片的请求。</p>
+<p><strong>QUERY_THEN_FETCH</strong> 总体的流程大概是：</p>
+<ul>
+<li><p>客户端请求发送到集群的某个节点上。集群上的每个节点都是 coordinate node（协调节点）</p>
+</li>
+<li><p>然后协调节点将搜索的请求转达到所有分片上（主分片和副本分片都行）</p>
+</li>
+<li><p>每个分片将自己搜索出的结果（doc id）返回给协调节点，由协调节点进行数据的合并、排序、分页等操作，产出最终结果。</p>
+</li>
+<li><p>接着由协调节点根据 <code>doc id</code> 去各个节点上拉取实际的 document 数据，最终返回给客户端。</p>
+</li>
+</ul>
+<p><strong>Query Phase</strong> 时节点做的事：</p>
+<ul>
+<li><p>协调节点向目标分片发送查询的命令（转发请求到主分片或者副本分片上）</p>
+</li>
+<li><p>数据节点（在每个分片内做过滤，排序等操作），返回 doc id 给协调节点</p>
+</li>
+</ul>
+<p><strong>Fetch Phase</strong> 阶段时节点做的事：</p>
+<ul>
+<li><p>协调节点得到数据节点返回的 doc id，对这些 doc id 做聚合，然后将目标数据分片发送抓取命令（希望拿到这个 doc 记录）</p>
+</li>
+<li><p>数据节点按照协调节点发送的 doc id，拉取实际需要的数据返回给协调节点</p>
+</li>
+</ul>
+<p>主流程其实说白了就是：<strong>由于 Elasticsearch 是分布式的，所以需要从各个节点都拉取对应的数据，然后最终统一合成给客户端</strong>。只是Elasticsearch 把这些活都干了，我们在使用的时候无感知而已。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/01/22/MySQL-的架构设计/" rel="next" title="MySQL 的架构设计">
+                <i class="fa fa-chevron-left"></i> MySQL 的架构设计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/01/26/初步了解-InnoDB-存储引擎的架构设计/" rel="prev" title="初步了解 InnoDB 存储引擎的架构设计">
+                初步了解 InnoDB 存储引擎的架构设计 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">79</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-简介"><span class="nav-number">1.</span> <span class="nav-text">Elasticsearch 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-的数据结构"><span class="nav-number">2.</span> <span class="nav-text">Elasticsearch 的数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#倒排索引"><span class="nav-number">2.1.</span> <span class="nav-text">倒排索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Term-Dictionary"><span class="nav-number">2.2.</span> <span class="nav-text">Term Dictionary</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Term-Index"><span class="nav-number">2.3.</span> <span class="nav-text">Term Index</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Posting-List-压缩技术-Roaring-Bitmap"><span class="nav-number">2.4.</span> <span class="nav-text">Posting List 压缩技术 Roaring Bitmap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-的术语和架构"><span class="nav-number">3.</span> <span class="nav-text">Elasticsearch 的术语和架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-写入流程"><span class="nav-number">4.</span> <span class="nav-text">Elasticsearch 写入流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-更新和删除"><span class="nav-number">5.</span> <span class="nav-text">Elasticsearch 更新和删除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-查询"><span class="nav-number">6.</span> <span class="nav-text">Elasticsearch 查询</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

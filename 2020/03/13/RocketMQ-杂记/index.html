@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="消息队列,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="RocketMQ 生产者工作原理MessageQueue要清楚生产者的工作原理，就需要明白一个概念：MessageQueue。而要明白 MessageQueue 是什么，就必须把它跟 Topic 以及 Broker 综合起来看。 如果我们要使用 RocketMQ，要先部署一套 RocketMQ集群，在有了集群之后，就要根据你的业务去创建一些 Topic。比如说创建一个 “TopicOrderPay">
+<meta name="keywords" content="消息队列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ 杂记">
+<meta property="og:url" content="https://github.com/2020/03/13/RocketMQ-杂记/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="RocketMQ 生产者工作原理MessageQueue要清楚生产者的工作原理，就需要明白一个概念：MessageQueue。而要明白 MessageQueue 是什么，就必须把它跟 Topic 以及 Broker 综合起来看。 如果我们要使用 RocketMQ，要先部署一套 RocketMQ集群，在有了集群之后，就要根据你的业务去创建一些 Topic。比如说创建一个 “TopicOrderPay">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/topic.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/MessageQueue.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/CommitLog.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/ConsumeQueue.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/offset.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/%E5%BC%82%E6%AD%A5%E5%88%B7%E7%9B%98.png">
+<meta property="og:updated_time" content="2020-03-18T01:28:38.083Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RocketMQ 杂记">
+<meta name="twitter:description" content="RocketMQ 生产者工作原理MessageQueue要清楚生产者的工作原理，就需要明白一个概念：MessageQueue。而要明白 MessageQueue 是什么，就必须把它跟 Topic 以及 Broker 综合起来看。 如果我们要使用 RocketMQ，要先部署一套 RocketMQ集群，在有了集群之后，就要根据你的业务去创建一些 Topic。比如说创建一个 “TopicOrderPay">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/topic.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/03/13/RocketMQ-杂记/">
+
+
+
+
+
+  <title>RocketMQ 杂记 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RocketMQ 杂记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-13T19:57:12+08:00">
+                2020-03-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="RocketMQ-生产者工作原理"><a href="#RocketMQ-生产者工作原理" class="headerlink" title="RocketMQ 生产者工作原理"></a>RocketMQ 生产者工作原理</h2><h3 id="MessageQueue"><a href="#MessageQueue" class="headerlink" title="MessageQueue"></a>MessageQueue</h3><p>要清楚生产者的工作原理，就需要明白一个概念：MessageQueue。而要明白 MessageQueue 是什么，就必须把它跟 Topic 以及 Broker 综合起来看。</p>
+<p>如果我们要使用 RocketMQ，要先部署一套 RocketMQ集群，在有了集群之后，就要根据你的业务去创建一些 Topic。比如说创建一个 “TopicOrderPaySuccess” 的 Topic 去存放订单支付成功的消息。像这些 Topic 就可以在 RocketMQ 可视化工作台里去创建，在里面就可以创建一个 Topic 出来，<strong>在创建 Topic的时候需要制定一个很关键的参数，就是 MessageQueue</strong>。</p>
+<p>简单来说，就是要走指定你的 Topic 对应了多少个队列，也就是多少个 MessageQueue。</p>
+<h3 id="Topic、MessageQueue-以及-Broker之间是什么关系"><a href="#Topic、MessageQueue-以及-Broker之间是什么关系" class="headerlink" title="Topic、MessageQueue 以及 Broker之间是什么关系"></a>Topic、MessageQueue 以及 Broker之间是什么关系</h3><p>其实 Topic、MessageQueue 以及 Broker 之间是有关系的。比如你现在有一个 Topic，我们为它指定 4 个 MessageQueue，那么这个 Topic 的数据在 Broker 集群中是如何分布的？</p>
+<p>其实，每个 Topic 的数据都是分布式存储在多个 Broker 中的，如图：</p>
+<p><img src="/CKING.github.io/2020/03/13/RocketMQ-杂记/topic.png" alt="topic"></p>
+<p>但是我们如何决定这个 Topic 的哪些数据放在这个 Broker 上，哪些数据放在另一个 Broker 上？所以在这里引入了 MessageQueue 的概念，本质上就是一个数据分片的机制。</p>
+<p>在这个机制中，假设你的 Topic 有 1 万条数据，然后你的 Topic 有 4 个 MessageQueue，那么大致可以认为在每个 MessageQueue 中放入 2500 条数据。当然，这个不是绝对的，有可能有的 MessageQueue 的数据多，有的数据少，要根据你的消息写入 MessageQueue 的策略来定。</p>
+<p>我们先假定在每个 MessageQueue 中会平均分配 Topic 的数据吧。那么，我们有 4 个 MessageQueue 平均分配了 Topic 的数据，这些 MessageQueue 放在哪里？当然是 Broker 上了。可能就是在 2 个 Broker 上，每个 Broker 放两个 MessageQueue。如图：</p>
+<p><img src="/CKING.github.io/2020/03/13/RocketMQ-杂记/MessageQueue.png" alt="MessageQueue"></p>
+<p>所以 MessageQueue 是 RocketMQ 中非常关键的一个数据分片机制，它通过 MessageQueue 将一个 Topic 的数据拆分成了很多个数据分片，然后再每个 Broker 机器上存储一些 MessageQueue。通过这个方法，就可以实现 Topic 数据的分布式存储。</p>
+<h3 id="生产者发送消息的时候写入哪个-MessageQueue"><a href="#生产者发送消息的时候写入哪个-MessageQueue" class="headerlink" title="生产者发送消息的时候写入哪个 MessageQueue"></a>生产者发送消息的时候写入哪个 MessageQueue</h3><p>生产者在发送消息的时候，会写入哪个 MessageQueue 中？其实，生产者会跟 NameServer 进行通信获取 Topic 的路由数据。所以生产者从 NameServer 中就会知道，一个 Topic 有几个 MessageQueue，哪些 MessageQueue 在哪台机器上。</p>
+<p>然后呢，我们暂时先认为生产者会均匀地把消息写入各个 MessageQueue。比如生产者发送出去了 20 条数据，那么 4 个 MessageQueue 就会每个写入 5 条数据。如图：</p>
+<p><img src="/CKING.github.io/2020/03/13/RocketMQ-杂记/%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE.png" alt="写入数据"></p>
+<p>通过这个方法，就可以让生产者把写入请求分散给多个 Broker，让每个Broker 都均匀分摊到一定的写入请求压力。假设单个 Broker 可以抗每秒 7 万并发，那么两个 Broker 可以抗每秒 14 万并发，可以实现 RocketMQ 集群每秒 10万+ 超高并发的场景了。</p>
+<p>另外通过这个方法，可以让一个 Topic 的数据分散在多个 MessageQueue 中，进而分散在多个 Broker 机器上，就可以实现 RocketMQ 集群分布式存储海量的消息数据了。</p>
+<h3 id="某个-Broker-出现故障"><a href="#某个-Broker-出现故障" class="headerlink" title="某个 Broker 出现故障"></a>某个 Broker 出现故障</h3><p>如果某个 Broker 临时出现故障了，此时正在等待其它 Slave Broker 自动切换为 Master Broker，那么这个时候这一组 Broker 就没有 Master Broker 可以写入了。</p>
+<p>如果还是按照之前的策略来均匀把数据写入各个 Broker 上的 MessageQueue，那么会导致你在一段时间内，每次访问到这个挂掉的 Master Broker 都会访问失败，这不是我们想要的。</p>
+<p>对于这个问题。建议大家在 Producer 中开启一个开关，就是 <code>sendLatencyFaultEnable</code>。一旦打开了这个开关，那么它会有一个容错机制，例如如果某次访问一个 Broker 发现网络延迟有 500ms，然后还无法访问，那么就会自动回避访问这个 Broker 一段时间，比如接下来 300ms 内，就不会访问这个 Broker 了。</p>
+<p>这样的话，就可以避免一个 Broker 故障之后，短时间内生产者频繁地发送消息到这个故障的 Broker 上，出现较多次数的异常。而是在一个 Broker 故障之后，自动回避一段时间不要访问这个 Broker，过段时间访问它。</p>
+<h2 id="RocketMQ-如何持久化存储消息"><a href="#RocketMQ-如何持久化存储消息" class="headerlink" title="RocketMQ 如何持久化存储消息"></a>RocketMQ 如何持久化存储消息</h2><p>首先我们要明确一点，Broker 数据存储是最重要的一个环节。实际上类似 RocketMQ，Kafka、RabbitMQ 的消息中间件系统，它们不只是让你写入消息和获取消息，它们本身最重要的是提供强大的数据存储能力，可以把亿万级的海量消息存储在自己的服务器的磁盘上。</p>
+<p>这样的话，各种不同的系统从 MQ 中消费消息的时候，才可以从 MQ 服务器的磁盘中读取到自己需要的消息。否则如果 MQ 不在机器磁盘上存储大量的消息，都放在自己的内存里，一个是内存很可能放不下，另外一个是可能你机器重启，内存里的消息就会全部丢失了。</p>
+<p>所以，<strong>Broker 数据存储实际上才是一个 MQ 最核心的环节</strong>。它决定生产者消息写入的吞吐量，决定了消息不能丢失，决定了消费者获取消息的吞吐量。所以，我们来说一下 Broker 的数据存储机制。</p>
+<h3 id="CommitLog-消息顺序写入机制"><a href="#CommitLog-消息顺序写入机制" class="headerlink" title="CommitLog 消息顺序写入机制"></a>CommitLog 消息顺序写入机制</h3><p>当生产者的消息发送到一个 Broker 上的时候，它会把这个消息写入磁盘的一个日志文件，叫做 commitLog，直接顺序写入这个文件。</p>
+<p><img src="/CKING.github.io/2020/03/13/RocketMQ-杂记/CommitLog.png" alt="CommitLog"></p>
+<p>这个 CommitLog 文件是很多磁盘文件，每个文件限定最多 1GB，Broker 收到消息之后就直接追加写入这个文件的末尾，就跟上图一样。如果一个 CommitLog 写满了 1GB，就会创建一个新的 CommitLog 文件。</p>
+<h3 id="MessageQueue-在数据存储中体现在哪"><a href="#MessageQueue-在数据存储中体现在哪" class="headerlink" title="MessageQueue 在数据存储中体现在哪"></a>MessageQueue 在数据存储中体现在哪</h3><p>我们写入 Broker 的消息都是进入到 CommitLog 中去存储的，那么 MessageQueue 是体现在哪里的？其实在 Broker 中，对 Topic 下的每个 MessageQueue 都会有一系列的 ConsumeQueue 文件。</p>
+<p>什么意思？就是在 Broker 的磁盘上，会有下面这种格式的一系列文件：</p>
+<p><code>$HOME/store/consumequeue/{topic}/{queueId}/{fileName}</code></p>
+<p>上面的那一串是什么意思？其实，每个 Topic 在这台 Broker 上都会有一些 MessageQueue，所以，{topic} 指代的就是某个 Topic，{queueId} 指代的就是某个 MessageQueue。然后对存储在这台 Broker 机器上的 Topic 下的一个 MessageQueue，它有很多的 ConsumeQueue 文件，这个 ConsumeQueue 文件里存储的是一条消息对应在 CommitLog 文件中的 offset 偏移量。</p>
+<p>例如，有一个 Topic，它有 4 个 MessageQueue，然后在两台 Broker 机器上，每台 Broker 机器会存储两个 MessageQueue。此时假设生产者选择对其中一个 MessageQueue 写入一条消息，此时消息会发送到 Broker 上。然后 Broker 会把这个消息写入自己的 CommitLog 文件中。</p>
+<p>如下图，我在图里加入了两个 ConsumeQueue，分别叫做 ConsumeQueue0 和 ConsumeQueue1，分别对应着 Topic 里的 MessageQueue0 和 MessageQueue1。</p>
+<p><img src="/CKING.github.io/2020/03/13/RocketMQ-杂记/ConsumeQueue.png" alt="ConsumeQueue"></p>
+<p>即，Topic 下的 MessageQueue0 和 MessageQueue1 就放在这个 Broker 机器上，而且它们每个 MessageQueue 目前在磁盘上对应了一个 ConsumeQueue。即 MessageQueue0 对应着 Broker 磁盘上的 ConsumeQueue0，MessageQueue1 对应着磁盘上的 ConsumeQueue1。</p>
+<p>假设 Queue 的名字叫做 TopicOrderPaySuccess，那么此时在 Broker 磁盘上应该有如下两个路径的文件：</p>
+<p>$HOME/store/consumequeue/TopicOrderPaySuccess/MessageQueue0/ConsumeQueue0 磁盘文件</p>
+<p>$HOME/store/consumequeue/TopicOrderPaySuccess/MessageQueue1/ConsumeQueue1 磁盘文件</p>
+<p>然后，当你的 Broker 收到一条消息写入 CommitLog 之后，它会同时将这条消息在 CommitLog 中的物理位置，也就是一个文件偏移量，就是一个 offset，写入到这条信息所属的 MessageQueue 对应的 ConsumeQueue 文件中去。</p>
+<p>比如现在这条消息在生产者发送的时候是发送给 MessageQueue0 的，那么此时 Broker 就会将这条消息在 CommitLog 中 offset 偏移量，写入到 MessageQueue 对应的 ConsumeQueue0 中去。所以实际上，ConsumeQueue0 中存储的是一个一个消息在 CommitLog 文件中的物理位置，也就是 offset。</p>
+<p>如下图，图里展示出来的是 ConsumeQueue 中的一个物理位置其实是对 CommitLog 文件中一个消息的引用。</p>
+<p><img src="/CKING.github.io/2020/03/13/RocketMQ-杂记/offset.png" alt="offset"></p>
+<p>实际上在 ConsumeQueue 中存储的每条数据不只是消息在 CommitLog 中的 offset 偏移量，还包含了消息的长度，以及 tag hashcode，一条数据是 20 个字节，每个 ConsumeQueue 文件保存 30万 条数据，大概每个文件是 5.72MB</p>
+<p>所以 Topic 的每个 MessageQueue 都对应了 Broker 机器上的多个 ConsumeQueue 文件，保存了这个 MessageQueue 的所有消息在 CommitLog 文件中的物理位置，也就是偏移量。</p>
+<h3 id="如何让消息写入-CommitLog-文件近乎内存写性能"><a href="#如何让消息写入-CommitLog-文件近乎内存写性能" class="headerlink" title="如何让消息写入 CommitLog 文件近乎内存写性能"></a>如何让消息写入 CommitLog 文件近乎内存写性能</h3><p>对于生产者把消息写入到 Broker 时，Broker 会直接把消息写入 CommitLog 文件，那么 Broker 是如何提升整个过程的性能的。因为这个部分的性能提升会直接提升 Broker 处理消息写入的吞吐量，比如你写入一条消息到 CommitLog 磁盘文件假设需要 10ms，那么每个线程每秒可以处理 100个 写入消息，100个 线程每秒只能处理 1万 个写入消息请求。</p>
+<p>但是把消息写入 CommitLog 磁盘文件的性能优化为只需要 1ms，那么每个线程每秒可以处理 1000个 消息写入，此时 100个 线程可以处理 10万 个写入消息请求。所以，Broker 把接收到的消息写入 CommitLog 磁盘文件的性能，对它的 TPS 有很大的影响。</p>
+<p>所以，Broker 是基于 <strong>OS 操作系统的 PageCache</strong> 和 <strong>顺序写</strong> 两个机制，来提升写入 CommitLog 文件的性能的。</p>
+<p>首先 Broker 是以顺序的方式将消息写入 CommitLog 磁盘文件的，也就是每次写入就是在文件末尾加一条数据即可，对文件进行顺序写的性能比对文件随机写的性能提升很多。</p>
+<p>另外，数据写入 CommitLog 文件的时候，其实不是直接写入底层的物理磁盘文件的，而是先进入 OS 的 PageCache 内存缓存中，然后后续由 OS 的后台线程选一个时间，异步化地将 OS PageCache 内存缓冲中的数据刷入底层的磁盘文件。如图：</p>
+<p><img src="/CKING.github.io/2020/03/13/RocketMQ-杂记/%E5%BC%82%E6%AD%A5%E5%88%B7%E7%9B%98.png" alt="异步刷盘"></p>
+<p>这样的优化下，采用 <strong>磁盘文件顺序写 + OS PageCache 写入 + OS 异步刷盘</strong> 的策略，基本上可以让消息吸入 CommitLog 的性能跟你直接写入内存里是差不多的，所以正是如此，才可以让 Broker 高吞吐地处理每秒大量的消息写入。</p>
+<h3 id="同步刷盘与异步刷盘"><a href="#同步刷盘与异步刷盘" class="headerlink" title="同步刷盘与异步刷盘"></a>同步刷盘与异步刷盘</h3><p>上述的模式，其实就是异步刷盘模式。在异步刷盘模式下，生产者把消息发送给 Broker，Broker 将消息写入 OS PageCache 中，就直接返回 ACK 给生产者了。此时生产者就认为消息写入成功了，那么会有什么问题？</p>
+<p>问题是有的。如果生产者认为消息写入成功了，但是实际上那条消息此时是在 Broker 机器上的 OS cache 中的，如果此时 Broker 直接宕机，那么 os cache 中的这条数据就会丢失。所以异步刷盘的策略下，可以让消息写入吞吐量非常高，但是有数据丢失的风险，这个是需要清楚的。</p>
+<p>另外一种模式叫同步刷盘。如果你使用同步刷盘，那么生产者发送一条消息出去，Broker 收到了消息，必须直接强制把这个消息刷入底层的物理磁盘文件中，然后才返回 ack 给 producer，此时你才知道消息写入成功了。</p>
+<p>只要消息进入了物理磁盘上，除非是你的物理磁盘坏了导致数据丢失，否则正常情况下数据就不会丢失了。如果 Broker 还没来得及把数据同步刷入磁盘，然后它自己挂了，那么此时对生产者来说会感知到消息发送失败了，然后只要不停地重试发送就可以了，直到有 slave broker 切换成 master broker 重新让你可以写入信息，此时可以保证数据是不会丢的。</p>
+<p>但是如果你强制每次消息写入都要直接进入磁盘中，必然导致每条消息写入性能急剧下降，导致消息写入吞吐量下降，但是可以保证数据不会丢失</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/消息队列/" rel="tag"># 消息队列</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/" rel="next" title="简单说说秒杀系统的技术难点">
+                <i class="fa fa-chevron-left"></i> 简单说说秒杀系统的技术难点
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">79</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ-生产者工作原理"><span class="nav-number">1.</span> <span class="nav-text">RocketMQ 生产者工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MessageQueue"><span class="nav-number">1.1.</span> <span class="nav-text">MessageQueue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Topic、MessageQueue-以及-Broker之间是什么关系"><span class="nav-number">1.2.</span> <span class="nav-text">Topic、MessageQueue 以及 Broker之间是什么关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生产者发送消息的时候写入哪个-MessageQueue"><span class="nav-number">1.3.</span> <span class="nav-text">生产者发送消息的时候写入哪个 MessageQueue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#某个-Broker-出现故障"><span class="nav-number">1.4.</span> <span class="nav-text">某个 Broker 出现故障</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ-如何持久化存储消息"><span class="nav-number">2.</span> <span class="nav-text">RocketMQ 如何持久化存储消息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CommitLog-消息顺序写入机制"><span class="nav-number">2.1.</span> <span class="nav-text">CommitLog 消息顺序写入机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MessageQueue-在数据存储中体现在哪"><span class="nav-number">2.2.</span> <span class="nav-text">MessageQueue 在数据存储中体现在哪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何让消息写入-CommitLog-文件近乎内存写性能"><span class="nav-number">2.3.</span> <span class="nav-text">如何让消息写入 CommitLog 文件近乎内存写性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同步刷盘与异步刷盘"><span class="nav-number">2.4.</span> <span class="nav-text">同步刷盘与异步刷盘</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

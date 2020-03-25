@@ -93,7 +93,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/08/11/SpringCloud常用组件原理/Ribbon.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/08/11/SpringCloud常用组件原理/Hystrix.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/08/11/SpringCloud常用组件原理/%E6%80%BB%E7%BB%93.png">
-<meta property="og:updated_time" content="2019-09-04T15:15:43.881Z">
+<meta property="og:updated_time" content="2020-03-15T13:22:42.874Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SpringCloud常用组件原理">
 <meta name="twitter:description" content="​        Spring Cloud是一个全家桶式的技术栈，包含了很多组件。本文主要简单介绍下最核心的几个组件的底层原理。包括Eureka、Ribbon、Feign、Hystrix和Zuul这几个组件。 业务场景介绍​        文章先假定一个业务场景：现在开发一个电商系统，要实现支付订单的功能，流程如下：  创建一个订单之后，如果用户立刻支付了这个订单，我们需要将订单状态更新为“已支付">
@@ -438,7 +438,7 @@
 <li>最后针对这个地址，发起请求，解析响应</li>
 </ul>
 <p><img src="/CKING.github.io/2019/08/11/SpringCloud常用组件原理/Feign.png" alt="Feign"></p>
-<h2 id="SpringCloud核心组件：Ribbon"><a href="#SpringCloud核心组件：Ribbon" class="headerlink" title="SpringCloud核心组件：Ribbon"></a>SpringCloud核心组件：Ribbon</h2><p>​        如果库存系统部署子在了五台机器上，Feign怎么知道该请求哪台机器呢。这时SpringCloud Ribbon就派上永昌路 。<strong>它的作用是负载均衡，会帮你在每次请求时选择一台机器，均匀的把请求分发到各个机器上</strong>。</p>
+<h2 id="SpringCloud核心组件：Ribbon"><a href="#SpringCloud核心组件：Ribbon" class="headerlink" title="SpringCloud核心组件：Ribbon"></a>SpringCloud核心组件：Ribbon</h2><p>​        如果库存系统部署子在了五台机器上，Feign怎么知道该请求哪台机器呢。这时SpringCloud Ribbon就派上永用处了。<strong>它的作用是负载均衡，会帮你在每次请求时选择一台机器，均匀的把请求分发到各个机器上</strong>。</p>
 <p>​        Ribbon的负载均衡<strong>默认使用的是Round Robin轮询算法</strong>。就是说如果订单服务对库存系统发起10次请求，那就先让你请求第1台机器。然后是第2台、第3台，第4、第5，然后再来一个循环，第1、第2。。。以此类推。</p>
 <p>​        此外，Ribbon和Feign以及Eureka紧密协作而完成工作的，具体如下：</p>
 <ul>
@@ -615,7 +615,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">76</span>
+                  <span class="site-state-item-count">79</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="消息队列,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="思维导图  秒杀活动压力过大怎么办秒杀活动压力过大，是否能通过堆机器解决？比如说给订单系统部署更多的机器，是不是可以抗下更高的并发？这个是没问题的，订单系统可以通过部署更多的机器机型线性扩展。 那数据库呢？是否也要部署更多的服务器，进行分库分表，然后让更多的数据库服务器来抗更高的数据库高并发访问？大概思路是这样，所谓分库分表，就是把目前的一台数据库服务器变成多台数据库服务器，然后把一张订单表变成多">
+<meta name="keywords" content="消息队列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单说说秒杀系统的技术难点">
+<meta property="og:url" content="https://github.com/2020/03/11/简单说说秒杀系统的技术难点/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="思维导图  秒杀活动压力过大怎么办秒杀活动压力过大，是否能通过堆机器解决？比如说给订单系统部署更多的机器，是不是可以抗下更高的并发？这个是没问题的，订单系统可以通过部署更多的机器机型线性扩展。 那数据库呢？是否也要部署更多的服务器，进行分库分表，然后让更多的数据库服务器来抗更高的数据库高并发访问？大概思路是这样，所谓分库分表，就是把目前的一台数据库服务器变成多台数据库服务器，然后把一张订单表变成多">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E5%95%86%E5%93%81%E8%AF%A6%E6%83%85%E9%A1%B5%E7%B3%BB%E7%BB%9F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E5%A4%9A%E7%BA%A7%E7%BC%93%E5%AD%98.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E7%AD%94%E9%A2%98.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E8%AE%A2%E5%8D%95%E7%B3%BB%E7%BB%9F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E6%89%A3%E5%87%8F%E5%BA%93%E5%AD%98.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/MQ%E9%9B%86%E7%BE%A4.png">
+<meta property="og:updated_time" content="2020-03-12T14:01:28.800Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="简单说说秒杀系统的技术难点">
+<meta name="twitter:description" content="思维导图  秒杀活动压力过大怎么办秒杀活动压力过大，是否能通过堆机器解决？比如说给订单系统部署更多的机器，是不是可以抗下更高的并发？这个是没问题的，订单系统可以通过部署更多的机器机型线性扩展。 那数据库呢？是否也要部署更多的服务器，进行分库分表，然后让更多的数据库服务器来抗更高的数据库高并发访问？大概思路是这样，所谓分库分表，就是把目前的一台数据库服务器变成多台数据库服务器，然后把一张订单表变成多">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/03/11/简单说说秒杀系统的技术难点/">
+
+
+
+
+
+  <title>简单说说秒杀系统的技术难点 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">简单说说秒杀系统的技术难点</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-11T19:28:56+08:00">
+                2020-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思维导图</p>
+<p><img src="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F.png" alt="秒杀系统"></p>
+<h2 id="秒杀活动压力过大怎么办"><a href="#秒杀活动压力过大怎么办" class="headerlink" title="秒杀活动压力过大怎么办"></a>秒杀活动压力过大怎么办</h2><p>秒杀活动压力过大，是否能通过堆机器解决？比如说给订单系统部署更多的机器，是不是可以抗下更高的并发？这个是没问题的，订单系统可以通过部署更多的机器机型线性扩展。</p>
+<p>那数据库呢？是否也要部署更多的服务器，进行分库分表，然后让更多的数据库服务器来抗更高的数据库高并发访问？大概思路是这样，所谓分库分表，就是把目前的一台数据库服务器变成多台数据库服务器，然后把一张订单表变成多张订单表。</p>
+<p>例如，假设订单表里有 1200 万条数据，然后有一台数据库服务器，如果我们现在变成 3 台数据库服务器，那么可以在每台数据库服务器里放 400 万订单数据，这就是所谓的分库分表。这样的好处是什么呢？如果未来订单系统的整体访问压力达到了每秒 3 万请求了，此时订单系统通过扩容可以部署更多机器，然后其中每台数据库服务器承受 1 万的请求，如图：</p>
+<p><img src="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8.png" alt="分库分表"></p>
+<p>这样不就可以通过增加更多的数据库服务器来抗下更高的并发请求了吗？但其实这不太靠谱。除非是技术能力比较弱的公司，没有厉害的架构师去利用已有的技术合理设计优秀的架构，才会用这种堆机器的方式简单地抗下超高的并发。</p>
+<p>如果用堆机器的方式来解决这个问题，必然存在一个问题，就是随着你的用户量越来越大，你的并发请求越来越多，会导致你要不停地增加更多的机器。所以解决问题不能用这种简单粗暴堆机器的方案。</p>
+<h2 id="高并发的商品详情页请求"><a href="#高并发的商品详情页请求" class="headerlink" title="高并发的商品详情页请求"></a>高并发的商品详情页请求</h2><p>秒杀活动主要涉及到的并发压力有两块：<strong>一个是高并发地读，一个是高并发地写。</strong></p>
+<p>首先思考一下，平时大量的用户是怎么参与到秒杀活动里来的？往往是这样。假设每天晚上 8:30 有一波秒杀商品开始售卖，因为每次到了晚上 8:30 之前，就有很多用户会登陆 APP，然后再 APP 前坐等秒杀特价商品。</p>
+<p>所以这个时候，必然会出现一种场景，就是首先大量用户会拿着 APP 不停地刷新一个秒杀商品的页面。那么这些秒杀商品页面是从哪儿加载出来的？本质上来说从商品技术团队负责的商品详情页加载出来的，如图，引入了一个商品详情页系统的概念，它负责提供我们看到的各种秒杀商品页面。</p>
+<p><img src="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E5%95%86%E5%93%81%E8%AF%A6%E6%83%85%E9%A1%B5%E7%B3%BB%E7%BB%9F.png" alt="商品详情页系统"></p>
+<p>所以这个商品详情页系统就是在秒杀活动开始之前最先被大量用户高并发访问的一个系统了。如果没有秒杀活动的时候，其实大量的用户是分散在不同的时间段来逛 APP 的，并且逛的是不同的人会看不同的商品的页面。</p>
+<p>但是在秒杀活动的时候，面临的第一个问题是，可能几十万人会同一时间频繁地访问同一个秒杀商品的页面，对商品详情页系统造成巨大的访问压力。</p>
+<h2 id="商品团队的秒杀架构优化：页面数据静态化"><a href="#商品团队的秒杀架构优化：页面数据静态化" class="headerlink" title="商品团队的秒杀架构优化：页面数据静态化"></a>商品团队的秒杀架构优化：页面数据静态化</h2><p>为了解决商品详情页系统的技术难点，一般采取的是 <strong>页面数据静态化 + 多级缓存</strong> 的方案。</p>
+<p>首先第一步，秒杀商品页面必须是将其数据做到静态化，这是什么意思呢？</p>
+<p>如果让秒杀商品页面是动态化的，那么每次一个用户只要访问这个商品详情页，就必须发送一次请求到后端的商品详情页来获取数据。比如商品的标题、副标题、价格、优惠策略、库存、大量的图片、商品详情说明。售后政策等等，这都是商品详情页的数据。</p>
+<p>那么你可以选择让用户浏览这个秒杀商品的时候，每次都发送请求到后台去加载这些数据过来，然后渲染出来给用户看这个商品页面，这就是所谓的动态模式。</p>
+<p>如果这商品详情页里的大量数据都是存储在商品团队里的数据库里的，那么岂不是大量用户同时频繁访问这个商品详情页，会直接导致商品详情页系统承受高并发的访问？同时导致商品数据库承受高并发的访问？</p>
+<p>所以首先需要将这个秒杀活动的商品详情页里的数据做成静态化的，也就是提前就从数据库里把这个页面需要的数据都提取出来组装成一份静态数据放在别的地方，避免每次访问这个页面都要访问后端数据库。</p>
+<h2 id="商品团队的秒杀架构优化：多级缓存"><a href="#商品团队的秒杀架构优化：多级缓存" class="headerlink" title="商品团队的秒杀架构优化：多级缓存"></a>商品团队的秒杀架构优化：多级缓存</h2><p>接着就是多级缓存的架构，我们会使用 <strong>CDN + Nginx + Redis</strong> 的多级缓存架构。</p>
+<p>比如说秒杀商品详情页的数据，首先会放一份在离用户地理位置比较近的 CDN 上。CDN 你大致可以这么理解，比如你们公司的机房在广州，系统也部署在广州，那么对于陕西的用户，我们可以将一份静态化好的数据放在陕西的一个 CDN 上。然后不同地方的用户在加载这个秒杀商品的详情页数据时，就是从附近的 CDN 上加载的，不需要每次请求都发送到我们公司在广州的机房去。</p>
+<p>这个 CDN 缓存就是我们多级缓存架构里的第一级缓存。那如果因为缓存过期之类的问题，CDN 上没有用户要加载的商品详情页数据，此时用户就会发送请求到我们公司的机房里的机器上去请求加载这个商品的数据了，这个时候我们需要在 Nginx 这样的服务器里做一级缓存。</p>
+<p>在 Nginx 中是可以基于 Lua 脚本实现本地缓存的，我们可以提前把秒杀商品详情页的数据放到 Nginx 中进行缓存，如果请求发送过来，我们可以从 Nginx 中直接加载缓存数据，不需要把请求转发到我们商品系统上去。</p>
+<p>这个时候如果在 Nginx 服务器上也没加载到秒杀商品的数据呢？此时就可以由 Nginx 中的 Lua 脚本发送请求去 Redis 集群中加载我们提前放进去的秒杀商品数据。</p>
+<p>如果在 Redis 中还是没有找到，那么就由 Nginx 中的 Lua 脚本直接把请求转发到商品详情页系统里去加载就可以了，此时就会直接从数据库中加载数据出来。但是一般来说数据是可以从 CDN、Nginx、Redis 中加载到的，可能只有极少的请求会直接访问到商品系统去从数据库里加载商品页数据。</p>
+<p><img src="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E5%A4%9A%E7%BA%A7%E7%BC%93%E5%AD%98.png" alt="多级缓存"></p>
+<p>通过这样的一套方案。我们就可以把用于秒杀活动的商品详情页数据进行静态化，然后把静态化以后的一串商品数据（例如 JSON 串）放到 CDN、Nginx、Redis 组成的多级缓存里去，这样大量的用户同时访问这个商品页面对我们系统本身就没什么压力了。</p>
+<h2 id="订单方面的优化"><a href="#订单方面的优化" class="headerlink" title="订单方面的优化"></a>订单方面的优化</h2><h3 id="用答题的方式避免作弊软件抢购以及延缓下单"><a href="#用答题的方式避免作弊软件抢购以及延缓下单" class="headerlink" title="用答题的方式避免作弊软件抢购以及延缓下单"></a>用答题的方式避免作弊软件抢购以及延缓下单</h3><p>首先我们要防止有人写一个抢购的脚本或者作弊软件，疯狂地发送请求去抢商品，所以一般来说，现在你要参与抢购，都会让你点击按钮之后先进行答题，就是说先弹出一个框，让你回答一个问题，回答正确了你才能发起抢购的请求。</p>
+<p>这个办法是非常有效的，因为首先它避免了一些作弊软件去发送抢购请求，另外就是不同的人答题的速度是不一样的，所以可以通过这个答题让不同的人发送请求的时间错开，不会在一个时间点发起请求。如图：</p>
+<p><img src="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E7%AD%94%E9%A2%98.png" alt="答题"></p>
+<h3 id="为秒杀独立出来一套订单系统"><a href="#为秒杀独立出来一套订单系统" class="headerlink" title="为秒杀独立出来一套订单系统"></a>为秒杀独立出来一套订单系统</h3><p>接着用户下单抢购的请求发送出去之后，会达到我们的后台系统，对于后台系统而言，我们需要思考，是否直接用我们目前已有的订单系统去抗所有的请求？</p>
+<p>答案是否定的。假设你有 100 万用户在这个时间段很活跃来购买物品，但是可能只有其中 50 万用户在参与秒杀活动，同一时间发送了大量的抢购请求到后台系统，但是同时还有很多其它的用户这个时候并不在参与秒杀系统，他们在进行其它商品的常规性浏览和下单。</p>
+<p>如果你让秒杀下单和普通下单请求都由一套订单系统来承载，那么可能会导致秒杀下单请求耗尽了订单系统的资源，或者导致系统不稳定，然后导致其他普通下单请求也出现问题，没有办法完成下单。所以我们一般会对订单系统部署两个集群，一个集群是秒杀订单系统集群，一个集群是普通订单系统集群。如图：</p>
+<p><img src="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E8%AE%A2%E5%8D%95%E7%B3%BB%E7%BB%9F.png" alt="订单系统"></p>
+<h3 id="基于-Redis-实现下单时精准扣减库存"><a href="#基于-Redis-实现下单时精准扣减库存" class="headerlink" title="基于 Redis 实现下单时精准扣减库存"></a>基于 Redis 实现下单时精准扣减库存</h3><p>在后台系统中首先要做的一个事情，就是扣减库存。秒杀商品一般是有数量限制的，所以当大量的请求到达后台系统之后，第一步，就是先去扣减库存。</p>
+<p>在秒杀场景下，<strong>一般会将每个商品的库存提前写入 Redis 中</strong>，然后当请求到来之后，就直接对 Redis 中的库存进行扣减。Redis 是可以轻松用单机抗每秒几万高并发的，因此这里就可以抗下高并发额库存扣减。比如我们总共就 1 万件秒杀商品，其实最多就是前 1 万个到达的请求可以成功从 Redis 中扣减库存，抢购到这个商品，接着后续的请求从 Redis 里扣减库存的时候，都会发现库存已经没有了，无法抢购商品了。</p>
+<p><img src="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/%E6%89%A3%E5%87%8F%E5%BA%93%E5%AD%98.png" alt="扣减库存"></p>
+<h3 id="抢购完毕之后提前过滤无效请求"><a href="#抢购完毕之后提前过滤无效请求" class="headerlink" title="抢购完毕之后提前过滤无效请求"></a>抢购完毕之后提前过滤无效请求</h3><p>在 Redis 中的库存被扣减完之后，就说明后续其他的请求都没有必要发送到秒杀系统了，此时我们一颗让 Nginx 在接收到后续请求之后，直接就把后续请求过滤掉。</p>
+<p>比如一旦商品请购完毕，可以在 ZooKeeper 中写入一个秒杀完毕的标志位，然后 ZK 会反向通知 Nginx 中我们自己写的 Lua 脚本，通过 Lua 脚本后续在请求后来的时候直接过滤掉，不要向后转发了。这样就可以最大幅度削减对后端秒杀系统的请求压力。</p>
+<h3 id="瞬时高并发下单请求进入-MQ-进行削峰"><a href="#瞬时高并发下单请求进入-MQ-进行削峰" class="headerlink" title="瞬时高并发下单请求进入 MQ 进行削峰"></a>瞬时高并发下单请求进入 MQ 进行削峰</h3><p>接着我们来思考下，即使是有 1 万件商品同时被 1 万人秒杀成功了，那么可能瞬间会有 1 万请求涌入正常的订单系统进行后续的处理，此时可能还是会有瞬间上万请求访问到订单数据库中创建订单。这个时候，<strong>完全可以引入 MQ 进行削峰处理</strong>。</p>
+<p>对于秒杀系统而言，如果发现通过 Redis 完成了库存扣减，并且此时库存还大于 0，说明秒杀成功了需要生成订单，此时就直接发送一个消息到 MQ 中即可，然后普通订单系统熊 MQ 中消费秒杀成功的消息进行常规化的流程处理即可，比如创建订单等等。</p>
+<p>这样的话，瞬间上万并发的压力会被 MQ 轻松抗下来，然后普通的订单系统可以根据自己的工作负载慢慢地从 MQ 中拉取秒杀成功的消息，然后进行后续操作即可，不会对订单数据造成过大的压力。否则如果你让瞬间产生的一万或者几万的订单请求直接访问订单数据库，必然还是会让它压力过大，需要额外增加机器，这就没有必要了。</p>
+<p>因此这里利用 MQ 抗下每秒几万并发的下单请求，然后让订单系统已每秒几千的速率慢慢处理即可，也就是延迟可能几十秒，这些下单请求就会处理完毕。如图：</p>
+<p><img src="/CKING.github.io/2020/03/11/简单说说秒杀系统的技术难点/MQ%E9%9B%86%E7%BE%A4.png" alt="MQ集群"></p>
+<h2 id="秒杀架构的核心要点"><a href="#秒杀架构的核心要点" class="headerlink" title="秒杀架构的核心要点"></a>秒杀架构的核心要点</h2><p>通过这篇文章的思路，就会清晰地看到，对于一个秒杀系统而言，比较重要的一下几点：</p>
+<ul>
+<li><p>在前端/客户端通过设置秒杀答题，错开大量下单的时间，组织作弊器刷点</p>
+</li>
+<li><p>独立出来一套秒杀系统，专门负责处理秒杀请求</p>
+</li>
+<li><p>优先基于 Redis 进行高并发的库存扣减，一旦库存扣减完则秒杀结束</p>
+</li>
+<li><p>秒杀结束后，Nginx 层过滤掉无效的请求，大幅度削减转发到后端的流量</p>
+</li>
+<li><p>瞬时生成的大量下单请求直接进入 MQ 进行削峰，订单系统慢慢拉取消息完成下单操作</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/消息队列/" rel="tag"># 消息队列</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/03/09/MySQL-事务/" rel="next" title="MySQL 事务">
+                <i class="fa fa-chevron-left"></i> MySQL 事务
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/03/13/RocketMQ-杂记/" rel="prev" title="RocketMQ 杂记">
+                RocketMQ 杂记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">79</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#秒杀活动压力过大怎么办"><span class="nav-number">1.</span> <span class="nav-text">秒杀活动压力过大怎么办</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#高并发的商品详情页请求"><span class="nav-number">2.</span> <span class="nav-text">高并发的商品详情页请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#商品团队的秒杀架构优化：页面数据静态化"><span class="nav-number">3.</span> <span class="nav-text">商品团队的秒杀架构优化：页面数据静态化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#商品团队的秒杀架构优化：多级缓存"><span class="nav-number">4.</span> <span class="nav-text">商品团队的秒杀架构优化：多级缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#订单方面的优化"><span class="nav-number">5.</span> <span class="nav-text">订单方面的优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用答题的方式避免作弊软件抢购以及延缓下单"><span class="nav-number">5.1.</span> <span class="nav-text">用答题的方式避免作弊软件抢购以及延缓下单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为秒杀独立出来一套订单系统"><span class="nav-number">5.2.</span> <span class="nav-text">为秒杀独立出来一套订单系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于-Redis-实现下单时精准扣减库存"><span class="nav-number">5.3.</span> <span class="nav-text">基于 Redis 实现下单时精准扣减库存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抢购完毕之后提前过滤无效请求"><span class="nav-number">5.4.</span> <span class="nav-text">抢购完毕之后提前过滤无效请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#瞬时高并发下单请求进入-MQ-进行削峰"><span class="nav-number">5.5.</span> <span class="nav-text">瞬时高并发下单请求进入 MQ 进行削峰</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#秒杀架构的核心要点"><span class="nav-number">6.</span> <span class="nav-text">秒杀架构的核心要点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
