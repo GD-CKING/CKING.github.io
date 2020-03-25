@@ -99,7 +99,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E5%86%99%E6%95%B0%E6%8D%AE%E6%B5%81%E7%A8%8B.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/Elasticsearch-介绍/%E6%9F%A5%E8%AF%A2%E6%B5%81%E7%A8%8B.png">
-<meta property="og:updated_time" content="2020-03-25T03:33:41.500Z">
+<meta property="og:updated_time" content="2020-03-25T03:47:16.170Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Elasticsearch 介绍">
 <meta name="twitter:description" content="思维导图   Elasticsearch 简介Elasticsearch 是一个近实时的分布式存储、搜索、分析的引擎。它是专门做搜索的，接下来我们简单说说 Elasticsearch 的相关知识。 Elasticsearch 的数据结构一般来说，要想知道查询的时候大概花多少时间，就需要知道它的底层数据结构是怎么样的。例如：  树形的查找时间复杂度一般是 O(logn)  链表的查找时间复杂度一般">
@@ -660,6 +660,8 @@
 </li>
 </ul>
 <p>主流程其实说白了就是：<strong>由于 Elasticsearch 是分布式的，所以需要从各个节点都拉取对应的数据，然后最终统一合成给客户端</strong>。只是Elasticsearch 把这些活都干了，我们在使用的时候无感知而已。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://juejin.im/post/5e264b026fb9a03003008435" target="_blank" rel="noopener">扫盲–Elasticsearch</a></p>
+<p><a href="https://blog.csdn.net/qq_36289377/article/details/82993160" target="_blank" rel="noopener">Elasticsearch 原理</a></p>
 
       
     </div>
@@ -854,7 +856,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-简介"><span class="nav-number">1.</span> <span class="nav-text">Elasticsearch 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-的数据结构"><span class="nav-number">2.</span> <span class="nav-text">Elasticsearch 的数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#倒排索引"><span class="nav-number">2.1.</span> <span class="nav-text">倒排索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Term-Dictionary"><span class="nav-number">2.2.</span> <span class="nav-text">Term Dictionary</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Term-Index"><span class="nav-number">2.3.</span> <span class="nav-text">Term Index</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Posting-List-压缩技术-Roaring-Bitmap"><span class="nav-number">2.4.</span> <span class="nav-text">Posting List 压缩技术 Roaring Bitmap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-的术语和架构"><span class="nav-number">3.</span> <span class="nav-text">Elasticsearch 的术语和架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-写入流程"><span class="nav-number">4.</span> <span class="nav-text">Elasticsearch 写入流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-更新和删除"><span class="nav-number">5.</span> <span class="nav-text">Elasticsearch 更新和删除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-查询"><span class="nav-number">6.</span> <span class="nav-text">Elasticsearch 查询</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-简介"><span class="nav-number">1.</span> <span class="nav-text">Elasticsearch 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-的数据结构"><span class="nav-number">2.</span> <span class="nav-text">Elasticsearch 的数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#倒排索引"><span class="nav-number">2.1.</span> <span class="nav-text">倒排索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Term-Dictionary"><span class="nav-number">2.2.</span> <span class="nav-text">Term Dictionary</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Term-Index"><span class="nav-number">2.3.</span> <span class="nav-text">Term Index</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Posting-List-压缩技术-Roaring-Bitmap"><span class="nav-number">2.4.</span> <span class="nav-text">Posting List 压缩技术 Roaring Bitmap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-的术语和架构"><span class="nav-number">3.</span> <span class="nav-text">Elasticsearch 的术语和架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-写入流程"><span class="nav-number">4.</span> <span class="nav-text">Elasticsearch 写入流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-更新和删除"><span class="nav-number">5.</span> <span class="nav-text">Elasticsearch 更新和删除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch-查询"><span class="nav-number">6.</span> <span class="nav-text">Elasticsearch 查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
