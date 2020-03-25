@@ -379,6 +379,12 @@ Elasticsearch 查询又可以分为五种搜索类型：
 
 
 
+## 参考资料
+
+[扫盲--Elasticsearch](https://juejin.im/post/5e264b026fb9a03003008435)
+
+[Elasticsearch 原理](https://blog.csdn.net/qq_36289377/article/details/82993160)
+
 
 
 
