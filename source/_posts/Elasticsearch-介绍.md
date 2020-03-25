@@ -5,6 +5,10 @@ tags: 分布式
 categories: 分布式
 ---
 
+> 思维导图
+
+![Elasticsearch](Elasticsearch-介绍/Elasticsearch.png)
+
 ## Elasticsearch 简介
 
 Elasticsearch 是一个**近实时**的**分布式存储、搜索、分析**的引擎。它是专门做搜索的，接下来我们简单说说 Elasticsearch 的相关知识。
@@ -27,6 +31,42 @@ Elasticsearch 是一个**近实时**的**分布式存储、搜索、分析**的�
 
 
 
+### 倒排索引
+
+Elasticsearch 最强大的就是为每个字段提供了倒排索引，当查询的时候不用担心没有索引可以利用，什么是倒排索引，举个简单例子：
+
+| 文档id | 年龄 | 性别 |
+| ------ | ---- | ---- |
+| 1      | 25   | 女   |
+| 2      | 32   | 女   |
+| 3      | 25   | 男   |
+
+
+
+每一行是一个文档（document），每个 document 都有一个文档 id，那么给这些文档建立的倒排索引就是：
+
+年龄的索引：
+
+| 年龄 | 文档 id |
+| ---- | ------- |
+| 25   | [1,3]   |
+| 32   | [2]     |
+
+
+
+性别的索引：
+
+| 性别 | 文档 id |
+| ---- | ------- |
+| 女   | [1,2]   |
+| 男   | [3]     |
+
+
+
+可以看到，倒排索引是针对每个字段的，每个字段都有自己的倒排索引，25、32 这些叫做 `term`，[1,3] 这种叫做 `posting list`。
+
+
+
 首先我们得知道为什么 Elasticsearch 为什么可以实现快速的“模糊查询”或者“相关性查询”，实际上是你写入数据到 Elasticsearch 的时候会进行**分词**。如图：
 
 ![分词](Elasticsearch-介绍/分词.png)
@@ -37,11 +77,11 @@ Elasticsearch 是一个**近实时**的**分布式存储、搜索、分析**的�
 
 我们都知道，世界上有很多语言，那 Elasticsearch 怎么切分这写词呢？其实 Elasticsearch 内置了一些分词器：
 
-- Standard Analyzer：按词切分，将词小写
+- **Standard Analyzer**：按词切分，将词小写
 
-- Simple Analyzer：按非字母过滤（符号被过滤掉），将词小写
+- **Simple Analyzer**：按非字母过滤（符号被过滤掉），将词小写
 
-- WhitespaceAnalyzer：按照空格切分，不转小写
+- **WhitespaceAnalyzer**：按照空格切分，不转小写
 
 - 等等等。。。
 
@@ -49,11 +89,11 @@ Elasticsearch 是一个**近实时**的**分布式存储、搜索、分析**的�
 
 Elasticsearch 分词器主要由三部分组成：
 
-- Character Filter：文本过滤器，取出 HTML
+- **Character Filter**：文本过滤器，取出 HTML
 
-- Tokenizer：按照规则切分，比如空格
+- **Tokenizer**：按照规则切分，比如空格
 
-- TokenFilter：将切分后的词进行处理，比如转小写
+- **TokenFilter**：将切分后的词进行处理，比如转小写
 
 
 
@@ -75,21 +115,80 @@ Elasticsearch 内置的分词器都是英文类的，而我们用户搜索的时
 
 
 
+### Term Dictionary
+
+Elasticsearch 为了能快速找到某个 term，将所有的 term 进行了排序，然后二分查找 term，类似于上学时候老师教我们的翻新华字典的方式，所以叫做 Term Dictionary，这种查询方式其实和传统关系型数据库的 B-Tree 的方式很相近，所以这并不是 Elasticsearch 快的原因。
+
+
+
+### Term Index
+
+如果说 **Term Dictionary** 是直接去二分法翻字典，那么 **Term Index** 就是字典的目录页，当然这比我们真的去翻字典目录快多了，假设我们的 term 如果全是英文，那么 Term Index  就是 26 个字母表，但是通常 term 未必都是英文，而可以是任意的 byte 数组。因为就算 26 个英文字符也不一定都有对应的 term。例如，a 来头的 term 只有一个，c 开头的 term 有一百万个，x 开头的 term 一个也没有，这样查询到 c 的时候又会很慢了。所以通常情况下 **term index 是包含 term 的一些前缀的一棵树**，例如这样的一个 Term Index：
+
+![termindex](Elasticsearch-介绍/termindex.png)
+
+
+
+这样的情况下通过 term index 就可以根据快速定位到某个 offset（分支的开端），然后以此位置向下查找，再加上 FST（Finite-State-Transducer，Lucene4.0 开始使用该算法来查找 Term 在 Dictionary 中的位置）的压缩技术，将 Term Index 缓存到内存中，通过 Term Index 找到对应的 Term Dictionary 的 block，然后直接 去磁盘直接找到 term，减少磁盘的随机读写次数，大大地提升查询效率。
+
+
+
+### Posting List 压缩技术 Roaring Bitmap
+
+说到 roaring bitmaps 就要先了解 bitset 或者 bitmap。bitset 是一种数据结构，对应 posting list 如果是：[2, 3, 5, 7, 9]，那么对应的 bitset 就是：[0,1,1,0,1,0,1,0,1,0]。用 0 和 1 来表示该位置的数值的有无，这种做法就是一个 byte 可以代表 8 个文档。当大数据量时，仍然会消耗很多内存，所以直接将 bitset 结构存入内存不太理想。
+
+
+
+Elasticsearch 不仅压缩了 Term Index，还对 posting list 进行了压缩。posting list 虽然只存储了文档 id，但是文档 id 很大的时候，可以达到 PB 级的数据，所以 Elasticsearch 对 posting List 的压缩做了两件事：排序和大数变小数。如图：
+
+![posting](Elasticsearch-介绍/posting.png)
+
+
+
+简单解读一下这种压缩技巧：
+
+- step1：在对 posting list 进行压缩时进行了正序排序。
+
+
+- step2：通过增量将 73 后面的大数变成小数存储增量值。例如 300 - 73 = 227、302 - 300 = 2
+
+
+- step3：转换成二进制，取占最大位的数，227 占 8 位，前三个占八位，30 占五位，后三个数每个占五位。
+
+
+
+
+从第三步可以看出，这种压缩方式仍然不够高效，所以 Lucene 使用的数据结构叫做 **Roaring Bitmap**，其压缩原理可以理解为：与其保存 100 个 0，占用 100 个 bit，还不如保存 0 一次，然后声明这个 0 有 100 个，它以两个自己可以表示的最大数 65535 为界，将 posting list 分块。比如第一块是 0 - 65535，第二块是 65535 - 131071，如图：
+
+![posting压缩](Elasticsearch-介绍/posting压缩.png)
+
+
+
+压缩技巧解读：
+
+- step1：从小到大进行排序
+
+- step2：将大数除以 65536，用除得的结果和余数来表示这个大数
+
+- step3：以 65535 为界进行分块
+
+
+
 ## Elasticsearch 的术语和架构
 
 在讲解 Elasticsearch 的架构之前，首先我们得了解一下 Elasticsearch 的一些常见术语：
 
-Index：Elasticsearch 的 Index 相当于数据库的 Table
+- **Index**：Elasticsearch 的 Index 相当于数据库的 Table
 
-Type：这个在新的 Elasticsearch 版本已经废除（在以前的 Elasticsearch 版本，一个 Index 下支持多个 Type，有点类似消息队列一个 topic 下多个 group 的概念）
+- **Type**：这个在新的 Elasticsearch 版本已经废除（在以前的 Elasticsearch 版本，一个 Index 下支持多个 Type，有点类似消息队列一个 topic 下多个 group 的概念）
 
-Document：Document 相当于数据库的一行记录
+- **Document**：Document 相当于数据库的一行记录
 
-Field：相当于数据库的 Column 的概念
+- **Field**：相当于数据库的 Column 的概念
 
-Mapping：相当于数据库的 Schema 的概念
+- **Mapping**：相当于数据库的 Schema 的概念
 
-DSL：相当于数据库的 SQL（给我们读取 Elasticsearch 数据的 API）
+- **DSL**：相当于数据库的 SQL（给我们读取 Elasticsearch 数据的 API）
 
 
 
@@ -226,7 +325,7 @@ Elasticsearch 的更新和删除操作流程：
 
 
 
-Elasticsearch 查询又可以分为三个阶段：
+Elasticsearch 查询又可以分为五种搜索类型：
 
 - **QUERY_AND_FETCH**：向索引的所有分片（shard）都发出请求，各分片返回的时候把文档（document）和计算后的排名信息一起返回。这种搜索方式是最快的。因为相比下面的几种搜索方式，这种查询方法只需要去 shard 查询一次。但是各个 shard 返回的结果的数量之和可能是用户要求的 size 的 n 倍。
 
@@ -240,7 +339,7 @@ Elasticsearch 查询又可以分为三个阶段：
 
 
 
-初始化散发其实就是在进行真正的查询之前，先把各个分片的词频率和文档频率手机一下，然后进行词搜索的时候，各分片依据全局的词频率和文档频率进行搜索和排名。显然如果使用 DFS_QUERY_THEN_FETCH 这种查询方式，效率是最低的，因为一个搜索，可能要查询 3 次分片，但使用 DFS 方法，搜索精度应该是最高的。
+初始化散发其实就是在进行真正的查询之前，先把各个分片的词频率和文档频率收集一下，然后进行词搜索的时候，各分片依据全局的词频率和文档频率进行搜索和排名。显然如果使用 DFS_QUERY_THEN_FETCH 这种查询方式，效率是最低的，因为一个搜索，可能要查询 3 次分片，但使用 DFS 方法，搜索精度应该是最高的。
 
 
 
