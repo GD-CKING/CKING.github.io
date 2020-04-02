@@ -77,6 +77,137 @@ ObjectMonitor 里还有一个 `entrylist`，想要加锁的线程全部先进入
 
 
 
-这里需要注意的是，尝试加锁这个过程，也就是对 `_count` 计数器累加操作。如何保证多线程并发安全的原子性？就如上面说的，在 JDK1.6 之后，对 `synchronized` 内的加锁机制做了大量的优化，这里就是优化为 CAS 加锁的。
+这里需要注意的是，尝试加锁这个过程，也就是对 `_count` 计数器累加操作。如何保证多线程并发安全的原子性？就如上面说的，**在 JDK1.6 之后，对 `synchronized` 内的加锁机制做了大量的优化，这里就是优化为 CAS 加锁的。**
 
 ![保证原子性](Synchronized-和-volatile/保证原子性.png)
+
+
+
+### Synchronized 使用内存屏障保证可见性和有序性
+
+Java 的并发技术底层很多都对应了内存屏障的使用，包括 `synchronized`，它底层也是依托于各种不同的内存屏障来保证可见性和有序性的。
+
+
+
+**按照可见性来划分的话，内存屏障可以分为 Load 屏障和 Store 屏障。**
+
+
+
+Load 屏障的作用是执行 `refresh` 处理器缓存的操作。说白了就是对别的处理器更新过的值，从其他处理器的高速缓存（或者主内存）加载数据到自己的高速缓存来，确保自己看到的是最新的数据。
+
+
+
+Store 屏障的作用是执行 `flush` 处理器缓存的操作，就是把自己当前处理器更新的变量的值，都刷到高速缓存（或者主内存）里去。
+
+
+
+在 `monitorexit` 指令之后，会有一个 Store 屏障，让线程把自己在同步代码块里修改的变量的值都执行 `flush` 处理器缓存的操作，刷到高速缓存（或者主内存）里去；然后在 `monitorenter` 指令之后会加一个 Load 屏障，执行 refresh 处理器缓存的操作，把别的处理器修改过的最新值加载到自己高速缓存里来。
+
+
+
+所以说，通过 Load 屏障和 Store 屏障，就可以让 synchronized 保证可见性
+
+```java
+int b = 0;
+int c = 0;
+synchronized(this) { -> monitorenter
+	
+	Load 内存屏障
+	
+	int a = b;
+    
+    c = 1; // synchronized 代码块里还是可能发生指令重排
+} -> monitorexit
+
+Store 内存屏障
+```
+
+
+
+按照有序性保障来划分的话，还可以分为 Acquire 屏障和 Release 屏障
+
+
+
+在 `monitorenter` 指令之后，Load 屏障之后，会加一个 `Acquire` 屏障，这个屏障的作用是禁止读操作和读写操作之间发生指令重排序；在 `monitorexit` 指令之前，会加一个 `Release` 屏障，这个屏障的作用是禁止写操作和读写操作之间发生重排序。
+
+
+
+所以说，通过 `Acquire` 屏障和 `Release` 屏障，就可以让 `synchronized` 保证有序性，只有 `synchronized` 内部的指令可以重排序，但是绝对不会跟外部的指令发生重排序。
+
+```java
+int b = 0;
+int c = 0;
+synchronized(this) { -> monitorenter
+	
+	Load 内存屏障
+	
+	Acquire 内存屏障
+	
+	int a = b;
+    
+    c = 1; // synchronized 代码块里还是可能发生指令重排
+    
+    Release 内存屏障
+    
+} -> monitorexit
+
+Store 内存屏障
+```
+
+
+
+总结：
+
+原子性：通过加锁和释放锁来保证原子性
+
+可见性：加了 Load 屏障和 Store 屏障，释放锁 flush 数据，加锁会 refresh 数据
+
+有序性：Acquire 屏障和 Release 屏障，保证同步代码块内部的指令可以重排，但是同步代码块内部的指令和外面的指令是不能重排的。
+
+
+
+## Volatile
+
+`volatile` 对原子性的保证是非常有限的，其实主要是 32 位 JVM 中的 long/double  类型变量的赋值操作是不具备原子性的，加上 volatile 就可以保证原子性了。
+
+
+
+在 volatile 变量写操作的前面会加一个 `Release` 屏障，然后在之后会加入一个 `Store` 屏障，这样就可以保证 volatile 写跟 Release 屏障之前的任何读写操作都不会指令重排。然后 Store 屏障保证了，写完数据之后，立马会执行 flush 处理器缓存的操作。
+
+
+
+在 volatile 变量读操作的前面会加入一个 `Load` 屏障，这样就可以保证对这个变量的读取时，如果被别的处理器修改过了，必须得从其他处理器的高速缓存（或者主内存）中加载到自己本地高速缓存里，保证读到的是最新的数据。之后会加入一个 `Acquire` 屏障，禁止 volatile 读操作之后的任何读写操作会跟 volatile 读指令重排序。
+
+
+
+**那个 Acquire 屏障其实就是 `LoadLoad` 屏障 + `LoadStore` 屏障，Release 屏障就是 StoreLoad 屏障 + StoreStore 屏障**
+
+```java
+线程1:
+
+Release 屏障
+
+isRunning = false;
+
+Store 屏障
+```
+
+
+
+```java
+线程2:
+
+Load 屏障
+while(isRunning) {
+
+	Acquire 屏障
+	
+	// 代码逻辑
+}
+```
+
+
+
+## 总结
+
+volatile 和 synchronized 保证可见性和有序性，原来都是通过各种内存屏障来实现的，因为加了内存屏障，就会有一些特殊的指令和实现，就可以保证可见性和有序性了。

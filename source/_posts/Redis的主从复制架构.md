@@ -89,7 +89,7 @@ repl-diskless-sync-delay 5
 
 ​		上面说过，根据host+ip定位master node是不靠谱的，**如果master node重启或者数据发生了变化，那么slave node应该根据不同的run id区分，run id不同就做全量复制**。如果需要不更改run id重启redis，可以使用`redis-cli debug reload`命令。
 
-![run id](Redis的主从复制架构/run id.png)
+![run id](Redis的主从复制架构/runid.png)
 
 #### psync
 
