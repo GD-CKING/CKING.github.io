@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="高速缓存的数据结构处理器高速缓存的底层数据结构实际上一个拉链散列表的结构，就是有很多个 bucket，每个 bucket 挂了很多的 cache entry，每个 cache entry 由三个部分组成：tag、cache line 和 flag，其中的 cache line 就是缓存的数据；tag 指向了这个缓存数据在主内存中的数据地址，flag 标识了缓存行的状态。另外需要注意的一点是，cac">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="硬件层面聊聊可见性和有序性">
+<meta property="og:url" content="https://github.com/2020/04/06/硬件层面聊聊可见性和有序性/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="高速缓存的数据结构处理器高速缓存的底层数据结构实际上一个拉链散列表的结构，就是有很多个 bucket，每个 bucket 挂了很多的 cache entry，每个 cache entry 由三个部分组成：tag、cache line 和 flag，其中的 cache line 就是缓存的数据；tag 指向了这个缓存数据在主内存中的数据地址，flag 标识了缓存行的状态。另外需要注意的一点是，cac">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/MESI%E5%8D%8F%E8%AE%AE.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/%E5%86%99%E7%BC%93%E5%86%B2%E5%99%A8%E5%92%8C%E6%97%A0%E6%95%88%E9%98%9F%E5%88%97.png">
+<meta property="og:updated_time" content="2020-04-06T10:36:58.116Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="硬件层面聊聊可见性和有序性">
+<meta name="twitter:description" content="高速缓存的数据结构处理器高速缓存的底层数据结构实际上一个拉链散列表的结构，就是有很多个 bucket，每个 bucket 挂了很多的 cache entry，每个 cache entry 由三个部分组成：tag、cache line 和 flag，其中的 cache line 就是缓存的数据；tag 指向了这个缓存数据在主内存中的数据地址，flag 标识了缓存行的状态。另外需要注意的一点是，cac">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/04/06/硬件层面聊聊可见性和有序性/">
+
+
+
+
+
+  <title>硬件层面聊聊可见性和有序性 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">硬件层面聊聊可见性和有序性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-06T11:41:36+08:00">
+                2020-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="高速缓存的数据结构"><a href="#高速缓存的数据结构" class="headerlink" title="高速缓存的数据结构"></a>高速缓存的数据结构</h2><p>处理器高速缓存的底层数据结构实际上一个<strong>拉链散列表</strong>的结构，就是有很多个 <code>bucket</code>，每个 <code>bucket</code> 挂了很多的 <code>cache entry</code>，每个 <code>cache entry</code> 由三个部分组成：<code>tag</code>、<code>cache line</code> 和 <code>flag</code>，其中的 <code>cache line</code> 就是缓存的数据；<code>tag</code> 指向了这个缓存数据在主内存中的数据地址，<code>flag</code> 标识了缓存行的状态。另外需要注意的一点是，cache line 中可以包含多个变量的值</p>
+<p>处理器会操作一些变量，那怎么在高速缓存里定位到这个变量呢？其实处理器在读写高速缓存的时候，实际上会根据变量名执行一个<strong>内存地址解码</strong>的操作，解析出 3 个东西：<code>index</code>、<code>tag</code> 和 <code>offset</code>。<code>index</code> 用于定位到拉链散列表中的某个 bucket，<code>tag</code> 是用于定位 cache entry，offset 是用于定位一个变量时在 cache line 中的位置。</p>
+<p>如果说可以成功定位到一个高速缓存中的数据，而且 <code>flag</code> 还标志着有效，则缓存命中；否则不满足上述条件，就是缓存未命中。如果是读数据未命中的话，会从主内存重新加载数据到高速缓存中。现在处理器一般都有三级高速缓存：L1、L2 和 L3，越靠前面的缓存读写速度越快。</p>
+<p><img src="/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98.png" alt="高速缓存"></p>
+<h2 id="缓存一致性协议（MESI-协议）"><a href="#缓存一致性协议（MESI-协议）" class="headerlink" title="缓存一致性协议（MESI 协议）"></a>缓存一致性协议（MESI 协议）</h2><p>因为有高速缓存的存在，所以就导致各个处理器可能对一个变量会在自己的高速缓存里有自己的副本，这样一个处理器修改了变量值，别的处理器是看不到的。为了解决这个问题，引入了缓存一致性协议（<code>MESI</code> 协议）</p>
+<p><code>MESI</code> 协议规定：对一个共享变量的读操作可以是多个处理器并发执行的，但是对于一个共享变量的写操作，只有一个处理器可以执行。其实也会通过排他锁的机制保证就一个处理器能写。</p>
+<p>之前说过那个 cache entry 的 <code>flag</code> 代表了缓数据的状态，MESI 协议中划分为：</p>
+<ul>
+<li><p><strong>invalid</strong>：无效的。标记为 <code>I</code>。这个意思是当前 cache entry 无效，里面的数据不能使用</p>
+</li>
+<li><p><strong>shared</strong>：共享的。标记为 <code>S</code>。这个意思是当前 cache entry 有效，而且里面的数据在各个处理器都有各自的副本，但是这些副本的值跟主内存的值是一样的，各个处理器就是并发地在读而已</p>
+</li>
+<li><p><strong>exclusive</strong>：独占的。标记为 <code>E</code>。这个意思就是当前处理器对这个数据独占了，只有它可以有这个副本，其它的处理器都不能包含这个副本</p>
+</li>
+<li><p><strong>modified</strong>：修改的。标记为 <code>M</code>。只能有一个处理器对共享数据更新，所以只有更新数据的处理器的 cache entry，才是 exclusive 状态。表明当前线程更新了这个数据，这个副本的数据跟主内存是不一样的。</p>
+</li>
+</ul>
+<p><code>MESI</code> 协议规定了一组消息，就是各个处理器在操作内存数据的时候，都会往总线发送消息，而且各个处理器还会不停地从总线嗅探最新的消息，通过这个总线的消息传递来保证各个处理器的协作。</p>
+<p>下面来详细地图解 <code>MESI</code> 协议的工作原理，处理器0 读取某个变量的数据时，首先会根据 index、tag 和 offset 从高速缓存的拉链散列表读取数据，如果发现状态为 <code>I</code>，也就是无效的，此时就会发送 <code>read</code> 消息到总线。</p>
+<p>接着主内存会返回对应的数据给 处理器0，处理器0 就会把数据放到高速缓存里，同时 cache entry 的 flag 状态为 <code>S</code>。</p>
+<p>在 处理器0 对一个数据进行更新的时候，如果数据状态是 <code>S</code>，则此时就需要发送一个 invalidate 消息到总线，尝试让其他的处理器的高速缓存的 cache entry 全部变为 <code>I</code>，以获得数据的独占锁。其他的 处理器1 会从总线嗅探到 invalidate 消息，此时就会把自己的 cache entry 设置为 <code>I</code>，也就是过期掉自己本地的缓存，然后就是返回 invalidate ack 消息到总线，传递回 处理器0，处理器0 必须收到所有处理器返回的 ack 消息</p>
+<p>接着 处理器0 就会将 cache entry 先设置为 <code>E</code>，独占这条数据，在独占期间，别的处理器就不能修改数据了，因为别的处理器此时发出 invalidate 消息，这个 处理器0 是不会返回 invalidate ack 消息的，除非它先修改完再说</p>
+<p>接着 处理器0 就修改这条数据，接着将数据设置为 <code>M</code>，也有可能是把数据此时强制写会到主内存中，具体看底层硬件实现</p>
+<p>然后其他处理器此时这条数据的状态都是 <code>I</code> 了，如果要读的话，全部都需要重新发送 read 消息，从出内存（或者是其他处理器）来加载，这个具体怎么实现看底层的硬件，都有可能的</p>
+<p>这套机制其实就是缓存一致性在硬件缓存模型下的完整执行原理。</p>
+<p><img src="/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/MESI%E5%8D%8F%E8%AE%AE.png" alt="MESI协议"></p>
+<h2 id="采用写缓冲器和无效队列优化-MESI-协议"><a href="#采用写缓冲器和无效队列优化-MESI-协议" class="headerlink" title="采用写缓冲器和无效队列优化 MESI 协议"></a>采用写缓冲器和无效队列优化 MESI 协议</h2><p><code>MESI</code> 协议如果每次写数据的时候都要发送 <code>invalidate</code> 消息等待所有处理器返回 ack，然后获取独占锁后才能写入数据，那可能就会导致性能很差了。因为对这个共享变量的写操作，实际上在硬件级别变成串行的。所以为了解决这个问题，硬件层面引入了<strong>写缓冲器</strong>和<strong>无效队列</strong>。</p>
+<p>写缓冲器的作用是，一个处理器写数据的时候，直接把数据写入缓冲器，同时发送 invalidate 消息，然后就认为写操作完成了，接着就干别的事情，不会阻塞在这里。接着这个处理器如果收到其他处理器的 ack 消息之后，才会把写缓冲器中的写结果拿出来，通过堆 cache entry 设置为 E 加独占锁，同时修改数据，然后设置为 M。</p>
+<p>其实写缓冲器的作用，就是处理器写数据的时候直接写入缓冲器，不需要同步阻塞等待其他处理器的 invalidate ack 返回，这就大大提升了硬件层面的执行效率了。包括查询数据的时候，会先从写缓冲器里查，因为有可能刚修改的值在这里，然后才会从高速缓存里查，这个就是存储转发。</p>
+<p>引入无效队列，就是说其他处理器在接收到 <code>invalidate</code> 消息之后，不需要立马过期本地缓存，直接把消息放入无效队列，就返回 ack 给那个写处理器了，这就进一步加速了性能，然后之后从无效队列里取出消息，过期本地缓存即可</p>
+<p>通过引入写缓冲器和无效队列，一个处理器要写数据的话，这个性能是很高的，它直接写数据到写缓冲器，发送一个 invalidate 消息出去，就立马返回，执行别的操作了；其他处理器收到 invalidate 消息之后直接放入无效队列，立马就返回 invalidate ack</p>
+<p><img src="/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/%E5%86%99%E7%BC%93%E5%86%B2%E5%99%A8%E5%92%8C%E6%97%A0%E6%95%88%E9%98%9F%E5%88%97.png" alt="写缓冲器和无效队列"></p>
+<h2 id="硬件层面的-MESI-协议引发有序性和可见性的问题"><a href="#硬件层面的-MESI-协议引发有序性和可见性的问题" class="headerlink" title="硬件层面的 MESI 协议引发有序性和可见性的问题"></a>硬件层面的 MESI 协议引发有序性和可见性的问题</h2><p>通过上面的讲解，MESI 协议在硬件层面的原理大家应该清晰了。现在就讲讲 MESI 协议引发的可见性和有序性问题。</p>
+<h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><p>可见性是写缓冲器和无效队列导入的。写数据不一定立马写入自己的高速缓存（或者主内存），有可能写入了写缓冲器，导致其他处理器读不到最新的值；读数据不一定立马从别人的高速缓存（或者主内存）刷新最新的值过来，invalidate 消息还无效队列里面，高速缓存还保留着未被无效化的旧值，处理器会在自己的高速缓冲中读取旧值。</p>
+<h3 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h3><h4 id="StoreLoad-重排序"><a href="#StoreLoad-重排序" class="headerlink" title="StoreLoad 重排序"></a>StoreLoad 重排序</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> c = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">线程<span class="number">1</span>:</span><br><span class="line"></span><br><span class="line">a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> b = c;</span><br></pre></td></tr></table></figure>
+
+<p>上面线程 1 的代码，第一个是 <code>Store</code>，第二个是 <code>Load</code>。但是可能处理器对 store 操作先写入了写缓冲器，此时这个写操作相当于没执行，然后就执行第二行代码，第二行代码的 b 是局部变量，那这个操作等于是读取 c 的值，是 load 操作。这就导致了好像第二行代码的 load 先执行了，第一行代码的 store 后执行</p>
+<p>第一个 store 操作写到写缓冲器里去了，导致其他的线程是读取不到的，看不到的，好像是第一个写操作没执行一样，而第二个 load 操作是成功地执行了。</p>
+<h4 id="StoreStore-重排序"><a href="#StoreStore-重排序" class="headerlink" title="StoreStore 重排序"></a>StoreStore 重排序</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">resource = loadResource();</span><br><span class="line">loaded = <span class="keyword">true</span>;</span><br></pre></td></tr></table></figure>
+
+<p>上面两个写操作，但是可能第一个写操作写入了写缓冲器，然后第二个写操作是直接修改的高速缓存，这个时候不久导致了两个写操作顺序颠倒了？</p>
+<p>诸如此类的重排序，都可能因为 MESI 的机制发生。可见性问题也是一样的，写入写缓冲器之后，没输入高速缓存，导致别人读不到；读数据的时候，可能 invalidate 消息在无效队列里，导致没法立马感知到过期的缓存，立马加载最新的数据</p>
+<h2 id="内存屏障在硬件层面的实现以及问题解决"><a href="#内存屏障在硬件层面的实现以及问题解决" class="headerlink" title="内存屏障在硬件层面的实现以及问题解决"></a>内存屏障在硬件层面的实现以及问题解决</h2><p>解决可见性问题，可以通过 <strong>Store 屏障 + Load 屏障</strong>。</p>
+<p>如果加了 Store 屏障之后，就会强制性要求你对一个写操作必须阻塞等待到其他的处理器返回 <code>invalidate ack</code> 之后，对数据加锁，然后修改到高速缓存中，在写数据之后，必须强制执行 flush 操作。它的效果，是要求一个写操作必须刷到高速缓存（或者主内存），不能停留在写缓冲器里。</p>
+<p>如果加了 Load 屏障之后，就从高速缓存读取数据的时候，如果发现无效队列里有一个 invalidate 消息，此时会立马强制那个 invalidate 消息把自己本地缓存的数据过期掉（设置为 <code>I</code>），然后就可以强制从其他处理器的高速缓存中加载最新的值了，这就是 refresh 操作。</p>
+<p>为了解决有序性问题，可以通过<strong>内存屏障</strong>。通过使用 Acquire 屏障（StoreStore 屏障）、Release 屏障（StoreLoad 屏障），可以避免重排序</p>
+<p>StoreStore 屏障，会强制让写数据的操作全部按照顺序写入写缓冲器里，不会让你第一个写到写缓冲器里去，第二个直接修改高速缓存了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">resource = loadResource();</span><br><span class="line"></span><br><span class="line">StoreStore 屏障</span><br><span class="line"></span><br><span class="line">loaded = <span class="keyword">true</span>;</span><br></pre></td></tr></table></figure>
+
+<p>StoreLoad 屏障，它会强制先将写缓冲器里的数据写入高速缓存中，接着读数据的时候强制清空无效队列，对里面的 invalidate 消息全部过期掉高速缓存中的条目，然后强制从主内存里重新加载数据。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/02/RocketMQ-杂记之消费者/" rel="next" title="RocketMQ 杂记之消费者">
+                <i class="fa fa-chevron-left"></i> RocketMQ 杂记之消费者
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#高速缓存的数据结构"><span class="nav-number">1.</span> <span class="nav-text">高速缓存的数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存一致性协议（MESI-协议）"><span class="nav-number">2.</span> <span class="nav-text">缓存一致性协议（MESI 协议）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#采用写缓冲器和无效队列优化-MESI-协议"><span class="nav-number">3.</span> <span class="nav-text">采用写缓冲器和无效队列优化 MESI 协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#硬件层面的-MESI-协议引发有序性和可见性的问题"><span class="nav-number">4.</span> <span class="nav-text">硬件层面的 MESI 协议引发有序性和可见性的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#可见性"><span class="nav-number">4.1.</span> <span class="nav-text">可见性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有序性"><span class="nav-number">4.2.</span> <span class="nav-text">有序性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#StoreLoad-重排序"><span class="nav-number">4.2.1.</span> <span class="nav-text">StoreLoad 重排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#StoreStore-重排序"><span class="nav-number">4.2.2.</span> <span class="nav-text">StoreStore 重排序</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存屏障在硬件层面的实现以及问题解决"><span class="nav-number">5.</span> <span class="nav-text">内存屏障在硬件层面的实现以及问题解决</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
