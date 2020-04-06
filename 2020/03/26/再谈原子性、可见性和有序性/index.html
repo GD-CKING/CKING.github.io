@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="思维导图   原子性Java 语言规范里，int i = 0、resource = loadResources、flag = true，各种变量的简单赋值操作，规定都是原子的，包括引用类型的变量的赋值操作，也是原子的。 但是很多复杂的操作，例如 i++，先读取 i 的值，再更新 i 的值。还有 i = y + 2，先读取 y 的值，再更新 i 的值，这种复杂操作，不是简单赋值写，它是有计算的过程">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="再谈原子性、可见性和有序性">
+<meta property="og:url" content="https://github.com/2020/03/26/再谈原子性、可见性和有序性/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="思维导图   原子性Java 语言规范里，int i = 0、resource = loadResources、flag = true，各种变量的简单赋值操作，规定都是原子的，包括引用类型的变量的赋值操作，也是原子的。 但是很多复杂的操作，例如 i++，先读取 i 的值，再更新 i 的值。还有 i = y + 2，先读取 y 的值，再更新 i 的值，这种复杂操作，不是简单赋值写，它是有计算的过程">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E5%8E%9F%E5%AD%90%E6%80%A7%E3%80%81%E5%8F%AF%E8%A7%81%E6%80%A7%E5%92%8C%E6%9C%89%E5%BA%8F%E6%80%A7.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E5%AF%84%E5%AD%98%E5%99%A8.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/MESI.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E6%8C%87%E4%BB%A4%E9%87%8D%E6%8E%92%E5%BA%8F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E6%8C%87%E4%BB%A4%E4%B9%B1%E5%BA%8F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E5%86%85%E5%AD%98%E9%87%8D%E6%8E%92.png">
+<meta property="og:updated_time" content="2020-03-30T12:44:18.512Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="再谈原子性、可见性和有序性">
+<meta name="twitter:description" content="思维导图   原子性Java 语言规范里，int i = 0、resource = loadResources、flag = true，各种变量的简单赋值操作，规定都是原子的，包括引用类型的变量的赋值操作，也是原子的。 但是很多复杂的操作，例如 i++，先读取 i 的值，再更新 i 的值。还有 i = y + 2，先读取 y 的值，再更新 i 的值，这种复杂操作，不是简单赋值写，它是有计算的过程">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E5%8E%9F%E5%AD%90%E6%80%A7%E3%80%81%E5%8F%AF%E8%A7%81%E6%80%A7%E5%92%8C%E6%9C%89%E5%BA%8F%E6%80%A7.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/03/26/再谈原子性、可见性和有序性/">
+
+
+
+
+
+  <title>再谈原子性、可见性和有序性 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">再谈原子性、可见性和有序性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-26T20:48:26+08:00">
+                2020-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>思维导图</p>
+</blockquote>
+<p><img src="/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E5%8E%9F%E5%AD%90%E6%80%A7%E3%80%81%E5%8F%AF%E8%A7%81%E6%80%A7%E5%92%8C%E6%9C%89%E5%BA%8F%E6%80%A7.png" alt="原子性、可见性和有序性"></p>
+<h2 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h2><p>Java 语言规范里，<code>int i = 0</code>、<code>resource = loadResources</code>、<code>flag = true</code>，各种变量的简单赋值操作，规定都是原子的，包括引用类型的变量的赋值操作，也是原子的。</p>
+<p>但是很多复杂的操作，例如 <code>i++</code>，先读取 i 的值，再更新 i 的值。还有 <code>i = y + 2</code>，先读取 y 的值，再更新 i 的值，这种复杂操作，不是简单赋值写，它是有计算的过程在里面的，此时 Java 语言规范默认是不保证原子性的。</p>
+<p>volatile 关键字，保证了可见性和有序性，但不保证原子性。像上面的 <code>i++</code>，<code>i = y + 2</code>，volatile都是不保证原子性的。</p>
+<h3 id="赋值写操作中不保证原子性的特例"><a href="#赋值写操作中不保证原子性的特例" class="headerlink" title="赋值写操作中不保证原子性的特例"></a>赋值写操作中不保证原子性的特例</h3><p>原子性这块，在 32 位虚拟机里的 long/double 类型的变量的简单赋值写操作，不是原子的。例如 <code>long i = 30</code>、<code>double c = 45.0</code>，在 32 位虚拟机里就不是原子的，因为 long 和 double 是 64 位的。</p>
+<p>如果多个线程同时并发执行 long i = 30，long 是 64 位的，就会导致有的线程在修改 i 的高 32 位，有的线程在修改 i 的低 32 位，多线程并发给 long 类型的变量进行赋值操作，在 32 位的虚拟机下，是有问题的。可能会导致多线程给 long i = 30 赋值之后，导致 i 的值不是 30，可能是 -3333334429 乱码一样的数字，就是因为高低 32 位赋值错了，就导致二进制数字转换为十进制之后是一个很奇怪的数字。</p>
+<h3 id="volatile-保证原子性的特例"><a href="#volatile-保证原子性的特例" class="headerlink" title="volatile 保证原子性的特例"></a>volatile 保证原子性的特例</h3><p>volatile 对原子性保证的语义，在 Java 里是很有限的，几乎可以忽略不计。32 位的 Java 虚拟机里面，对 long/double 变量的赋值写是不原子的，此时如果对变量加上了 volatile，就可以保证在 32 位 Java 虚拟机里面，对 long/double 变量的赋值是原子的了。</p>
+<h2 id="硬件级别思考可见性的问题"><a href="#硬件级别思考可见性的问题" class="headerlink" title="硬件级别思考可见性的问题"></a>硬件级别思考可见性的问题</h2><p>每个处理器都有自己的寄存器（register），所以多个处理器各自运行一个线程的时候，可能导致某个变量给放到寄存器里去，接着就会导致各个线程没法看到其他处理器寄存器里的变量的值修改了。<strong>可见性的第一个问题，就有可能在寄存器的级别，导致变量副本的更新，无法让其他处理器看到</strong>。</p>
+<p>然后处理器运行的线程对变量的操作都是针对写缓冲来的（store buffer），并不是直接更新主内存，所以很可能导致一个线程更新了变量，但是仅仅是在写缓冲区而已，没有更新到主内存里去。<strong>这个时候，其他处理器的线程是没法读到它的写缓冲区的变量值的，所以此时会有可见性的问题，这是第二个可见性发生的场景。</strong></p>
+<p>然后即使这个时候一个处理器的线程更新了写缓冲区之后，将更新同步到了自己高速缓存里（cache，或者是主内存），然后还把这个更新通知给了其他的处理器，<strong>但是其他处理器可能就是把这个更新放到无效队列里</strong>，没有更新它的高速缓存。此时其他处理器的线程从高速缓存里读数据的时候，读到的还是过时的旧值。</p>
+<p><img src="/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E5%AF%84%E5%AD%98%E5%99%A8.png" alt="寄存器"></p>
+<h3 id="MESI协议"><a href="#MESI协议" class="headerlink" title="MESI协议"></a>MESI协议</h3><p>如果要实现可见性，其中一个方法就是通过 <code>MESI</code> 协议。这个 <code>MESI</code> 协议实际上有很多种不同的实现，因为它不过就是一个协议，具体的实现机制要考具体底层的系统如何实现。根据具体底层硬件的不同，<code>MESI</code> 协议的实现是有区别的。</p>
+<p>比如说 <code>MESI</code> 协议有一种实现，就是一个处理器将另外一个处理器的高速缓存中的更新后的数据拿到自己的高速缓存中更新一下，这样大家的缓存不就实现同步了，然后各个处理器的线程看到的数据就一样了。</p>
+<p>为了实现 <code>MESI</code> 协议，有两个配套的专业机制需要说一下：<strong>flush 处理器缓存</strong>、<strong>refresh 处理器缓存</strong>。</p>
+<p>flush 处理器缓存，它的意思是把自己更新的值刷新到高速缓存里去（或者是主内存），因为必须要刷到高速缓存（或者是主内存）里，才有可能在后续通过一些特殊的机制让其他的处理器从自己的高速缓存（或者是主内存）里读取到更新的值。</p>
+<p>除了 flush 以外，它还会发送一个消息到总线（bus），通知其他处理器，某个变量的值被它修改了。</p>
+<p>refresh 处理器缓存，它的意思就是说再读取一个变量的值的时候，如果发现其他处理器的线程更新了变量的值，必须从其他处理器的高速缓存（或者是主内存）里，读取这个最新的值，更新到自己的高速缓存中。</p>
+<p>所以，为了保证可见性，在底层是通过 <code>MESI</code> 协议、flush 处理器缓存和 refresh 处理器缓存，这一整套机制来保障的。要记住，flush 和 refresh 这两个操作，flush 是强制刷新数据到高速缓存（或主内存），不要仅仅停留在写缓冲器里面；refresh，是从总线嗅探发现某个变量被修改，必须强制从其他处理器的高速缓存加载变量的最新值到自己的高速缓存里去。</p>
+<p>内存屏障的使用，在底层硬件级别的原理，其实就是在执行 flush 和 refresh。还有 volatile 关键字：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatile boolean isRunning = true;</span><br></pre></td></tr></table></figure>
+
+<p>当执行 <code>isRunning = false</code> 时，就是写 volatile 变量，就会通过执行一个内存屏障，在底层触发 flush 处理器缓存的操作；<code>while(isRunnig) {}</code>，读 volatile 变量，也会通过执行一个内存屏障，在底层触发 refresh 操作。</p>
+<p>一个变量加了 volatile 修饰之后，对这个变量的写操作，会执行 flush 处理器缓存，把数据刷到高速缓存（或者是主内存）中，然后对这个变量的读操作，会执行 refresh 处理器缓存，从其他处理器的高速缓存中，读取最新的值。</p>
+<p><img src="/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/MESI.png" alt="MESI"></p>
+<h2 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h2><h3 id="Java-程序运行过程中发生指令重排的几个地方"><a href="#Java-程序运行过程中发生指令重排的几个地方" class="headerlink" title="Java 程序运行过程中发生指令重排的几个地方"></a>Java 程序运行过程中发生指令重排的几个地方</h3><p>我们写好的代码在实际执行的时候那个顺序可能在很多环节都会被人给重排序，一旦重排序之后，在多线程并发的场景下，就有可能出现一些问题。</p>
+<p><img src="/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E6%8C%87%E4%BB%A4%E9%87%8D%E6%8E%92%E5%BA%8F.png" alt="指令重排序"></p>
+<p>1、<strong>自己写的源代码中的执行顺序</strong>，这个是我们自己写的代码，一般来说就是按照我们自己脑子里想的那样来写。</p>
+<p>2、<strong>编译后的代码的执行顺序</strong>。java 里有两种编译器，一个是静态编译器（javac），一个是动态编译器（JIT）。javac 负责把 <code>.java</code> 文件中的源代码编译为 <code>.class</code> 文件中的字节码，这个一般是程序写好之后进行编译的。JIT 负责把 <code>.class</code> 文件中的字节码编译为 JVM 所在操作系统支持的机器码，一般在程序运行过程中进行编译。</p>
+<p>在这个编译的过程中，编译器是很有可能调整代码的执行顺序的，为了调高代码的执行效率，很可能调整代码的执行顺序。JIT 编译器对指令重排的还是挺多的。</p>
+<p>3、<strong>处理器的执行顺序</strong>。哪怕你给处理器一个代码的执行顺序，但是处理器还是可能会重排代码，更换一种执行顺序。JIT 编译好的指令，还是可能会被处理器调整顺序</p>
+<p>4、<strong>内存重排序</strong>。有可能你这个处理器在执行指令的时候，在高速缓存和写缓冲器、无效队列等等硬件层面的组件，也可能导致你的指令的执行看起来的顺序跟想象的不太一样。</p>
+<p>上述就是我们在写好 java 代码之后，从编译到执行的过程中，代码的执行顺序可能有指令重排的地方，只要有指令重排就有一定可能造成程序执行异常。</p>
+<p>但是编译器和处理器不是胡乱地重排序，他们会遵循一个关键的规则，就是数据依赖规则。如果说一个变量的结果依赖于之前的代码执行结果，那么就不能随意进行重排序，要遵循数据的依赖。例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">3</span>;</span><br><span class="line"><span class="keyword">int</span> b = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">int</span> c = a * b;</span><br></pre></td></tr></table></figure>
+
+<p>那第三行代码依赖于上面两行代码，第一行和第二行代码可以重排序，但是第三行代码必须放在最下面。</p>
+<p>此外还有 happens-before 原则，就是有一些基本的规则是要遵守的，不会让你胡乱地重排序。在遵守一定的规则的前提下，有好几个层面的代码和指令都可能出现重排序。</p>
+<h3 id="JIT编译器指令重排的例子"><a href="#JIT编译器指令重排的例子" class="headerlink" title="JIT编译器指令重排的例子"></a>JIT编译器指令重排的例子</h3><p>JIT 动态编译的时候，有可能造成一个非常经典的指令重排。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyObject</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> Resource resource;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">MyObject</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">		<span class="comment">// 从配置文件里加载数据构造 Resource 对象</span></span><br><span class="line">		<span class="keyword">this</span>.resource = loadResource();</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.resource.execute();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>假设线程 1 执行我们写的这么一行代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MyObject myObj = <span class="keyword">new</span> MyObject();</span><br></pre></td></tr></table></figure>
+
+<p>而线程 2 执行下面这行代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">myObj.execute();</span><br></pre></td></tr></table></figure>
+
+<p>首先，我们要知道 <code>new Object()</code> 是如何创建一个 MyObject 对象实例的。</p>
+<ul>
+<li>步骤1：以 MyObject 类作为原型，给它的对象实例分配一块内存空间。<code>objRef</code> 就是指向了分配好的内存空间的地址的引用。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objRef = allocate(MyObject.class);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>步骤2：就是针对分配好内存空间的一个对象实例，执行它的构造函数，对这个对象进行初始化的操作，执行我们自己写的构造函数里的一些代码，对各个实例变量赋值，执行初始化的逻辑。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">invokeConstructor(objRef);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>步骤3：上面两个步骤搞定之后，一个对象实例就算创建完成。此时就是把 objRef 指针指向的内存地址，赋值给我们自己的引用类型的变量，myObj 就可以作为一个类似指针的概念指向了 MyObject 对象实例的内存地址。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">myObj = objRef;</span><br></pre></td></tr></table></figure>
+
+<p>有可能 JIT 动态编译为了加速程序的执行速度，因为步骤 2 是在初始化一个对象实例，这个步骤是有可能很耗时的，比如说你可能会在这里执行一些网络的通信，磁盘文件的读写等等。而 JIT 为了加速程序的执行性能和效率，就可能发生指令重排，把顺序排为：步骤 1 -&gt; 步骤 3 -&gt; 步骤 2</p>
+<p>此时线程 1 刚好执行完了 步骤 1 和步骤 3，步骤 2 还没执行，此时 myObj 已经不是 null 了，但是 MyObject 对象实例内部的 resource 还是 null。而线程 2 直接调用 <code>myObj.execute</code> 方法，此时内部会调用 resource.execute() 方法。但因为 resource 还是 null，直接导致空指针错误。</p>
+<p>double check 单例模式里面，就是可能会出现这样的 JIT 指令重排。如果你不加 volatile 关键字，会导致一些问题的发生。volatile 可以避免出现  步骤1、步骤3、步骤2 这样的重排序。</p>
+<h3 id="现代处理器为了提升性能的指令乱序和猜测执行机制"><a href="#现代处理器为了提升性能的指令乱序和猜测执行机制" class="headerlink" title="现代处理器为了提升性能的指令乱序和猜测执行机制"></a>现代处理器为了提升性能的指令乱序和猜测执行机制</h3><h4 id="指令乱序机制"><a href="#指令乱序机制" class="headerlink" title="指令乱序机制"></a>指令乱序机制</h4><p>指令不一定说是拿到了一个指令立马可以执行的，比如有的指令是要进行网络通信、磁盘读写、获取锁等等，因此有的指令不是立马就绪可以执行的。为了调高效率，在现代处理器里面都是走的指令的乱序执行机制。</p>
+<p>把编译好的指令一条一条读取到处理器里，但是哪个指令先就绪可以执行，就先执行，不是按照代码顺序来的。每个指令的结果放到一个重排序处理器中，重排序处理器把各个指令的结果按照代码顺序应用到主内存或者写缓冲器里。</p>
+<p>这就导致处理器可能在乱序执行我们代码编译后的指令。</p>
+<p><img src="/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E6%8C%87%E4%BB%A4%E4%B9%B1%E5%BA%8F.png" alt="指令乱序"></p>
+<h4 id="猜测执行机制"><a href="#猜测执行机制" class="headerlink" title="猜测执行机制"></a>猜测执行机制</h4><p>还有一个猜测执行。比如一个 <code>if</code> 判断有一堆代码，很可能先去执行 <code>if</code> 的代码算出来结果，然后再来判断 if 是否成立。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">int sum = 0;</span><br><span class="line">if(flag) &#123;</span><br><span class="line">	for(int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="内存重排序"><a href="#内存重排序" class="headerlink" title="内存重排序"></a>内存重排序</h3><p>处理器会将数据写入写缓冲器，这个过程是 <code>store</code>；从高速缓存里读数据，这个过程是 <code>load</code>。写缓冲器和高速缓存执行 <code>load</code> 和 <code>store</code> 的过程，都是按照处理器指示的顺序来的，处理器的重排处理器也是按照程序顺序来 <code>load</code>  和 <code>store</code> 的。</p>
+<p>但是有个问题，就是在其他的处理器看到的一个视觉假象而言，有可能会出现看到的 <code>load</code> 和 <code>store</code> 是重排序的，也就是内存重排序。</p>
+<p>处理器的乱序执行和猜测执行，都是指令重排序，这次说的是内存重排序，因为都是发生在内存层面的写缓冲器和高速缓存中的。</p>
+<p>这个内存重排序，有 4 种可能性：</p>
+<ul>
+<li><p><strong>LoadLoad</strong> 重排序：一个处理器先执行一个 L1 读操作，再执行一个 L2 读操作。但是另外一个处理器看到的是先 L2 再 L1</p>
+</li>
+<li><p><strong>StoreStore</strong> 重排序：一个处理器先执行一个 W1 写操作，再执行一个 W2 写操作。但是另外一个处理器看到的是先 W2 再 W1</p>
+</li>
+<li><p><strong>LoadStore</strong> 重排序：一个处理器先执行一个 L1 读操作，再执行一个 W2 写操作。但是另外一个处理器看到的是 W2 在 L1</p>
+</li>
+<li><p><strong>StoreLoad</strong> 重排序：一个处理器先执行一个 W1 写操作，再执行一个 L2 读操作。但是另外一个处理器看到的是先 L2 在 W1</p>
+</li>
+</ul>
+<p>例如，一个处理器向写缓冲器先后写入 W1 W2 的指令。但写缓冲器在内部进行了 指令重排，变成 W2 W1 的顺序写入到高速缓冲中。此时其他处理器看到的顺序就是 W2 再 W1了，这就是 StoreStore 重排序。</p>
+<p><img src="/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/%E5%86%85%E5%AD%98%E9%87%8D%E6%8E%92.png" alt="内存重排"></p>
+<p>再比如，看下面的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 共享变量</span></span><br><span class="line">Resource resource = <span class="keyword">null</span>;</span><br><span class="line">Boolean resourceLoaded = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 处理器0</span></span><br><span class="line">resource = loadResourceFromDish();</span><br><span class="line">resourceLoaded = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 处理器1</span></span><br><span class="line"><span class="keyword">while</span>(!resourceLoaded) &#123;</span><br><span class="line">	<span class="keyword">try</span>&#123;</span><br><span class="line">		Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">		</span><br><span class="line">	&#125;<span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource.execute();</span><br></pre></td></tr></table></figure>
+
+<p>类似上面的代码，很可能处理器 0 先写了 resource，再写了 resourceLoaded。结果写缓冲器进行内存重排序，先落地了 <code>resourceLoaded = true</code>，此时 resource 还是 null。此时处理器 1 就会看到 resourceLoaded =  true，就会对 resource 对象执行了 execute() 方法，此时就会有空指针异常的问题。</p>
+<p>总之，高速缓存和写缓冲器都可以自己对 <code>Load</code>  和 <code>Store</code> 操作的结果落地到内存进行各种不同的重排序，进而造成上述 4 种内存重排序问题的发生。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/03/26/MySQL-锁/" rel="next" title="MySQL 锁">
+                <i class="fa fa-chevron-left"></i> MySQL 锁
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/03/30/Synchronized-和-volatile/" rel="prev" title="Synchronized 和 volatile">
+                Synchronized 和 volatile <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">85</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原子性"><span class="nav-number">1.</span> <span class="nav-text">原子性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#赋值写操作中不保证原子性的特例"><span class="nav-number">1.1.</span> <span class="nav-text">赋值写操作中不保证原子性的特例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile-保证原子性的特例"><span class="nav-number">1.2.</span> <span class="nav-text">volatile 保证原子性的特例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#硬件级别思考可见性的问题"><span class="nav-number">2.</span> <span class="nav-text">硬件级别思考可见性的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MESI协议"><span class="nav-number">2.1.</span> <span class="nav-text">MESI协议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有序性"><span class="nav-number">3.</span> <span class="nav-text">有序性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-程序运行过程中发生指令重排的几个地方"><span class="nav-number">3.1.</span> <span class="nav-text">Java 程序运行过程中发生指令重排的几个地方</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JIT编译器指令重排的例子"><span class="nav-number">3.2.</span> <span class="nav-text">JIT编译器指令重排的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#现代处理器为了提升性能的指令乱序和猜测执行机制"><span class="nav-number">3.3.</span> <span class="nav-text">现代处理器为了提升性能的指令乱序和猜测执行机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#指令乱序机制"><span class="nav-number">3.3.1.</span> <span class="nav-text">指令乱序机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#猜测执行机制"><span class="nav-number">3.3.2.</span> <span class="nav-text">猜测执行机制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存重排序"><span class="nav-number">3.4.</span> <span class="nav-text">内存重排序</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

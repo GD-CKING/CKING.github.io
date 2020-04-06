@@ -93,7 +93,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/rewrite.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/RDB%E9%85%8D%E7%BD%AE.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/09/01/Redis持久化/AOF%E9%85%8D%E7%BD%AE.png">
-<meta property="og:updated_time" content="2019-09-22T14:11:41.835Z">
+<meta property="og:updated_time" content="2020-03-31T08:38:19.092Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis持久化">
 <meta name="twitter:description" content="本节思维导图   ​        Redis持久化的意义在于数据备份和灾难恢复。Redis如果仅仅只是将数据缓存在内存里面，如果Redis宕机了再重启，内存里的数据就全部弄丢了。所以得用Redis的持久化机制，将数据写入内存的同时，异步的慢慢的将数据写入磁盘文件里，进行持久化。如果Redis宕机重启，自动从磁盘上加载之前持久化的一些数据即可，也许会丢失少许数据，但是至少不会将所有数据都弄丢。">
@@ -402,10 +402,10 @@
 <li>AOF可以更好的保护数据不丢失，一般AOF会每隔1秒，通过一个后台线程执行一次<code>fsync</code>操作，最多丢失1秒钟的数据。</li>
 <li>AOF日志文件以<code>append-only</code>模式写入，所以没有任何磁盘寻址的开销，写入性能非常高，而且文件不容易破损，即使尾部破损，也很容易修复。</li>
 <li>AOF日志文件即使过大的时候，出现后台重写操作，也不会影响客户端的读写。因为在<code>rewrite</code>log的时候，会对其中的指令进行压缩，创建出一份需要恢复数据的最小日志出来。在创建新日志文件的时候，老的日志文件还是照常写入。当新的merge后日志文件ready的时候，再交换新老日志文件即可。</li>
-<li>AOF日志文件的命令通过非常可读的方式进行记录，这个特定非常适合做灾难性的误删除的紧急操作。比如某人不小心用<code>flushall</code>命令清空了所有数据，只要这个时候后台<code>rewrite</code>还没有发生，那么就可以立即拷贝AOF文件，将最后一条<code>flushall</code>命令给删了，然后再将该AOF文件放回去，就可以通过恢复机制，自动恢复所有数据。</li>
+<li>AOF日志文件的命令通过非常可读的方式进行记录，这个特性非常适合做灾难性的误删除的紧急操作。比如某人不小心用<code>flushall</code>命令清空了所有数据，只要这个时候后台<code>rewrite</code>还没有发生，那么就可以立即拷贝AOF文件，将最后一条<code>flushall</code>命令给删了，然后再将该AOF文件放回去，就可以通过恢复机制，自动恢复所有数据。</li>
 <li>对于同一份数据来说，AOF日志文件通常比RDB数据快照文件更大。</li>
 <li>AOF开启后，支持的QPS会比RDB支持的写QPS低，因为AOF一般会配置成每秒<code>fsync</code>一次日志文件，当然每秒一次<code>fsync</code>性能也还是很高的。但如果实时写入，那么QPS会大降，redis性能会大大降低。</li>
-<li>以前AOF发生过bug，就是通过AOF记录的日志，进行数据恢复的时候，没有恢复一模一样的数据。因此，类似AOF这种较为复杂的基于命令/merge/回放的方式，比基于RDB每次持久化一份完整的数据快照的方式，更加脆弱一些，容易有bug。不过AOF就是为了rewrite过程导致的bug，因此每次rewrite并不是基于旧的指令日志进行merge，而是<strong>基于当时内存中的数据进行指令的重新构建</strong>，这样健壮性好很多。</li>
+<li>以前AOF发生过bug，就是通过AOF记录的日志，进行数据恢复的时候，没有恢复一模一样的数据。因此，类似AOF这种较为复杂的基于命令/merge/回放的方式，比基于RDB每次持久化一份完整的数据快照的方式，更加脆弱一些，容易有bug。不过AOF就是为了避免 rewrite 过程导致的bug，因此每次rewrite并不是基于旧的指令日志进行merge，而是<strong>基于当时内存中的数据进行指令的重新构建</strong>，这样健壮性好很多。</li>
 </ul>
 <p><strong>补充</strong>：rewrite类似于普通数据库管理系统日志恢复点，当AOF文件随着写命令的运行膨胀时，当文件大小触碰到临界时，rewrite会被运行。<br>        rewrite会像replication一样，fork出一个子进程，创建一个临时文件，遍历数据库，将每个key、value对输出到临时文件。输出格式就是Redis的命令，但是为了减小文件大小，会将多个key、value对集合起来用一条命令表达。在rewrite期间的写操作会保存在内存的rewrite buffer中，rewrite成功后这些操作也会复制到临时文件中，在最后临时文件会代替AOF文件。</p>
 <p><img src="/CKING.github.io/2019/09/01/Redis持久化/rewrite.png" alt="rewrite"></p>
@@ -575,7 +575,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">80</span>
+                  <span class="site-state-item-count">85</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
