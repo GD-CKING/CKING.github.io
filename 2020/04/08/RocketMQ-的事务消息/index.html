@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="消息队列,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="示例背景在一个电商系统中，按照规则在支付之后可以拿到一个现金红包的，但是在支付了一个订单之后，却没有收到这个现金红包。这是怎么回事？ 经过一通排查，找了系统中打印的很多日志之后，发现了一个奇怪的现象。按理来说，订单系统在完成支付之后，会推送一条消息到 RocketMQ 里去，然后红包系统会从 RocketMQ 里接收那条消息去给用户发现金红包：如图：  但是从订单系统和红包系统当天那个时间段的日志">
+<meta name="keywords" content="消息队列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ 的事务消息">
+<meta property="og:url" content="https://github.com/2020/04/08/RocketMQ-的事务消息/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="示例背景在一个电商系统中，按照规则在支付之后可以拿到一个现金红包的，但是在支付了一个订单之后，却没有收到这个现金红包。这是怎么回事？ 经过一通排查，找了系统中打印的很多日志之后，发现了一个奇怪的现象。按理来说，订单系统在完成支付之后，会推送一条消息到 RocketMQ 里去，然后红包系统会从 RocketMQ 里接收那条消息去给用户发现金红包：如图：  但是从订单系统和红包系统当天那个时间段的日志">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E5%86%99%E5%85%A5%E6%B6%88%E6%81%AF.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%B6%88%E6%81%AF%E6%9C%AA%E6%B6%88%E8%B4%B9.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%B6%88%E8%B4%B9%E8%80%85%E4%B8%A2%E5%A4%B1%E6%B6%88%E6%81%AF.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E5%8F%91%E9%80%81half%E6%B6%88%E6%81%AF.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%9B%B4%E6%96%B0%E8%AE%A2%E5%8D%95%E6%95%B0%E6%8D%AE.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/rollback.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/commit.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E8%A1%A5%E5%81%BF%E6%9C%BA%E5%88%B6.png">
+<meta property="og:updated_time" content="2020-04-08T09:13:01.453Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RocketMQ 的事务消息">
+<meta name="twitter:description" content="示例背景在一个电商系统中，按照规则在支付之后可以拿到一个现金红包的，但是在支付了一个订单之后，却没有收到这个现金红包。这是怎么回事？ 经过一通排查，找了系统中打印的很多日志之后，发现了一个奇怪的现象。按理来说，订单系统在完成支付之后，会推送一条消息到 RocketMQ 里去，然后红包系统会从 RocketMQ 里接收那条消息去给用户发现金红包：如图：  但是从订单系统和红包系统当天那个时间段的日志">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%B5%81%E7%A8%8B.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/04/08/RocketMQ-的事务消息/">
+
+
+
+
+
+  <title>RocketMQ 的事务消息 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RocketMQ 的事务消息</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-08T14:46:45+08:00">
+                2020-04-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="示例背景"><a href="#示例背景" class="headerlink" title="示例背景"></a>示例背景</h2><p>在一个电商系统中，按照规则在支付之后可以拿到一个现金红包的，但是在支付了一个订单之后，却没有收到这个现金红包。这是怎么回事？</p>
+<p>经过一通排查，找了系统中打印的很多日志之后，发现了一个奇怪的现象。按理来说，订单系统在完成支付之后，会推送一条消息到 RocketMQ 里去，然后红包系统会从 RocketMQ 里接收那条消息去给用户发现金红包：如图：</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%B5%81%E7%A8%8B.png" alt="流程"></p>
+<p>但是从订单系统和红包系统当天那个时间段的日志来看，只看到了订单系统有推送消息到 RocketMQ 的日志，但是并没有看到红包系统从 RocketMQ 中接收消息以及发现金红包的日志。</p>
+<p>大家推测可能问题就出在这，有可能支付订单系统在传输的过程中丢失了，导致现金红包没有派发出去。</p>
+<h3 id="订单系统推送消息到-MQ-的过程会丢失消息"><a href="#订单系统推送消息到-MQ-的过程会丢失消息" class="headerlink" title="订单系统推送消息到 MQ 的过程会丢失消息"></a>订单系统推送消息到 MQ 的过程会丢失消息</h3><p>首先，订单系统在接收到订单支付成功的通知之后，会去推动一条订单支付成功的消息到 MQ 的，那么这个过程中，会出现丢失消息的问题吗？当然有可能。例如，订单系统在推送消息到 RocketMQ 的过程中，是通过网络去进行传输的，但是这个时候恰巧网络发送了抖动，也就是网络突然出了问题，导致这次网络通信失败了，于是这个消息就没有成功投递给 MQ。</p>
+<p>除此之外，还有其他情况。例如 MQ 的确收到消息了，但是它的网络通信模块的代码出现了异常，可能是它内部的网络通信的 bug，导致消息没成功处理；或者是你在写消息到 RocketMQ 的过程中，刚好遇到了某个 Leader Broker 自身故障，其他的 Follower Broker 正在尝试切换为 Leader Broker，这个过程中也可能有异常等等。</p>
+<p>因为我们在使用任何一个 MQ 的时候，无论是 RocketMQ、还是 RabbitMQ 或者 Kafka，都要明确一点：不一定你发送消息出去就一定会成功，有可能就会失败，此时你的代码里可能会抛出异常，也可能不会抛出异常，这都不好说，要具体看什么原因导致的消息推送失败。</p>
+<h3 id="消息到达-MQ-后，MQ-自己丢失信息"><a href="#消息到达-MQ-后，MQ-自己丢失信息" class="headerlink" title="消息到达 MQ 后，MQ 自己丢失信息"></a>消息到达 MQ 后，MQ 自己丢失信息</h3><p>接下来，假设我们的订单系统成功地把消息写入了 MQ，此时我们可以认为你写成功了，此时消息有可能丢失吗？这也是有可能的。通过之前的 RocketMQ 的底层原理的分析，我们知道一点，就是你的消息写入 MQ 之后，其实 MQ 可能仅仅把这个消息给写入 page cache 里，也就是操作系统自己管理的一个缓冲区，这本质也是内存。如图：</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E5%86%99%E5%85%A5%E6%B6%88%E6%81%AF.png" alt="写入消息"></p>
+<p>可能你认为写成功了一个消息，但是此时仅仅进入了 os cache，还没有写入磁盘。然后这个时候，假如出现了 Broker 机器的崩溃，机器宕机了，是不是 os cache 内存中的数据就没了？</p>
+<h3 id="消息进入磁盘，真的万无一失吗"><a href="#消息进入磁盘，真的万无一失吗" class="headerlink" title="消息进入磁盘，真的万无一失吗"></a>消息进入磁盘，真的万无一失吗</h3><p>之前说过，Broker 把消息写入 os cache 之后，其实操作系统自己在一段不太确定的时间之后，它自己是会把数据从内存刷入磁盘文件里的。假设我们写入 MQ 的一条消息已经稳稳进入 Broker 所在机器的磁盘文件里了，这个时候数据一定不会丢失吗？</p>
+<p>答案是不，因为如果你的磁盘出现故障，你上面的存储的数据还是会丢失。之前就有互联网公司把数据存储在服务器的磁盘上，但是因为没有做完善的冗余备份，结果机器磁盘故障导致公司运营几年的核心数据没了。所以如果消息进入 Broker 机器的磁盘之后，赶上机器刚好磁盘坏了，可能上面的消息也就都丢失了。</p>
+<h3 id="红包系统拿到消息，就不会丢失吗"><a href="#红包系统拿到消息，就不会丢失吗" class="headerlink" title="红包系统拿到消息，就不会丢失吗"></a>红包系统拿到消息，就不会丢失吗</h3><p>接着，假设红包系统这个时候顺利从 MQ 里拿到了一条消息，然后它就能安稳地把现金红包发出去吗？这也是未必的，要解释这个问题，就需要牵扯到消息的 offset 这个概念了。</p>
+<p>之前已经在底层原理分析的部分解释了 MQ 底层的存储结构，包括消息的 offset 的概念，说白了，offset 就是代表了一个消息的标识，代表了它的位置。</p>
+<p>假设现在有两个消息，offset 分别为 1 和 2，现在我们假设红包系统已经获取到了消息 1 了，然后消息 1 此时就在它的内存里，正准备运行代码去派发现金红包，但是要注意，此时还没发红包。如图：</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%B6%88%E6%81%AF%E6%9C%AA%E6%B6%88%E8%B4%B9.png" alt="消息未消费"></p>
+<p>默认情况下，MQ 的消费者有可能会自动提交已经消费的 offset，如果此时你还没处理这个消息派发红包的情况下，MQ 的消费者可能直接给你提交这个消息 1 的 offset 到 Broker 去了，标识为你已经成功处理了这个消息。接着恰巧在这个时候，我们的红包系统突然宕机了，或者是可能在派发红包的时候更新数据库失败了，总之就是它突然故障了，然后此时内存里的消息 1 必然丢失了，而且红包也没发出去。</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%B6%88%E8%B4%B9%E8%80%85%E4%B8%A2%E5%A4%B1%E6%B6%88%E6%81%AF.png" alt="消费者丢失消息"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>红包为什么没发出去？原因有很多，比如订单系统推送消息到 MQ 就失败了，压根就没推送出去；或者是消息确实推送到 MQ 了，但是结果 MQ 自己机器故障，把消息搞丢了；或者是红包系统拿到了消息，但是它把消息搞丢了，红包也没来得及发。</p>
+<h2 id="发送消息零丢失方案：RocketMQ-的事务消息"><a href="#发送消息零丢失方案：RocketMQ-的事务消息" class="headerlink" title="发送消息零丢失方案：RocketMQ 的事务消息"></a>发送消息零丢失方案：RocketMQ 的事务消息</h2><p>我们明确了消息在基于 MQ 传输的过程中可能丢失的几个地方，那么我们就要一步一步考虑如何去解决各个环节丢失信息的问题。</p>
+<p>首先要解决的第一个问题，就是订单系统推送消息到 MQ 的过程中，可能消息就丢失了。在 RocketMQ 中，有一个非常牛逼的功能，就是<strong>事务消息</strong>功能。凭借这个事务级的消息机制，就可以让我们确保订单系统推送出去的消息一定会成功写入 MQ 里，不会半路就搞丢了。</p>
+<h3 id="发送-half-消息到-MQ-去，试探-MQ-是否正常"><a href="#发送-half-消息到-MQ-去，试探-MQ-是否正常" class="headerlink" title="发送 half 消息到 MQ 去，试探 MQ 是否正常"></a>发送 half 消息到 MQ 去，试探 MQ 是否正常</h3><p>作为订单系统而言，假设它收到了一个订单支付成功的通知之后，它必然是需要在自己的订单数据库里做一些增删改操作的，比如更新订单状态之类的。可能有些人会认为，订单系统不就是在自己数据库里做一些增删改操作，然后直接发个消息到 MQ 去，让其他关注这个订单支付成功消息的系统从 MQ 获取消息做对应的处理就行了么？</p>
+<p>其实并不会这么简单。在基于 RocketMQ 的事务消息机制中，我们先让订单系统发送一条 <code>half</code> 消息到 MQ 去。这个 half 消息本质就是一个订单支付成功的消息，只不过你可以理解为这个 half 消息的状态是 half 状态，这个时候红包系统是看不见这个 half 消息的。然后我们去等待接收这个 half 消息写入成功的响应通知。如图：</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E5%8F%91%E9%80%81half%E6%B6%88%E6%81%AF.png" alt="发送half消息"></p>
+<p>发送这个 half 消息有什么用？假设你二话不说就让订单系统直接做了本地的数据库操作，比如订单状态都更新为了已完成，然后你再发送消息给 MQ，结果报出一堆异常，发现 MQ 挂了。这个时候，会导致你没法通过消息通知到红包系统去派发红包，那用户一定会发现自己订单支付了，结果红包没收到。</p>
+<p>所以，这里我们第一件事，不是先让订单系统做一些增删改操作，而是先发一个 half 消息给 MQ 以及收到它的成功的相应，初步先跟 MQ 做个联系和沟通。</p>
+<h3 id="half-消息写入失败"><a href="#half-消息写入失败" class="headerlink" title="half 消息写入失败"></a>half 消息写入失败</h3><p>如果 half 消息写入失败，例如 MQ 挂了，或者网络故障了，总之你现在没法跟 MQ 通信了。这个时候你的订单系统就应该执行一系列回滚操作，比如对一个订单状态做一个更新，让状态变成 “关闭交易”，同时通知支付系统自动进行退款，这才是正确的做法。</p>
+<p>因为你订单虽然支付了，但是派发红包、发送优惠券之类的后续操作是无法执行的，所以此时必须把钱款退还给用户，说交易失败了。</p>
+<h3 id="half-消息成功之后，订单系统完成自己的任务"><a href="#half-消息成功之后，订单系统完成自己的任务" class="headerlink" title="half 消息成功之后，订单系统完成自己的任务"></a>half 消息成功之后，订单系统完成自己的任务</h3><p>接着，如果你的 half 消息写成功了，这个时候你的订单系统就应该在自己的本地数据库里执行一些增删改操作了，因为一旦 half 消息写成功了，就说明 MQ 肯定已经收到这条消息了，MQ 还活着，而且目前你是可以跟 MQ 正常沟通的。</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E6%9B%B4%E6%96%B0%E8%AE%A2%E5%8D%95%E6%95%B0%E6%8D%AE.png" alt="更新订单数据"></p>
+<h3 id="订单系统的本地事务执行失败"><a href="#订单系统的本地事务执行失败" class="headerlink" title="订单系统的本地事务执行失败"></a>订单系统的本地事务执行失败</h3><p>接着上面的情况，如果订单更新自己的数据库失败了怎么办？比如订单系统的数据当时也有网络异常，或者数据库挂了等等。这个时候也简单，就是让订单系统发送一个 <code>rollback</code> 请求给 MQ 就可以了。意思是说，你可以把之前我发送给你的 half 消息给删除掉了，因为我自己出现问题了，已经没办法跟你继续后续的流程了。</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/rollback.png" alt="rollback"></p>
+<p>当然你发送 <code>rollback</code> 请求给 MQ 删除那个 half 消息之后，你的订单系统就必须走后续的回退流程了，就是通知支付系统退款。当然这里可能还有一些订单系统自己的高可用降级的机制需要考虑，比如数据库无法更新了，此时你可能需要在机器本地磁盘文件里写入订单支付失败的记录，然后你可以开一个后台线程在 MySQL 数据库恢复之后，把订单状态更新为 “已关闭”。</p>
+<h3 id="订单完成本地事务之后"><a href="#订单完成本地事务之后" class="headerlink" title="订单完成本地事务之后"></a>订单完成本地事务之后</h3><p>如果订单系统成功完成了本地的事务操作，此时你就可以发送一个 <code>commit</code> 请求给 MQ，要求让 MQ 对之前的 half 消息进行 commit 操作，让红包系统可以看见这个订单支付成功消息。</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/commit.png" alt="commit"></p>
+<p>之前我们说过，half 消息实际就是订单支付成功的消息，只不过它的状态是 half，红包系统是看不见它的，没法获取这条消息，必须等到订单系统指定 commit 请求，消息比 commit 之后，红包系统才可以看到和获取这条消息进行后续操作。</p>
+<h3 id="half-消息发送成功，但没有收到响应"><a href="#half-消息发送成功，但没有收到响应" class="headerlink" title="half 消息发送成功，但没有收到响应"></a>half 消息发送成功，但没有收到响应</h3><p>大致的事务流程是讲完了。但是接着我们进行比较严谨的分析。如果我们把 half 消息发送给 MQ，MQ 给保存下来了，但是 MQ 返回给我们的响应我们没收到呢？此时会发生什么？</p>
+<p>这个时候我们没收到响应，有可能是网络超时报错，或者是其他的异常错误，这个时候订单系统会误以为是发送 half 消息到 MQ 失败，订单系统会直接执行退款流程，订单状态也会标记为 “已关闭”。</p>
+<p>但这个时候 MQ 已经存储下来一条 half 消息了，那这个消息怎么处理？其实 RocketMQ 这里有一个补偿流程，它会去扫描自己处于 half 状态的消息，如果我们一直没有对这个消息执行 commit/half 操作，超过了一定的时间，它就会回调你的订单系统的一个接口。</p>
+<p>它会询问这个消息是打算 commit 还是 rollback，这个时候订单系统就得去查一下数据库，查询订单的状态，发现状态是 “已关闭”，就得发送 rollback 请求给 MQ 去删除之前那个 half 消息了。</p>
+<p><img src="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/%E8%A1%A5%E5%81%BF%E6%9C%BA%E5%88%B6.png" alt="补偿机制"></p>
+<h3 id="rollback-或者-commit-发送失败"><a href="#rollback-或者-commit-发送失败" class="headerlink" title="rollback 或者 commit 发送失败"></a>rollback 或者 commit 发送失败</h3><p>如果订单系统是收到 half 消息写入成功的相应了，同时尝试对自己的数据库更新了，然后根据失败或者成功去执行了 rollback 或者 commit 请求，发送给 MQ 了，结果因为网络故障，导致 rollback 或者 commit 请求发送失败了。这时候要怎么处理？</p>
+<p>其他也简单，因为 MQ 里的消息一直是 half 状态，所以说它过了一定的超时时间会发现这个 half 消息有问题，它会回调你的订单系统的接口，此时你要判断一下，这个订单的状态如果更新为了 “已完成”，那你就得再次执行 commit 请求，反之则再次执行 rollback 请求。</p>
+<p>本质这个 MQ 的回调就是一个补偿机制，如果你的 half 消息响应没收到，或者 rollback、commit 请求没发送成功，它都会来找你询问 half 消息后续如何处理。</p>
+<p>如果订单系统收到了 half 消息写入成功的相应了，同时尝试对自己的数据库更新了，然后根据失败或者成功去执行了 rollback 或者 commit 请求，发送给 MQ 了。但 MQ 在这个时候挂掉了，导致 rollback 或者 commit 请求发送失败。如果是这种情况，那就等 MQ 自己重启了，重启之后它会扫描 half 消息，然后还是通过上面说到的补偿机制，去回调你的接口。</p>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h3><p>上面的流程意义是什么？其实，如果你的 MQ 有问题或者网络有问题，half 消息根本都发布出去，此时 half 消息肯定是失败的，那么订单系统就不会执行后续流程了。</p>
+<p>如果 half 消息发送出去了，但是 half 消息的响应没收到，然后执行了退款流程，那 MQ 会有补偿机制来回调你询问要 commit 还是 rollback，此时你选择 rollback 删除消息就可以了，不会执行后续流程。</p>
+<p>如果订单系统收到 half 消息响应了，但是订单系统自己更新数据库失败了，那他它也不会执行后续流程了。如果它更新数据库成功了，订单状态是 “已完成”，此时就会发送 commit 请求给 MQ，一旦消息 commit 了，那么可以保证红包系统可以收到这个消息。</p>
+<p>而且即使你 commit 请求发送失败了，MQ 也会有补偿机制，回调你接口让你判断是否重新发送 commit 请求。</p>
+<p>总之，就是你的订单系统只要成功了，那么必然要保证 MQ 里的消息是 commit 了，可以让红包系统看到它。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/消息队列/" rel="tag"># 消息队列</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/" rel="next" title="硬件层面聊聊可见性和有序性">
+                <i class="fa fa-chevron-left"></i> 硬件层面聊聊可见性和有序性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/09/RocketMQ-事务消息机制的底层原理/" rel="prev" title="RocketMQ - 事务消息机制的底层原理">
+                RocketMQ - 事务消息机制的底层原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">88</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#示例背景"><span class="nav-number">1.</span> <span class="nav-text">示例背景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#订单系统推送消息到-MQ-的过程会丢失消息"><span class="nav-number">1.1.</span> <span class="nav-text">订单系统推送消息到 MQ 的过程会丢失消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息到达-MQ-后，MQ-自己丢失信息"><span class="nav-number">1.2.</span> <span class="nav-text">消息到达 MQ 后，MQ 自己丢失信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息进入磁盘，真的万无一失吗"><span class="nav-number">1.3.</span> <span class="nav-text">消息进入磁盘，真的万无一失吗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#红包系统拿到消息，就不会丢失吗"><span class="nav-number">1.4.</span> <span class="nav-text">红包系统拿到消息，就不会丢失吗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.5.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发送消息零丢失方案：RocketMQ-的事务消息"><span class="nav-number">2.</span> <span class="nav-text">发送消息零丢失方案：RocketMQ 的事务消息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#发送-half-消息到-MQ-去，试探-MQ-是否正常"><span class="nav-number">2.1.</span> <span class="nav-text">发送 half 消息到 MQ 去，试探 MQ 是否正常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#half-消息写入失败"><span class="nav-number">2.2.</span> <span class="nav-text">half 消息写入失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#half-消息成功之后，订单系统完成自己的任务"><span class="nav-number">2.3.</span> <span class="nav-text">half 消息成功之后，订单系统完成自己的任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#订单系统的本地事务执行失败"><span class="nav-number">2.4.</span> <span class="nav-text">订单系统的本地事务执行失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#订单完成本地事务之后"><span class="nav-number">2.5.</span> <span class="nav-text">订单完成本地事务之后</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#half-消息发送成功，但没有收到响应"><span class="nav-number">2.6.</span> <span class="nav-text">half 消息发送成功，但没有收到响应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rollback-或者-commit-发送失败"><span class="nav-number">2.7.</span> <span class="nav-text">rollback 或者 commit 发送失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结-1"><span class="nav-number">2.8.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
