@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="消息队列,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日志">
+<meta name="keywords" content="消息队列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ-重发机制">
+<meta property="og:url" content="https://github.com/2020/04/15/RocketMQ-重发机制/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日志">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E7%94%9F%E4%BA%A7%E7%AB%AF%E9%87%8D%E5%8F%91.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%B6%88%E6%81%AF%E9%87%8D%E5%8F%91.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%B6%88%E8%B4%B9%E7%AB%AF%E9%87%8D%E5%8F%91.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E4%B8%9A%E5%8A%A1%E5%88%A4%E6%96%AD%E6%B3%95.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E7%8A%B6%E6%80%81%E5%88%A4%E6%96%AD%E6%B3%95.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/reconsume_later.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/D:%5Cgit%5CCKING.github.io%5Csource_posts%5CRocketMQ-%E9%87%8D%E5%8F%91%E6%9C%BA%E5%88%B6%5C%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97.png">
+<meta property="og:updated_time" content="2020-04-16T09:34:39.699Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RocketMQ-重发机制">
+<meta name="twitter:description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日志">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E7%94%9F%E4%BA%A7%E7%AB%AF%E9%87%8D%E5%8F%91.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/04/15/RocketMQ-重发机制/">
+
+
+
+
+
+  <title>RocketMQ-重发机制 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RocketMQ-重发机制</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-15T16:02:14+08:00">
+                2020-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景示例"><a href="#背景示例" class="headerlink" title="背景示例"></a>背景示例</h2><p>今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券</p>
+<h3 id="优惠券系统重复消费了一条消息"><a href="#优惠券系统重复消费了一条消息" class="headerlink" title="优惠券系统重复消费了一条消息"></a>优惠券系统重复消费了一条消息</h3><p>目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。</p>
+<p>通过查看日志发现，优惠券系统对同一个订单支付成功的消息处理了两次，就导致给用户重复发放了两张优惠券。为什么优惠券会对同一个消息重复处理两次？</p>
+<h3 id="订单系统发送消息到-MQ-的时候会重复吗"><a href="#订单系统发送消息到-MQ-的时候会重复吗" class="headerlink" title="订单系统发送消息到 MQ 的时候会重复吗"></a>订单系统发送消息到 MQ 的时候会重复吗</h3><p>首先，我们的订单系统在收到一个支付成功的通知之后，它在发送消息到 MQ 的时候，会重发把一个消息发送两次吗？这是有可能的。</p>
+<p>首先，假设用户在支付成功之后，我们的订单系统收到了一个支付成功的通知，接着它就向 MQ 发送了一条订单支付成功的消息。但是可能因为不知道什么原因，你的订单系统处理的速度有点慢。然后可能因为你的订单系统处理的速度有点慢，这就导致支付系统跟你订单系统之间的请求出现了超时，此时有可能支付系统再次重试调用了你订单系统的接口去通知了，然后你的订单系统这个时候可能有一次推送了一条消息到 MQ 里去，相当于是一个订单支付成功的消息，你重复推送了两次到 MQ。</p>
+<p>此时相当于是 MQ 里就会对一个订单的支付成功消息，总共有两条。</p>
+<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E7%94%9F%E4%BA%A7%E7%AB%AF%E9%87%8D%E5%8F%91.png" alt="消费端重发"></p>
+<p>如果订单系统重复推送了两次支付成功消息的 MQ，MQ 里对一个订单有两条重复的支付成功消息，优惠券必然会消费到一个订单的两条重复的支付成功消息，也会针对这个订单用户重复地派发两个优惠券。</p>
+<p>因此，如果出现了接口超时等问题，可能会导致上游的支付系统重试调用订单系统的接口，进而导致订单系统对一个消息重复发送两条到 MQ 里去。</p>
+<h3 id="订单系统自己重复发送消息"><a href="#订单系统自己重复发送消息" class="headerlink" title="订单系统自己重复发送消息"></a>订单系统自己重复发送消息</h3><p>假设支付系统没有对一个订单重复调用你的订单系统的接口，而是你订单系统自己可能就重复发送消息到 MQ 里去。假设我们的订单系统为了保证消息一定能投递到 MQ 里去，因此采用了重试的代码，如下面的代码片段，如果发现 MQ 发送有异常，则会进行几次重试。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">	<span class="comment">// 执行订单本地事务</span></span><br><span class="line">	orderService.finishOrderPay();</span><br><span class="line">	<span class="comment">// 发送消息到 MQ 去</span></span><br><span class="line">	producer.sendMessage();</span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">	<span class="comment">// 如果发送消息失败了，进行重试</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">		<span class="comment">// 重试发送消息</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 如果多次充实发送消息之后，还是不行，回滚本地订单事务</span></span><br><span class="line">	orderService.rollbackOrderPay();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是这种重试的方式 ，其实是一把双刃剑，因为正是这个重试可能导致消息重复发送。我们来考虑一个情况，假设你发送一条消息到 MQ 了，其实 MQ 是已经收到这条消息了，结果 MQ 返回响应给你的时候，网络有问题了超时了，就是你没能及时收到 MQ 返回给你的响应。但是，此时 MQ 里其实是已经有你发送过去的消息了，只不过它返回给你的响应没能给到你而已。</p>
+<p>这个时候，你的代码里可能会发现一个网络超时的异常，然后你就会进行重试再次发送这个消息到 MQ 去，然后 MQ 会收到一条一模一样的消息，进而导致你的消息重复发送了。</p>
+<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%B6%88%E6%81%AF%E9%87%8D%E5%8F%91.png" alt="消息重发"></p>
+<p>所以这种重试代码大家在使用的时候要小心，因为它还是有一定的概率会导致你重发消息的。</p>
+<h3 id="优惠券系统重复消费一条消息"><a href="#优惠券系统重复消费一条消息" class="headerlink" title="优惠券系统重复消费一条消息"></a>优惠券系统重复消费一条消息</h3><p>接着我们继续，即使你没有重复发送消息到 MQ，哪怕 MQ 里就一条消息，优惠券系统也有可能会重复进行消费。</p>
+<p>假设你的优惠券系统拿到一条订单支付成功的消息，然后都已经进行处理了，也就是说都已经对这个订单发了一张优惠券了，这个时候它应该返回一个 <code>CONSUME_SUCCESS</code> 的状态，然后提交消费进度 offset 到 broker 的。</p>
+<p>但是，你刚发完优惠券，还没来得及提交消息 offset 到 broker，优惠券系统就进行了一次重启，这是因为你没提交这条消息的 offset 给 broker，broker 并不知道你已经处理了这条消息，然后优惠券系统重启之后，broker 就会再次把这条消息交给你，让你再一次进行处理，然后你会再一次发送一张优惠券，导致重复发送了两次优惠券。</p>
+<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%B6%88%E8%B4%B9%E7%AB%AF%E9%87%8D%E5%8F%91.png" alt="消费端重发"></p>
+<h3 id="消息重复问题"><a href="#消息重复问题" class="headerlink" title="消息重复问题"></a>消息重复问题</h3><p>实际上，对类似优惠券系统这样的业务系统，一般会频繁地更新代码，可能每隔几天就需要重启一次系统进行代码的更新。所以你重启优惠券系统的时候，可能有一批消息刚处理完，还没来得及提交 offset 给 broker，然后你重启之后就会再一次重复处理这批数据，这种情况是比较常见的。</p>
+<p>另外就是对于系统之间的调用，有的时候出现超时和重试的情况也是很常见的，所以你负责发消息到 MQ 的系统，很可能时不时地出现一次超时，然后被别人重试调用你的接口，你可能会重复发送一条消息到 MQ 里去，这也是很常见的。</p>
+<h2 id="引入幂等性机制"><a href="#引入幂等性机制" class="headerlink" title="引入幂等性机制"></a>引入幂等性机制</h2><p>要解决上述问题，我们就要先引入一个概念，叫做幂等性机制。这个幂等性机制，就是用来避免对同一个请求或者同一条消息进行重复处理的机制。幂等，就是比如你有一个接口，然后如果别人对一次请求重试了多次，来调用你的接口，你必须保证自己系统的数据是正常的，不能多出来一些重复的数据，这就是幂等性的意思。</p>
+<h3 id="发送消息到-MQ-的时候如何保证幂等性"><a href="#发送消息到-MQ-的时候如何保证幂等性" class="headerlink" title="发送消息到 MQ 的时候如何保证幂等性"></a>发送消息到 MQ 的时候如何保证幂等性</h3><p>当我们的订单系统发送消息到 MQ 的时候需要保证幂等性吗？订单系统的接口有可能被重复调用导致发送重复的消息到 MQ 去，也可能有重试机制导致发送重复的消息到 MQ。那我们应该怎样避免这种情况？</p>
+<h3 id="业务判断法"><a href="#业务判断法" class="headerlink" title="业务判断法"></a>业务判断法</h3><p>业务判断法。也就是说你的订单系统必须要知道自己到底是否发送过消息到 MQ 去，消息到底是否已经在 MQ 里了。</p>
+<p>例如，当支付系统重试调用你的订单系统的接口时，你需要发送一个请求到 MQ 去，查询一下当前 MQ 里是否存在针对这个订单的支付消息？如果 MQ 告诉你，针对 id = 1000 这个订单的支付成功消息，MQ  已经有了，那么订单系统可以不要再次发送这条消息到 MQ 去了。</p>
+<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E4%B8%9A%E5%8A%A1%E5%88%A4%E6%96%AD%E6%B3%95.png" alt="业务判断法"></p>
+<p>这个业务判断法的核心在于，你的消息肯定是存在于 MQ 里的，到底发没发送过，只有 MQ 知道，如果没发送过这个消息，MQ 肯定没有这个消息，如果发送过这个消息，MQ 里就有这个消息。</p>
+<p>所以当你的订单系统的接口被重试调用的时候，你这个接口上来就应该发送请求到 MQ 里查询一下，如果在 MQ 中已经存在，那就不再重复发送消息了。</p>
+<h3 id="基于-Redis-缓存的幂等性机制"><a href="#基于-Redis-缓存的幂等性机制" class="headerlink" title="基于 Redis 缓存的幂等性机制"></a>基于 Redis 缓存的幂等性机制</h3><p>第二种方法，就是状态判断法。</p>
+<p>这个方法的核心在于，你需要引入一个 Redis 缓存来存储你是否发送过消息的状态，如果你成功发送了一个消息到 MQ 里去，你得在 Redis 缓存里写一条数据，标记这个消息已经发送过。</p>
+<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E7%8A%B6%E6%80%81%E5%88%A4%E6%96%AD%E6%B3%95.png" alt="状态判断法"></p>
+<p>那么当你的订单接口被重读调用的时候，你只要根据订单 id 去 Redis 缓存里查询一下，这个订单的支付消息是否已经发送给 MQ 了，如果发送过了，就别再次发送了。</p>
+<p>其实两种幂等性机制都是很常用的，但是，基于 Redis 的状态判断法，有可能没办法完全做到幂等性。例如，你的支付系统发送请求给订单系统，然后已经发送消息到 MQ 去了，但是此时订单系统突然崩溃了，没来得及把消息发送的状态写入 Redis。这个时候如果你的订单系统在其他机器上部署了，或者是它重启了，那么这个时候订单系统被重试调用的时候，它去找 Redis 查询消息发送状态，会以为消息没发送过，然后会再次发送重复消息到 MQ 去。</p>
+<h3 id="有没有必要在订单系统环节保证消息不重复发送"><a href="#有没有必要在订单系统环节保证消息不重复发送" class="headerlink" title="有没有必要在订单系统环节保证消息不重复发送"></a>有没有必要在订单系统环节保证消息不重复发送</h3><p>在我们这个场景中，如果在订单系统要保证消息不重复发送，上面讲的两种方案，其实都不是太好。因为 RocketMQ 虽然是支持你查询某个消息是否存在，但是在这个环节你直接从 MQ 查询消息是没这个必要的，它的性能也不是太好，会影响你的接口的性能。</p>
+<p>另外基于 Redis 的消息发送状态的方案，在极端情况下还是没法 100% 保证幂等性，所以也不是特别好的一个方案。所以在这里建议是不用在这个环节保证幂等性，也就是我们可以默许它可能会发送重复的消息到 MQ 里去。</p>
+<h3 id="优惠券系统如何保证消息处理的幂等性"><a href="#优惠券系统如何保证消息处理的幂等性" class="headerlink" title="优惠券系统如何保证消息处理的幂等性"></a>优惠券系统如何保证消息处理的幂等性</h3><p>接着我们来看优惠券系统假设会拿到重复的消息，那么如何保证消息处理的幂等性？这个就比较简单了，直接基于业务判断法就可以了，因为优惠券每次拿到一条消息后会给用户发一张优惠券，实际上核心就是在数据库里给用户插入一条优惠券记录。</p>
+<p>那么如果优惠券系统从 MQ 那里拿到一个订单的两条重复支付成功消息，这个时候它只要先去优惠券数据库中查询一下，比如对订单 id = 1000 的订单，是否已经发放过优惠券了，如果有的话，就不要重复发券了。通过这个业务判断的方法，就可以简单高效地避免消息的重复处理了。</p>
+<h3 id="MQ-消息幂等性的方案总结"><a href="#MQ-消息幂等性的方案总结" class="headerlink" title="MQ 消息幂等性的方案总结"></a>MQ 消息幂等性的方案总结</h3><p>一般来说，对于 MQ 的重复消息问题而言，我们往 MQ 里重复发送一些消息其实还是可以接收的，因为 MQ 里有许多条重复消息，它不会对系统的核心数据直接造成影响，但是我们关键要保证的，是你从 MQ 里获取消息进行处理的时候，必须保证消息不能重复处理。</p>
+<p>要保证消息的幂等性，优先推荐的其实还是业务判断法，直接根据你的数据存储中的记录来判断这个消息是否已经处理过，如果处理过，就不需要再处理了。因为，基于 Redis 的消息发送状态的方案，在一些极端情况下还是无法保证幂等性的。</p>
+<h2 id="死信队列解决数据库宕机问题"><a href="#死信队列解决数据库宕机问题" class="headerlink" title="死信队列解决数据库宕机问题"></a>死信队列解决数据库宕机问题</h2><p>上述我们已经分析和解决了 MQ 实践使用过程中可能存在的消息丢失问题和消息重复问题，现在假设我们可以基本确保 MQ 的消息不丢失，同时不会对消息进行重复处理，在正常流程下，基本没啥问题。</p>
+<p>假设我们的 MQ 使用过程中都没问题，但是如果我们的优惠券系统的数据库宕机了呢？这个时候，就会导致我们从 MQ 里获取到消息之后是没办法进行处理的。现在我们对这个实际的生产场景进行分析。</p>
+<h3 id="数据库宕机的时候，可以返回-CONSUME-SUCCESS-吗"><a href="#数据库宕机的时候，可以返回-CONSUME-SUCCESS-吗" class="headerlink" title="数据库宕机的时候，可以返回 CONSUME_SUCCESS 吗"></a>数据库宕机的时候，可以返回 CONSUME_SUCCESS 吗</h3><p>我们看下面的代码片段，可以看到，我们注册了一个监听器回调函数，当 Consumer 获取到消息之后，就会交给我们的函数来处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">consumer.registerMessageListener(<span class="keyword">new</span> MessageListenerConcurrently() &#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> ConsumeConcurrentlyStatus <span class="title">consumeMessage</span><span class="params">(List&lt;MessageExt&gt; msgs, </span></span></span><br><span class="line"><span class="function"><span class="params">										ConsumeConcurrentlyContext context)</span> </span>&#123;</span><br><span class="line">													</span><br><span class="line">		<span class="comment">// 在这里对获取到的 msgs 订单消息进行处理</span></span><br><span class="line">		<span class="comment">// 比如增加积分，发送优惠券，通知发货等等</span></span><br><span class="line">		<span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>上述代码返回 CONSUME_SUCCESS，那么 Consumer 就知道这批消息处理完成了，就会提交这批消息的 offset 到 broker 去，然后下次就会继续从 broker 获取下一批消息来处理。</p>
+<p>但是如果此时我们在上面的回调函数中，对一批消息发优惠券的时候，因为数据库宕机了，导致优惠券发放逻辑无法完成，此时我们还能返回 CONSUME_SUCCESS 状态码？如果你返回的话，下一次就会处理下一批消息，但是这批消息其实没处理成功，此时必然导致这批消息就丢失了。</p>
+<h3 id="消息处理有异常，可以返回-RECONSUME-LATER-状态"><a href="#消息处理有异常，可以返回-RECONSUME-LATER-状态" class="headerlink" title="消息处理有异常，可以返回 RECONSUME_LATER 状态"></a>消息处理有异常，可以返回 RECONSUME_LATER 状态</h3><p>实际上如果我们因为数据库宕机等问题，对这批消息的处理是异常的，此时没法处理这批消息，我们就应该返回一个 <code>RECONSUME_LATER</code> 状态。它的意思是，我现在没法完成这批消息的处理，你稍后过段时间再次给我这批消息让我重试一下。</p>
+<p>所以，我们应该改成如下的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">consumer.registerMessageListener(<span class="keyword">new</span> MessageListenerConcurrently() &#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> ConsumeConcurrentlyStatus <span class="title">consumeMessage</span><span class="params">(List&lt;MessageExt&gt; msgs, </span></span></span><br><span class="line"><span class="function"><span class="params">										ConsumeConcurrentlyContext context)</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="comment">// 在这里对获取到的 msgs 订单消息进行处理</span></span><br><span class="line">			<span class="comment">// 比如增加积分，发送优惠券，通知发货等等</span></span><br><span class="line">			<span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS;</span><br><span class="line">		&#125; <span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">			<span class="comment">// 如果因为数据库宕机等问题，对消息处理失败了</span></span><br><span class="line">			<span class="comment">// 此时返回一个稍后重试消费的状态</span></span><br><span class="line">			<span class="keyword">return</span> ConsumeConcurrentlyStatus.RECONSUME_LATER;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="RocketMQ-是如何让你进行消费重试的"><a href="#RocketMQ-是如何让你进行消费重试的" class="headerlink" title="RocketMQ 是如何让你进行消费重试的"></a>RocketMQ 是如何让你进行消费重试的</h3><p>RocketMQ 在收到你返回的 <code>RECONSUME_LATER</code> 状态之后，是如何让你进行消费重试的？简单说，RocketMQ 会有一个针对你这个 ConsumerGroup 的重试队列。如果你返回了 <code>RECONSUME_LATER</code> 状态，它会把你这批消息放到你这个消费组的重试队列中去。</p>
+<p>比如你的消费组的名称是 “VoucherConsumerGroup”，意思是优惠券系统的消费组，那么它会有一个 “%RETRY%VoucherConsumerGroup” 这个名字的重试队列。如图：</p>
+<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/reconsume_later.png" alt="reconsume_later"></p>
+<p>然后过一段时间之后，重试队列中的消息会再次发送给我们，让我们进行处理。如果再次失败，又返回了 <code>RECONSUME_LATER</code>，那么会再过一段时间让我们来处理，默认最多是重试 16 次。每次重试之间的间隔时间是不一样的，这个间隔时间可以进行如下配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">messageDelayLevel = 1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h</span><br></pre></td></tr></table></figure>
+
+<p>上面这段配置的意思是，第一次重试是 1秒 后，第二次重试是 5秒 后，第三次重试是 10秒 后，第四次重试是 30秒 后，第五次重试是 1分钟 后，以此类推，最多重试 16 次。</p>
+<h3 id="连续重试-16-次还是无法处理消息"><a href="#连续重试-16-次还是无法处理消息" class="headerlink" title="连续重试 16 次还是无法处理消息"></a>连续重试 16 次还是无法处理消息</h3><p>如果在 16次 重试范围内消息处理成功了，自然没问题，但是如果你对一批消息重试了 16 次还是无法成功处理，这个时候就需要另外一个队列了，叫<strong>死信队列</strong>。所谓的死信队列，就是死掉的消息就放进这个队列里。</p>
+<p>什么是死掉的消息？就是一批消息交给你处理，你重试了 16 次还是一直没处理成功，就不要继续重试这批消息了，你就认为他们死掉了就可以了。然后这批消息就会自动进入死信队列。死信队列的名字是 “%DLQ%VoucherConsumerGroup”。我们在 RocketMQ 的管理后台上是可以看到的。如图：</p>
+<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/D:%5Cgit%5CCKING.github.io%5Csource_posts%5CRocketMQ-%E9%87%8D%E5%8F%91%E6%9C%BA%E5%88%B6%5C%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97.png" alt="死信队列"></p>
+<p>那么我们对死信队列中的消息我们怎么处理？其实这个就看你的使用场景了，比如我们可以专门开一个后台线程，就是订阅 “%DLQ%VoucherConsumerGroup” 这个队列，对死信队列中的消息，还是一直不停地重试。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这一次我们搞清楚了另外一个生产环境下的问题，就是消费者底层的一些依赖可能有故障，比如数据库宕机，缓存宕机之类的，此时就就没办法完成消息的处理了，那么可以通过一些返回状态去让消息进入 RocketMQ 自带的重试队列，如果反复重试还是不行，可以让消息进入 RocketMQ 自带的死信队列，后续针对死信队列中的消息进行单独的处理就可以了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/消息队列/" rel="tag"># 消息队列</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/12/常见的网络攻击/" rel="next" title="常见的网络攻击">
+                <i class="fa fa-chevron-left"></i> 常见的网络攻击
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">90</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景示例"><span class="nav-number">1.</span> <span class="nav-text">背景示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#优惠券系统重复消费了一条消息"><span class="nav-number">1.1.</span> <span class="nav-text">优惠券系统重复消费了一条消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#订单系统发送消息到-MQ-的时候会重复吗"><span class="nav-number">1.2.</span> <span class="nav-text">订单系统发送消息到 MQ 的时候会重复吗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#订单系统自己重复发送消息"><span class="nav-number">1.3.</span> <span class="nav-text">订单系统自己重复发送消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优惠券系统重复消费一条消息"><span class="nav-number">1.4.</span> <span class="nav-text">优惠券系统重复消费一条消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息重复问题"><span class="nav-number">1.5.</span> <span class="nav-text">消息重复问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引入幂等性机制"><span class="nav-number">2.</span> <span class="nav-text">引入幂等性机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#发送消息到-MQ-的时候如何保证幂等性"><span class="nav-number">2.1.</span> <span class="nav-text">发送消息到 MQ 的时候如何保证幂等性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#业务判断法"><span class="nav-number">2.2.</span> <span class="nav-text">业务判断法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于-Redis-缓存的幂等性机制"><span class="nav-number">2.3.</span> <span class="nav-text">基于 Redis 缓存的幂等性机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有没有必要在订单系统环节保证消息不重复发送"><span class="nav-number">2.4.</span> <span class="nav-text">有没有必要在订单系统环节保证消息不重复发送</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优惠券系统如何保证消息处理的幂等性"><span class="nav-number">2.5.</span> <span class="nav-text">优惠券系统如何保证消息处理的幂等性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MQ-消息幂等性的方案总结"><span class="nav-number">2.6.</span> <span class="nav-text">MQ 消息幂等性的方案总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#死信队列解决数据库宕机问题"><span class="nav-number">3.</span> <span class="nav-text">死信队列解决数据库宕机问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库宕机的时候，可以返回-CONSUME-SUCCESS-吗"><span class="nav-number">3.1.</span> <span class="nav-text">数据库宕机的时候，可以返回 CONSUME_SUCCESS 吗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息处理有异常，可以返回-RECONSUME-LATER-状态"><span class="nav-number">3.2.</span> <span class="nav-text">消息处理有异常，可以返回 RECONSUME_LATER 状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RocketMQ-是如何让你进行消费重试的"><span class="nav-number">3.3.</span> <span class="nav-text">RocketMQ 是如何让你进行消费重试的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连续重试-16-次还是无法处理消息"><span class="nav-number">3.4.</span> <span class="nav-text">连续重试 16 次还是无法处理消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.5.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

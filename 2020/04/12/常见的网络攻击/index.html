@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机网络,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="XSS 攻击XSS 的全称是 Cross Site Script，就是跨站点脚本攻击，意思就是，黑客恶意篡改你的网页的前端代码，在里面注入一些它自己的 html + JavaScript 的脚本和代码，然后在你访问那个网站的网页的时候，他注入的那些恶意脚本就会运行。恶意脚本运行的时候就会控制你的浏览器，这个时候它的脚本就可以做很多的事情了。 XSS 反射性攻击第一种 XSS 攻击是反射性攻击，它主">
+<meta name="keywords" content="计算机网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常见的网络攻击">
+<meta property="og:url" content="https://github.com/2020/04/12/常见的网络攻击/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="XSS 攻击XSS 的全称是 Cross Site Script，就是跨站点脚本攻击，意思就是，黑客恶意篡改你的网页的前端代码，在里面注入一些它自己的 html + JavaScript 的脚本和代码，然后在你访问那个网站的网页的时候，他注入的那些恶意脚本就会运行。恶意脚本运行的时候就会控制你的浏览器，这个时候它的脚本就可以做很多的事情了。 XSS 反射性攻击第一种 XSS 攻击是反射性攻击，它主">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-13T04:01:42.789Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="常见的网络攻击">
+<meta name="twitter:description" content="XSS 攻击XSS 的全称是 Cross Site Script，就是跨站点脚本攻击，意思就是，黑客恶意篡改你的网页的前端代码，在里面注入一些它自己的 html + JavaScript 的脚本和代码，然后在你访问那个网站的网页的时候，他注入的那些恶意脚本就会运行。恶意脚本运行的时候就会控制你的浏览器，这个时候它的脚本就可以做很多的事情了。 XSS 反射性攻击第一种 XSS 攻击是反射性攻击，它主">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/04/12/常见的网络攻击/">
+
+
+
+
+
+  <title>常见的网络攻击 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/12/常见的网络攻击/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">常见的网络攻击</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-12T17:50:36+08:00">
+                2020-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/计算机网络/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="XSS-攻击"><a href="#XSS-攻击" class="headerlink" title="XSS 攻击"></a>XSS 攻击</h2><p>XSS 的全称是 <code>Cross Site Script</code>，就是跨站点脚本攻击，意思就是，黑客恶意篡改你的网页的前端代码，在里面注入一些它自己的 html + JavaScript 的脚本和代码，然后在你访问那个网站的网页的时候，他注入的那些恶意脚本就会运行。恶意脚本运行的时候就会控制你的浏览器，这个时候它的脚本就可以做很多的事情了。</p>
+<h3 id="XSS-反射性攻击"><a href="#XSS-反射性攻击" class="headerlink" title="XSS 反射性攻击"></a>XSS 反射性攻击</h3><p>第一种 XSS 攻击是反射性攻击，它主要是想办法让你点击一个 URL 链接，在这个 URL 链接里就嵌入它自己的恶意脚本，你点击那个 URL 链接之后，那个 URL 指向的是黑客自己服务器上的一段恶意脚本。</p>
+<p>它可能给你展示的是一个图片，或者是一个 flash 动图，亦或是一个小视频的东西，引诱你去点击，然后恶意脚本被返回到你的浏览器里运行，就可以控制你的浏览器里的行为了。这个控制行为就很恐怖了，它可以干很多事情，比如说脚本可以让你自动关注某个用户 id，然后控制你发自动发布一个带有病毒的微博，这是比较简单的。</p>
+<p>实际上，一段恶意的 JS 脚本，几乎是无恶不作的。因为它一旦控制你的浏览器就可以得到大量的东西。浏览器一般包含了你的一些 cookie，有的浏览器还可能存储了你的密码，通过知道你的 cookie，就可以利用 cookie 伪造你的用户登录的 session 状态，以你的名义去干一些事情。</p>
+<h3 id="XSS-持久型攻击"><a href="#XSS-持久型攻击" class="headerlink" title="XSS 持久型攻击"></a>XSS 持久型攻击</h3><p>另一种 XSS 攻击是叫持久型攻击。举个例子，例如一个论坛，或者社交网站之类的系统，你可以发布一些帖子，或者是评论啥的内容，此时黑客就可以在里面写一段恶意脚本，然后把恶意脚本混杂在评论内容里提交到你的网站数据库里去。</p>
+<p>然后后面其他用户在社交网站里浏览到你的评论，评论内容会被返回到浏览器里去，此时评论内容是包含恶意 JS 脚本的。恶意脚本一运行，又可以干坏事了。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p><strong>消毒机制</strong>。就是说，如果黑客在一些评论之类的内容里混入恶意脚本，那么你的代码必须对内容进行消毒，就是进行一些转义。这样就可以把恶意脚本里的 HTML 标签，JS 代码之类的东西，给转义掉，让这些恶意脚本失效。</p>
+<p><strong>HttpOnly 方式</strong>。如果你在浏览器里存放 cookie 的时候，可以设置一个 <code>HttpOnly</code> 属性，比如存放用户加密认证消息的 cookie，这样的话，在浏览器里运行的 JS 脚本是被禁止访问这些 HttpOnly cookie 的。他就无法窃取你在浏览器里存储的 cookie 了。</p>
+<h2 id="SQL-注入"><a href="#SQL-注入" class="headerlink" title="SQL 注入"></a>SQL 注入</h2><p>系统在数据库里执行 SQL 语句的时候，可能也存在漏洞，导致黑客把一些恶意的 SQL 语句注入进去，让你的系统在你的数据库里执行。例如下面这么一个请求：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.xxx.com/goods?goodsSkuNo=xxxxx</span><br></pre></td></tr></table></figure>
+
+<p>通过前端传递 <code>goodsSkuNo</code> 的数据 “xxxxx”，然后在后台执行这么一条 SQL 语句来查询数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> eshop_goods_sku <span class="keyword">WHERE</span> goods_sku_no = <span class="string">'xxxxx'</span></span><br></pre></td></tr></table></figure>
+
+<p>但是如果后台的 SQL 语句是手动拼接的，那前端传过来的数据有可能就会拼接成如下的 SQL 语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> eshop_goods_sku <span class="keyword">WHERE</span> goods_sku_no = <span class="string">'xxxxx'</span>; <span class="keyword">drop</span> <span class="keyword">table</span> eshop_goods_sku;<span class="comment">--';</span></span><br></pre></td></tr></table></figure>
+
+<p>这样就直接恶意给你造成删库跑路的效果了。这还不算什么，关键是这种 SQL 语句里可以拼接进入各种支持的 SQL 语法，包括对数据库施加的命令，甚至通过附加一些脚本直接窃取你的数据，都是有可能的。</p>
+<p>但是如果要给你搞 SQL 注入，其实也不是那么容易的，因为必须要知道你的数据库表结构才行。一般获取数据库表结构的方式就下面几种：</p>
+<ul>
+<li><p>如果你使用的是开源软件，比如开源的博客系统，论坛系统，或者别的什么系统，那么人家自然知道你的表结构了。这种情况是比较少见的。</p>
+</li>
+<li><p>错误回显。就是有时候把系统跑在 web 服务器里，然后程序报错了，结果直接在浏览器页面上显示出来你的异常堆栈信息，包括有错误的 SQL 语句。这就尴尬了，通过这个，黑客就知道你的表结构了。</p>
+</li>
+<li><p>根据你的请求参数的名称，大致推测你的数据库表结构。这个一般不现实。</p>
+</li>
+</ul>
+<p>所以要防止 SQL 注入，一个是别让人家知道你的数据表结构，关闭 web 服务器的错误回显，显示一个 400,500 之类的就可以了。另外，就是要用<strong>预编译</strong>的方式。现在 mybatis、hibernate 都是支持预编译的。</p>
+<p>预编译，放到底层的 JDBC 里，就是 <code>PrepareStatement</code> 对SQL 进行预编译。如果你给 SQL 的某个参数传入进去的是一个恶意 SQL 语句，人家预编译过后，会让你的恶意 SQL 语句是无法执行的，所以千万不要直接自己用字符串去拼接 SQL 语句。</p>
+<p>例如 <code>INSERT INTO xxx_table(xx, xxx, xx) VALUES(?, ?, ?)</code> 对这个 SQL 进行预编译，然后把里面各个参数设置进去，此时参数里如果带有恶意 SQL 是不会作为 SQL 去执行的。</p>
+<p>在 Mybatis 中。对这个方法比如传进去一个 map 或者是对象，mybatis 会根据你的占位符的变量名字，从你的 map 里或者是对象里提取出来一个一个的参数的值，进行预编译 SQL 的参数值的设置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO xxx_table(xx, xxx,xx) VALUES(#&#123;xx&#125;, #&#123;xxx&#125;, #&#123;xx&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这个预编译，就是说把黑客在参数里混进来的 SQL 语句当做一个参数，而绝对不会作为独立的 SQL 语句去执行，这就避免了 SQL 注入攻击了。</p>
+<h2 id="CSRF-攻击"><a href="#CSRF-攻击" class="headerlink" title="CSRF 攻击"></a>CSRF 攻击</h2><p>CSRF（Cross Site Request Forgery），跨站点请求伪造。这个就是黑客想办法去伪造你这个用户发送请求到某个系统上去，然后查询你的数据，或者进行转账交易之类的。伪装成你，有很多办法，比如利用 XSS 搞一个恶意脚本让你执行，然后盗取你的浏览器里的 cookie，利用你的 cookie 伪装成你登录的状态，然后去执行一些请求。</p>
+<p>防御 CSRF  的方法主要是以下几种：</p>
+<ul>
+<li><p><strong>防止 cookie 被窃取</strong>：最根本的，还是防止 cookie 被窃取，可以给你的网站的cookie 设置 <code>HttpOnly</code> 属性，禁止别别人的 script 脚本窃取，那么别人就无法伪造用户登录请求了。</p>
+</li>
+<li><p><strong>随机 token</strong>：每次返回一个页面给你的时候，都生成一个随机 token 附加在页面的随机元素里，同时可以在你的 redis 里可以存一下，然后页面发送请求的时候附加随机 token，验证过来才能执行请求，黑客要是用 postman 构造请求就不知道随机 token 是什么了</p>
+</li>
+<li><p><strong>验证码</strong>：页面提交搞一个验证码，那种图形的。现在比较流行的还有拖动一个拼图什么的，必须验证码通过了才能执行你的请求，避免黑客直接伪造请求发送过来，这个其实是比较常见的，最好是在用户进行支付交易的时候，要求必须在页面上拖拽一个拼图验证码</p>
+</li>
+<li><p><strong>Referer请求头</strong>：这个是 http 请求里有一个 referer 请求头，带有这个请求头的来源，你可以验证一下这个请求是不是从自己的页面里来的，如果是的话才执行，否则就不要执行。</p>
+</li>
+</ul>
+<h2 id="文件上传可以遭受的攻击"><a href="#文件上传可以遭受的攻击" class="headerlink" title="文件上传可以遭受的攻击"></a>文件上传可以遭受的攻击</h2><p>很多时候我们的网站允许别人上传文件，那么文件可能是可执行的脚本，可能是病毒或者木马文件，这个是非常危险的。如果是脚本的话，可能在服务器执行，搞很多破坏，比如黑客黑掉你的服务器，勒索你给他比特币之类的。他们会把自己的文件后缀改成 .jpg、.txt 之类的来上传，其实本质上是病毒文件。</p>
+<p>对于文件上传这块，核心就是要进行白名单校验，<strong>限制上传文件的类型</strong>，<strong>而且要限制文件的大小</strong>，<strong>还要对文件重命名</strong>。限制文件类型不能简单地根据后缀来判断，要根据文件二进制数据的开头几个字节代表的 <code>magic number</code> 来判断文件的类型。例如 JPEG 的魔数是 FFD8FF；PNG 的魔数是 89504E47。以此类推。</p>
+<p>网上可以查到完整的 magic number 列表，根据这个限制一下，哪些文件可以上传，这样就避免木马、病毒之类的可执行文件被上传了。</p>
+<p>另外，最好对文件进行一定的压缩，这样可以破坏原来的 文件结构，避免文件在服务器执行。利用 <code>imagemagick</code> 这种开源包，可以很方便进行文件缩放。</p>
+<h2 id="DDoS"><a href="#DDoS" class="headerlink" title="DDoS"></a>DDoS</h2><p><code>DDoS</code>，distributed denial of service，分布式拒绝服务攻击。可以把你的网站、APP、系统搞瘫痪了。DDos 攻击，就是说黑客知道你的服务器地址了，然后你的系统假设每秒就抗 1000 请求，黑客就以每秒 1000 请求访问你，你的服务器线程资源全部打满，正常用户根本无法发送请求，你的网站就宕机了。甚至他以每秒 1万 请求攻击你的服务器，那你的系统机器就挂了。</p>
+<p><code>Dos</code> 攻击是一对一的，就是黑客搞一台高性能服务器，拼命发送请求给你的一台服务器，但是如果你的服务器配置超高，每秒抗 1万 请求，结果黑客的机器才每秒 5000 请求，那么就没用了。</p>
+<p><code>DDos</code> 意思就是黑客控制大量的机器，比如普通人的电脑，或者是一些公司的服务器，被他的一些木马植入给控制了，就是所谓的 “肉鸡”，然后黑客下达指令，让所有肉鸡一起发送请求给攻击目标，直接搞瘫你的服务器。</p>
+<p>如何防御 DDoS 攻击？如果只靠自己还是挺难的，这其实是非常专业的一种攻击手段，通常我们可以采购云厂商的安全服务，比如 DDoS 高防 IP，可以把攻击流量到导入到云厂商的高防 IP 的服务器上去，他们有专业的技术方案和算法来防御。</p>
+<h3 id="基于-SYN-Flood-模式的-DDoS-攻击"><a href="#基于-SYN-Flood-模式的-DDoS-攻击" class="headerlink" title="基于 SYN Flood 模式的 DDoS 攻击"></a>基于 SYN Flood 模式的 DDoS 攻击</h3><p>我们简单说一下 TCP 三次握手：</p>
+<p>客户端发送一个 <code>SYN</code> 请求，指明客户端的端口号以及 TCP 连接的初始序列号</p>
+<p>服务器收到 <code>SYN</code> 后，返回一个 <code>SYN</code> + <code>ACK</code>，表示请求被接收，TCP 序列号加 1</p>
+<p>客户端收到服务器的 <code>SYN</code> + <code>ACK</code> 后，返回一个 <code>ACK</code> 给服务器，TCP 序列号加 1，连接建立完毕，接着可以通信了。</p>
+<p>如果服务器没有收到第三步的 <code>ACK</code>，会重试返回 <code>SYN</code> + <code>ACK</code> 给客户端，同时处于 <code>SYN_RECV</code> 状态，把客户端放入等待列表，重试会 3 ~ 5 次，每隔 30 秒重试一次，遍历等待列表，再次重试发送 <code>SYN</code> + <code>ACK</code></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/计算机网络/" rel="tag"># 计算机网络</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/09/RocketMQ-事务消息机制的底层原理/" rel="next" title="RocketMQ - 事务消息机制的底层原理">
+                <i class="fa fa-chevron-left"></i> RocketMQ - 事务消息机制的底层原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/15/RocketMQ-重发机制/" rel="prev" title="RocketMQ-重发机制">
+                RocketMQ-重发机制 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">90</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#XSS-攻击"><span class="nav-number">1.</span> <span class="nav-text">XSS 攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS-反射性攻击"><span class="nav-number">1.1.</span> <span class="nav-text">XSS 反射性攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS-持久型攻击"><span class="nav-number">1.2.</span> <span class="nav-text">XSS 持久型攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案"><span class="nav-number">1.3.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL-注入"><span class="nav-number">2.</span> <span class="nav-text">SQL 注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CSRF-攻击"><span class="nav-number">3.</span> <span class="nav-text">CSRF 攻击</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件上传可以遭受的攻击"><span class="nav-number">4.</span> <span class="nav-text">文件上传可以遭受的攻击</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DDoS"><span class="nav-number">5.</span> <span class="nav-text">DDoS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基于-SYN-Flood-模式的-DDoS-攻击"><span class="nav-number">5.1.</span> <span class="nav-text">基于 SYN Flood 模式的 DDoS 攻击</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
