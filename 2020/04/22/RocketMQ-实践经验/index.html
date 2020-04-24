@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="消息队列,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="灵活地运用 tags 来过滤数据之前我们讲解过基于 tags 来过滤数据的功能，其实在真正的生产项目中，建议大家合理地规划 Topic 和里面的 tags。一个 Topic 代表了一类业务消息数据，然后对于这类业务消息数据，如果你希望继续划分一些类别的话，可以在发送消息的时候设置 tags 例如，我们知道现在常见的外卖平台有美团外卖。饿了么和其他一些外卖，假设你现在一个系统要发送外卖订单数据到 M">
+<meta name="keywords" content="消息队列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ 实践经验">
+<meta property="og:url" content="https://github.com/2020/04/22/RocketMQ-实践经验/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="灵活地运用 tags 来过滤数据之前我们讲解过基于 tags 来过滤数据的功能，其实在真正的生产项目中，建议大家合理地规划 Topic 和里面的 tags。一个 Topic 代表了一类业务消息数据，然后对于这类业务消息数据，如果你希望继续划分一些类别的话，可以在发送消息的时候设置 tags 例如，我们知道现在常见的外卖平台有美团外卖。饿了么和其他一些外卖，假设你现在一个系统要发送外卖订单数据到 M">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-24T06:17:19.745Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RocketMQ 实践经验">
+<meta name="twitter:description" content="灵活地运用 tags 来过滤数据之前我们讲解过基于 tags 来过滤数据的功能，其实在真正的生产项目中，建议大家合理地规划 Topic 和里面的 tags。一个 Topic 代表了一类业务消息数据，然后对于这类业务消息数据，如果你希望继续划分一些类别的话，可以在发送消息的时候设置 tags 例如，我们知道现在常见的外卖平台有美团外卖。饿了么和其他一些外卖，假设你现在一个系统要发送外卖订单数据到 M">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/04/22/RocketMQ-实践经验/">
+
+
+
+
+
+  <title>RocketMQ 实践经验 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/22/RocketMQ-实践经验/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RocketMQ 实践经验</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-22T17:44:26+08:00">
+                2020-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="灵活地运用-tags-来过滤数据"><a href="#灵活地运用-tags-来过滤数据" class="headerlink" title="灵活地运用 tags 来过滤数据"></a>灵活地运用 tags 来过滤数据</h2><p>之前我们讲解过基于 tags 来过滤数据的功能，其实在真正的生产项目中，建议大家合理地规划 Topic 和里面的 tags。一个 Topic 代表了一类业务消息数据，然后对于这类业务消息数据，如果你希望继续划分一些类别的话，可以在发送消息的时候设置 tags</p>
+<p>例如，我们知道现在常见的外卖平台有美团外卖。饿了么和其他一些外卖，假设你现在一个系统要发送外卖订单数据到 MQ 里去，就可以针对性地设置 tags。比如不同的外卖数据都到一个 “WaimaiOrderTopic” 里去，但是不同类型的外卖可有不不同的 tags：”meituan_waimai”，”eleme_waimai”，”other_waimai” 等等。然后你对消费 “WaimaiOrderTopic” 的系统，可以根据 tags 来筛选，可能你就需要某一种类别的外卖数据而已。</p>
+<h2 id="基于消息-key-来定位消息是否丢失"><a href="#基于消息-key-来定位消息是否丢失" class="headerlink" title="基于消息 key 来定位消息是否丢失"></a>基于消息 key 来定位消息是否丢失</h2><p>在消息零丢失方案中，可能要解决的消息是否丢失的问题，那么如果消息真的丢失了，我们就需要排查，需要从 MQ 里查一下，这个小时是否丢失了</p>
+<p>那怎么从 MQ 里查消息是否丢失？可以基于消息 key 来实现。比如通过这样的方式设置一个消息的 key为订单 id：<code>message.setKeys(orderId)</code>，这样这个消息就具备一个 key 了。接着这个消息到 Broker 上，会基于 key 构建 hash 索引，这个 hash 索引就存放在 IndexFile 索引文件里。然后后续我们可以通过 MQ 提供的命令去根据 key 查询这个消息，类似下面这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mqadmin queryMsgByKey -n 127.0.0.1:9876 -t SCANRECORD -k orderId</span><br></pre></td></tr></table></figure>
+
+<p>具体的命令，可以去查官方手册</p>
+<h2 id="消息零丢失方案的补充"><a href="#消息零丢失方案的补充" class="headerlink" title="消息零丢失方案的补充"></a>消息零丢失方案的补充</h2><p>之前有讲过零丢失方案，其实在消息零丢失方案还有一个问题，就是 MQ 集群彻底故障，此时就是不可用了，那这么处理？</p>
+<p>其实对于一些金融级的系统，或者跟钱相关的支付系统，或者是广告系统，类似这样的系统，都必须有超高级别的高可用保障机制，一般假设 MQ 集群彻底崩溃了，你生产者就应该把消息写入到本地磁盘里去进行持久化，或者写入数据库里去暂存起来，等待 MQ 恢复之后，然后再把持久化的消息继续投递到 MQ 里去。</p>
+<h2 id="提高消费者的吞吐量"><a href="#提高消费者的吞吐量" class="headerlink" title="提高消费者的吞吐量"></a>提高消费者的吞吐量</h2><p>如果消费的时候发现消费地比较慢，那么可以提高消费者的并行度，常见的就是部署更多的 consumer 机器。但是这里要注意，你的 Topic 的 MessageQueue 得是有对应的增加，因为如果你的 consumer 机器有 5 台，然后 MessageQueue 只有 4 个，那么意味着有一个 consume 机器是获取不到消息的。</p>
+<p>然后就是可以增加 consumer 的线程数量，可以设置 consumer 端的参数：<code>consumeThreadMin</code>、<code>consumeThreadMax</code>，这样一台 consumer 机器上的消费线程越多，消费的速度就越快。</p>
+<p>此外，还可以开启消费者的批量消费功能，就是设置 <code>consumeMessageBatchMaxSize</code> 参数，它默认是 1，但是你可以设置的多一些，那么一次就会交给你的回调函数一批消息给你处理，此时你可以通过 SQL 一次性批量处理一批数据。比如：<code>update xxx set xxx where id in(xx,xx,xx)</code></p>
+<h2 id="企业级的-RocketMQ-集群进行权限机制的控制"><a href="#企业级的-RocketMQ-集群进行权限机制的控制" class="headerlink" title="企业级的 RocketMQ 集群进行权限机制的控制"></a>企业级的 RocketMQ 集群进行权限机制的控制</h2><p>如果一个公司有很多技术团队，每个技术团队都会使用 RocketMQ 集群中的部分 Topic，那么此时可能就会有一个问题，如果订单团队使用的 Topic，被商品团队不小心写入了错误的脏数据，怎么办？可能导致订单团队的 Topic 里的数据出错了。</p>
+<p>此时就需要在 RocketMQ 中引入权限功能，也就是说规定好订单团队的用户，只能使用 <code>OrderTopic</code>，然后商品团队的用户只能使用 <code>ProductTopic</code>，大家互相之间不能混乱地使用别人的 Topic。要在 RocketMQ 中实现权限控制也不难，首先我们需要在 Broker 端放一个额外的 ACK 权限控制配置文件，里面需要规定好权限，包括什么用户对哪些 Topic 有什么操作权限，这样的话，各个 Broker 才知道你每个用户的权限。</p>
+<p>首先在每个 Broker 的配置文件里需要设置 <code>aclEnable = true</code> 这个配置，开启权限控制。其次，在每个 Broker 部署机器的 <code>${ROCKETMQ_HOME}/store/config</code> 目录下，可以放一个 <code>plain_acl.yml</code> 的配置文件，这个里面就可以进行权限配置，类似下面这样子：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个参数就是全局性的白名单</span></span><br><span class="line"><span class="comment"># 这个定义的 ip 地址，都是可以访问 Topic 的</span></span><br><span class="line"><span class="attr">globalWhiteRemoteAddresses:</span></span><br><span class="line"><span class="bullet">-</span> <span class="number">10.10</span><span class="number">.15</span><span class="string">.*</span></span><br><span class="line"><span class="bullet">-</span> <span class="number">192.168</span><span class="number">.0</span><span class="string">.*</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这个 accounts 就是说，你在这里可以定义很多账号</span></span><br><span class="line"><span class="attr">accounts:</span></span><br><span class="line"><span class="comment"># 这是 AccessKey 就是用户名的意思，比如我们这里叫做 “订单技术团队”</span></span><br><span class="line"><span class="attr">- accessKey:</span> <span class="string">OrderTeam</span></span><br><span class="line"><span class="comment"># 这个 secretKey 就是这个用户名的密码</span></span><br><span class="line"><span class="attr">  secretKey:</span> <span class="number">123456</span></span><br><span class="line"><span class="comment"># 下面这个是当前这个用户名下哪些机器要加入白名单</span></span><br><span class="line"><span class="attr">  whiteRemoteAddress:</span></span><br><span class="line"><span class="comment"># admin 指的是这个账号是不是管理员账号</span></span><br><span class="line"><span class="attr">  admin:</span> <span class="literal">false</span></span><br><span class="line"><span class="comment"># 这个指的是默认情况下这个账号的 Topic 权限和 ConsumerGroup 权限</span></span><br><span class="line"><span class="attr">  defaultTopicPerm:</span> <span class="string">DENY</span></span><br><span class="line"><span class="attr">  defaultGroupPerm:</span> <span class="string">SUB</span></span><br><span class="line"><span class="comment"># 这个就是这个账号具体的一些账号的权限</span></span><br><span class="line"><span class="comment"># 下面就是说当前这个账号对应两个 Topic，都具备 PUB|SUB 权限，就是发布和订阅的权限</span></span><br><span class="line"><span class="comment"># PUB 就是发布消息的权限，SUB 就是订阅消息的权限</span></span><br><span class="line"><span class="comment"># DENY 就是拒绝你这个账号访问这个 Topic</span></span><br><span class="line"><span class="attr">  topicPerms:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">topicA=DENY</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">CreateOrderInformTopic=PUB|SUB</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">PaySuccessInformTopic=SUB|SUB</span></span><br><span class="line"><span class="comment"># 下面就是对 ConsumerGroup 的权限，也是同理的</span></span><br><span class="line"><span class="attr">  groupPerms:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">groupA=DENY</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">groupB=PUB|SUB</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">groupC=SUB</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 下面就是另一个账号了，比如是商品技术团队的账号</span></span><br><span class="line"><span class="attr">- accessKey:</span> <span class="string">ProductTeam</span></span><br><span class="line"><span class="attr">  secretKey:</span> <span class="number">12345678</span></span><br><span class="line"><span class="attr">  whiteRemoteAddress:</span> <span class="number">192.168</span><span class="number">.1</span><span class="string">.*</span></span><br><span class="line">  <span class="comment"># 如果设置为 true，就是具备一切权限</span></span><br><span class="line"><span class="attr">  admin:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>上面配置中，需要注意一点，就是如果你一个账号没有对某个 Topic 显式地指定权限，那么就是会采用默认 Topic 权限。</p>
+<p>接着我们看看你的生产者和消费者里，如何指定你的团队分配到的 RocketMQ 的账号。当你使用一个账号的时候，就只能访问你有权限的 Topic</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DefaultMQProducer producer = <span class="keyword">new</span> DefaultMQProducer(</span><br><span class="line">                        <span class="string">"OrderProducerGroup"</span>,</span><br><span class="line">                        <span class="keyword">new</span> AclClientRPCHook(<span class="keyword">new</span> SessionCredentials(<span class="string">"OrderTeam"</span>, <span class="string">"123456"</span>))</span><br><span class="line">                );</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码中就是在创建 Producer 的时候，传入进去一个 <code>AclClientRPHook</code>，里面就可以设置你这个 Producer 的账号密码。对于创建 Consumer 也是同理的，通过这样的方式，就可以在 Broker 端设置好每个账号对 Topic 的访问权限，然后你不同的技术团队就用不同的账号就可以了。</p>
+<h2 id="RocketMQ-集群进行消息轨迹的追踪"><a href="#RocketMQ-集群进行消息轨迹的追踪" class="headerlink" title="RocketMQ 集群进行消息轨迹的追踪"></a>RocketMQ 集群进行消息轨迹的追踪</h2><p>如何在生产环境里查询一条消息的轨迹？即，对于一个消息，我想要知道，这个消息是什么时候从哪个 Producer 发送出来？它在 Broker 端是进入到了 哪个 Topic 里去的？它在消费者层面是被 哪个 Consumer 什么时候消费出来的？</p>
+<p>我们有时候对于一条消息的丢失，可能就想要了解到这样的一个消息轨迹，协助我们去进行线上问题的排查，所以此时就可以使用 RocketMQ 支持的消息轨迹功能，我们看下面的配置过程。</p>
+<p>首先需要在 Broker 的配置文件里开启 <code>traceTopicEnable = true</code> 这个选项，此时就会开启消息轨迹追踪的功能。接着当我们开启了上述的选项之后，我们启动这个 Broker 的时候会自动创建一个内部的 Topic，就是 <code>RMQ_SYS_TRACE_TOPIC</code>，这个 Topic 就是用来存储所有的消息轨迹追踪的数据的。</p>
+<p>接着做好上述一切事情之后，我们需要在发送消息的时候开启消息轨迹，此时创建 Producer 的时候要用如下的方式，下面构造函数中的第二个参数，就是 <code>enableMsgTrace</code> 参数，它设置为 true，就是说可以对消息开启轨迹追踪。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DefaultMQProducer producer =</span><br><span class="line">                       new DefaultMQProducer(&quot;TestProducerGroup&quot;, true);</span><br></pre></td></tr></table></figure>
+
+<p>在订阅消息的时候，对于 Consumer 也是同理的，在构造函数的第二个参数设置为 true，就是开启了消费时候的轨迹追踪。</p>
+<p>其实，一旦我们在 Broker、Producer、Consumer 都配置好了轨迹追踪之后，其实 Producer 在发送消息的时候，就会上报这个消息的一些数据到内置的 <code>RMQ_SYS_TRACE_TOPIC</code> 里去。此时会上报如下的一些数据：Producer 的消息、发送消息的时间、消息是否发送成功、发送消息的耗时。</p>
+<p>接着消息到 Broker 端之后，Broker 端也会记录消息的轨迹数据，包括如下：消息存储的 Topic、消息存储的位置、消息的 key、消息的 tags。然后消息被消费到 Consumer 端之后，它也会上报一些轨迹数据到内置的 <code>RMA_SYS_TRACE_TOPIC</code> 里去，包括如下一些东西：Consumer 的消息、投递消息的时间、这是第几轮投递消息、消息消费是否成功，消费这条消息的耗时。</p>
+<p>接着如果我们想要查询消息轨迹，也很简单。在 RocketMQ 控制台里，在导航栏里就有一个消息轨迹，在里面可以创建任务，你可以根据 messageId、message key 或者 Topic 来查询，查询任务执行完毕之后，就可以看到消息轨迹的界面了。</p>
+<p>在消息轨迹的界面就会展示出来刚才说的 Producer、Broker、Consumer 上报的一些轨迹数据了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/消息队列/" rel="tag"># 消息队列</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/21/记一次系统-OOM/" rel="next" title="记一次系统 OOM">
+                <i class="fa fa-chevron-left"></i> 记一次系统 OOM
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">95</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#灵活地运用-tags-来过滤数据"><span class="nav-number">1.</span> <span class="nav-text">灵活地运用 tags 来过滤数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于消息-key-来定位消息是否丢失"><span class="nav-number">2.</span> <span class="nav-text">基于消息 key 来定位消息是否丢失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息零丢失方案的补充"><span class="nav-number">3.</span> <span class="nav-text">消息零丢失方案的补充</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提高消费者的吞吐量"><span class="nav-number">4.</span> <span class="nav-text">提高消费者的吞吐量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#企业级的-RocketMQ-集群进行权限机制的控制"><span class="nav-number">5.</span> <span class="nav-text">企业级的 RocketMQ 集群进行权限机制的控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ-集群进行消息轨迹的追踪"><span class="nav-number">6.</span> <span class="nav-text">RocketMQ 集群进行消息轨迹的追踪</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

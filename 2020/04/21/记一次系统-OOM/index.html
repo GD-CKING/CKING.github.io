@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="JVM,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="由此系统因为 OOM 问题而挂掉了，当时我们就登录到线上系统去下载日志，并在日志中发现类似这么一句话： 1Exception in thread &quot;http-nio-8080-exec-1089&quot; java.lang.OutOfMemoryError: Java heap space  日志中，http-nio-8080-exec 1089 说的其实是 Tomcat 的工作线程，而后面的 java">
+<meta name="keywords" content="JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次系统 OOM">
+<meta property="og:url" content="https://github.com/2020/04/21/记一次系统-OOM/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="由此系统因为 OOM 问题而挂掉了，当时我们就登录到线上系统去下载日志，并在日志中发现类似这么一句话： 1Exception in thread &quot;http-nio-8080-exec-1089&quot; java.lang.OutOfMemoryError: Java heap space  日志中，http-nio-8080-exec 1089 说的其实是 Tomcat 的工作线程，而后面的 java">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/21/记一次系统-OOM/Tomcat.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/21/记一次系统-OOM/Tomcat%E8%BF%90%E8%A1%8C.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/21/记一次系统-OOM/%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/21/记一次系统-OOM/%E6%95%85%E9%9A%9C%E5%8E%9F%E5%9B%A0.png">
+<meta property="og:updated_time" content="2020-04-21T09:22:00.579Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记一次系统 OOM">
+<meta name="twitter:description" content="由此系统因为 OOM 问题而挂掉了，当时我们就登录到线上系统去下载日志，并在日志中发现类似这么一句话： 1Exception in thread &quot;http-nio-8080-exec-1089&quot; java.lang.OutOfMemoryError: Java heap space  日志中，http-nio-8080-exec 1089 说的其实是 Tomcat 的工作线程，而后面的 java">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/04/21/记一次系统-OOM/Tomcat.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/04/21/记一次系统-OOM/">
+
+
+
+
+
+  <title>记一次系统 OOM | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/21/记一次系统-OOM/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记一次系统 OOM</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-21T14:17:28+08:00">
+                2020-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>由此系统因为 OOM 问题而挂掉了，当时我们就登录到线上系统去下载日志，并在日志中发现类似这么一句话：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread <span class="string">"http-nio-8080-exec-1089"</span> java<span class="variable">.lang</span><span class="variable">.OutOfMemoryError</span>: Java heap space</span><br></pre></td></tr></table></figure>
+
+<p>日志中，<code>http-nio-8080-exec 1089</code> 说的其实是 Tomcat 的工作线程，而后面的 <code>java.lang.OutOfMemoryError: Java heap space</code> 指的就是堆内存溢出的问题，所以连起来看，这段日志的意思是 Tomcat 的工作线程在处理请求的时候需要在堆内存里分配对象，但是发现堆内存塞满了，而且根本没办法回收多余的对象，堆内存已经放不下更多对象了，就报了这个异常。</p>
+<h3 id="简单说说-Tomcat-的底层原理"><a href="#简单说说-Tomcat-的底层原理" class="headerlink" title="简单说说 Tomcat 的底层原理"></a>简单说说 Tomcat 的底层原理</h3><p>讲到这，我们看看 Tomcat 的基本工作原理，以及发生这个 OOM 异常的基本原因。首先，我们写的系统一般都是部署在 Tomcat 中的。最早我们会在 Eclipse / IDEA 开发工具上写一堆 Servlet，然后打包放入 Tomcat，再启动 Tomcat。接着我们访问 Tomcat 监听的一个端口号（一般是 8080），然后系统的功能就可以运行起来了。</p>
+<p>后来随着技术的发展，我们不再写 Servlet 这么原始的东西，有一些类似 Spring MVC 之类的框架把 Servlet 封装起来，我们就基于 Spring MVC 之类的框架去开发。再后面，出现了 SpringBoot，我们可以把 Tomcat 之类的 Web 容器都内嵌在系统里。</p>
+<p>Tomcat 会监听一个默认的 8080 端口号，然后我们就通过浏览器可以对这个机器上的 Tomcat 发起请求，类似下面的请求：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.200.15:8080/order?userid=100</span><br></pre></td></tr></table></figure>
+
+<p>接着 Tomcat 会监听 8080 端口收到这个请求，通常来说它会把请求交给 Spring Web MVC 之类的框架去处理，这类框架一般底层都封装了 Servlet / Filter 之类的组件，它也是用这类组件去处理请求的，如图：</p>
+<p><img src="/CKING.github.io/2020/04/21/记一次系统-OOM/Tomcat.png" alt="Tomcat"></p>
+<p>然后类似 Spring MVC 的框架的 Servlet 组件，就会根据你的请求路径，比如 <code>/order</code> 这种东西，去找到你代码中用来处理这个请求的 Controller 组件。那我们来思考一个问题，Tomcat是个什么东西？</p>
+<p>如果我们是把写好的系统放入 Tomcat 目录中，然后启动 Tomcat，此时我们启动的 Tomcat 本身就是一个 JVM 进程，因为 Tomcat 自己也是 Java 写的。所以要明确一个概念，就是 T<strong>omcat 自己就是一个 JVM 进程</strong>，我们写好的系统只不过是一些代码而已，这些代码时一个一个的类，这些类被 Tomcat 加载到内存里去，然后由 Tomcat 来执行我们写的类。</p>
+<p>既然如此，Tomcat 本身是如何去监听 8080 端口上收到的请求？其实，Tomcat 有自己的工作线程，大家要对 Tomcat 的工作线程这个概念有一个认识，即 Tomcat 有很多自己的工作线程，少则一两百个，多则三四百个也是可以的。</p>
+<p>然后从 8080 端口上收到的请求都会均匀地分配给这些工作线程去处理，而这些工作线程收到请求之后，就负责调用 Spring MVC 框架的代码，Spring MVC 框架有负责调用我们自己写的代码，比如 Controller 之类的。所以最终运行起来原理如下图：</p>
+<p><img src="/CKING.github.io/2020/04/21/记一次系统-OOM/Tomcat%E8%BF%90%E8%A1%8C.png" alt="Tomcat运行"></p>
+<h3 id="再回顾异常日志"><a href="#再回顾异常日志" class="headerlink" title="再回顾异常日志"></a>再回顾异常日志</h3><p>接着我们回过头看当时在线上系统的日志中发现的异常：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread <span class="string">"http-nio-8080-exec-1089"</span> java<span class="variable">.lang</span><span class="variable">.OutOfMemoryError</span>: Java heap space</span><br></pre></td></tr></table></figure>
+
+<p>这个时候理解起来就很简单了，<code>http-nio-8080-exec-1089</code> 这个说白了就是上图中的 Tomcat 工作线程，因为它是负责调用 Spring MVC 以及我们写的 Controller、Service、DAO 等一大堆的代码的，所以它发现运行的时候堆内存不够了，就会抛出堆内存溢出的异常了。</p>
+<h3 id="一个关键的-JVM-参数"><a href="#一个关键的-JVM-参数" class="headerlink" title="一个关键的 JVM 参数"></a>一个关键的 JVM 参数</h3><p>一旦我们发现线上系统发生了内存溢出的异常，第一步是看日志，具体看两点：</p>
+<p>看是堆内存溢出，还是栈内存溢出，或者是 Metaspace 内存溢出。首先得确定一下具体的溢出类型</p>
+<p>看是哪个线程代码运行的时候内存溢出了，因为 Tomcat 运行的时候不光有自己的工作线程，我们写的代码也可能创建一些线程出来</p>
+<p>看完这两个东西之后，就得记得每个系统上线，必须设置一个参数：<code>-XX:+HeapDumpOnOutOfMemoryError</code>。这个参数会在系统内存溢出的时候导出来一份内存快照到我们指定的位置，接着排查和定位内存溢出问题，主要就得依托这个自动导出来的内存快照了。</p>
+<h3 id="对内存快照进行分析"><a href="#对内存快照进行分析" class="headerlink" title="对内存快照进行分析"></a>对内存快照进行分析</h3><p>一般我们都是用 MAT 来分析内存快照，主要就是通过 MAT 来找到那些占据内存最大的对象。</p>
+<p>通过内存快照分析我们发现占据内存最大的是大量的 <code>byte[]</code> 数组，一大堆 byte[]  数组就占据了大约 8G 左右的内存空间，而我们当时线上机器给 Tomcat 的 JVM 堆内存分配的也就是 8G 左右的内存而已。因此我们可以直接得出第一个结论：Tomcat 工作线程在处理请求的时候会创建大量的 byte[] 数组，大约有 8G 左右，直接把 JVM 堆内存占满了。</p>
+<p>接着我们想知道到底是哪些 byte[] 数组在这里，因此我们通过 MAT 深入查看，发现大概是类似下面的一大堆 byte[] 数组：</p>
+<ul>
+<li><p>byte[10008192] @ 0x7aa800000 GET /order/v2 HTTP/1.0-forward…</p>
+</li>
+<li><p>byte[10008192] @ 0x7aa800000 GET /order/v2 HTTP/1.0-forward…</p>
+</li>
+<li><p>byte[10008192] @ 0x7aa800000 GET /order/v2 HTTP/1.0-forward…</p>
+</li>
+</ul>
+<p>当时看到了很多类似这样的数组，而且数组大小都是一致的 10MB，大概清点了一下，类似上面那样的数据，大概有 800 个左右，也就对应了 8G 的空间。</p>
+<p>那这些数组时谁创建的？我们在 MAT 上可以继续查看一下这个数组时谁引用的，大致可以发现是 Tomcat 的类引用的，具体来说是类似下面这个类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.apache.tomcat.util.threads.TaskThread</span><br></pre></td></tr></table></figure>
+
+<p>这个一看就是 Tomcat 自己的线程类，因此可以认为是 Tomcat 的线程创建了大量的 byte[] 数组，占据了 8G 的内存空间。</p>
+<p>而我们发现 Tomcat 的工作线程大致有 400 个左右，也就是说每个 Tomcat 的工作线程都会创建 2 个 byte[] 数组，每个 byte[] 数组是 10MB 左右，最终就是 400 个 Tomcat 工作线程同时在处理请求，结果创建出来了 8G 内存的 byte[] 数组，进而导致了内存溢出。如图：</p>
+<p><img src="/CKING.github.io/2020/04/21/记一次系统-OOM/%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA.png" alt="内存溢出"></p>
+<h3 id="系统每秒的-QPS"><a href="#系统每秒的-QPS" class="headerlink" title="系统每秒的 QPS"></a>系统每秒的 QPS</h3><p>根据上面的分析，有可能一秒钟之内瞬间来了 400 个请求，导致 Tomcat 的 400 个工作线程全部上阵处理，每个工作线程在处理一个请求的时候，会创建 2 个数组，每个数组是 10MB，结果导致瞬间让 8G 的内存空间被占满。</p>
+<p>但我们检查了系统的监控，发现每秒的请求并不是 400，而是 100。那么出现这种情况只有一种可能，就是每个请求处理需要 4 秒钟的时间。如果每秒来 100 个请求，但是每个请求处理完毕需要 4 秒钟的时间，那么在 4 秒内会导致有 400 个请求同时在处理，也就会导致 Tomcat 的 400 个工作线程都在工作，接着就会导致上述的情况。</p>
+<p>另外，为什么 Tomcat 工作线程在处理一个请求的额时候会创建 2 个 10MB 的数组？通过检查 Tomcat 的配置文件，发现了一个配置 <code>max-http-header-size: 10000000</code>。有了这个东西，导致 Tomcat 工作线程在处理请求的时候会创建 2 个数组，每个数组的大小如上面配置就是 10MB。</p>
+<h3 id="为什么处理一个请求需要-4-秒钟"><a href="#为什么处理一个请求需要-4-秒钟" class="headerlink" title="为什么处理一个请求需要 4 秒钟"></a>为什么处理一个请求需要 4 秒钟</h3><p>为什么处理一个请求需要 4 秒钟。经过咨询得知这个问题是偶发性，不是每次处理请求都这样，平时处理一个请求也就几百毫秒的时间而已。这样就只能在日志里去找问题了，继续翻看事故发生的日志，发现日志中除了 OOM 以外，还有大量的服务请求超时的异常，类似下面：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Timeout Exception....</span><br></pre></td></tr></table></figure>
+
+<p>即，我们系统在调用其他系统的时候出现了大量的请求超时，看了一下调用超时的配置，发现负责这个系统的工程师将服务调用超时的时间设置为了刚好是 4 秒！也就是说，在这个时间里，远程服务自己故障了，导致我们的系统调用其他服务的时候是访问不通的，然后就会在配置好的 4 秒超时时间之后抛出异常，在这 4 秒钟内，工作线程会直接卡死在无效的网络访问上。</p>
+<p><img src="/CKING.github.io/2020/04/21/记一次系统-OOM/%E6%95%85%E9%9A%9C%E5%8E%9F%E5%9B%A0.png" alt="故障原因"></p>
+<p>上图可以清楚看到，之所以每个请求需要处理 4 秒钟，是因为下游服务故障了，网络请求都是失败的，此时会按照设置好的 4 秒钟时间一直卡住 4 秒之后才会抛出 Timeout 异常，然后请求处理结束。这就是一个请求处理需要 4 秒钟的根本原因，进而导致 100 个请求的压力下，4 秒内积压 400 个请求同时在处理，导致 400 个工作线程创建了 800 个数组，每个数组 10MB 内存，耗尽了 8G 的内存，最终导致内存溢出。</p>
+<h3 id="对系统进行优化"><a href="#对系统进行优化" class="headerlink" title="对系统进行优化"></a>对系统进行优化</h3><p>要解决上述问题，分析清楚原因之后，对症下药即可。</p>
+<p>最核心的问题就是那个超时时间设置太长了，因此将超时时间改为 1 秒即可。这样的话，每秒 100 个请求过来，也就只有 200 个数组，占据 2G 内存，远远不会把堆内存塞满，然后 1 秒内这 100 个请求会全部超时，请求就处理结束了。下一秒再来 100 个请求又是新的一轮处理，不会每秒积压 100 个请求，4 秒积压 400 个请求同时处理了</p>
+<p>另外，对 Tomcat 的那个参数，max-http-header-size，可以适当调节地小一些就可以了，这样 Tomcat 工作线程自身为请求创建的数组，不会占据太大的内存空间的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/JVM/" rel="tag"># JVM</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/20/JVM-内存溢出的解决方案/" rel="next" title="JVM 内存溢出的解决方案">
+                <i class="fa fa-chevron-left"></i> JVM 内存溢出的解决方案
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/22/RocketMQ-实践经验/" rel="prev" title="RocketMQ 实践经验">
+                RocketMQ 实践经验 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">95</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简单说说-Tomcat-的底层原理"><span class="nav-number">1.</span> <span class="nav-text">简单说说 Tomcat 的底层原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#再回顾异常日志"><span class="nav-number">2.</span> <span class="nav-text">再回顾异常日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一个关键的-JVM-参数"><span class="nav-number">3.</span> <span class="nav-text">一个关键的 JVM 参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对内存快照进行分析"><span class="nav-number">4.</span> <span class="nav-text">对内存快照进行分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统每秒的-QPS"><span class="nav-number">5.</span> <span class="nav-text">系统每秒的 QPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么处理一个请求需要-4-秒钟"><span class="nav-number">6.</span> <span class="nav-text">为什么处理一个请求需要 4 秒钟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对系统进行优化"><span class="nav-number">7.</span> <span class="nav-text">对系统进行优化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
