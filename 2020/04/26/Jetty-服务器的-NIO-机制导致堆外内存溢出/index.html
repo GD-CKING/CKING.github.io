@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="JVM,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="背景引入这是一个使用 Jetty 作为 Web 服务器的时候在某个非常罕见的场景下发生的一次堆外内存溢出的场景。这种场景其实并不多见，只是给大家介绍一下这种场景的排查方法 案例发生有一天收到线上的一个报警：某台机器部署的一个服务突然之间就不可以访问了。此时第一反应就是登陆机器去看日志，这个时候在机器的日志中发现了如下的一些信息： 1234nio handle failed java.lang.Ou">
+<meta name="keywords" content="JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jetty 服务器的 NIO 机制导致堆外内存溢出">
+<meta property="og:url" content="https://github.com/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="背景引入这是一个使用 Jetty 作为 Web 服务器的时候在某个非常罕见的场景下发生的一次堆外内存溢出的场景。这种场景其实并不多见，只是给大家介绍一下这种场景的排查方法 案例发生有一天收到线上的一个报警：某台机器部署的一个服务突然之间就不可以访问了。此时第一反应就是登陆机器去看日志，这个时候在机器的日志中发现了如下的一些信息： 1234nio handle failed java.lang.Ou">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/Jetty.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/%E5%A0%86%E5%A4%96%E5%86%85%E5%AD%98.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/%E5%85%B3%E8%81%94%E5%A4%A7%E9%87%8F%E5%A0%86%E5%A4%96%E5%86%85%E5%AD%98.png">
+<meta property="og:updated_time" content="2020-04-26T09:15:02.459Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jetty 服务器的 NIO 机制导致堆外内存溢出">
+<meta name="twitter:description" content="背景引入这是一个使用 Jetty 作为 Web 服务器的时候在某个非常罕见的场景下发生的一次堆外内存溢出的场景。这种场景其实并不多见，只是给大家介绍一下这种场景的排查方法 案例发生有一天收到线上的一个报警：某台机器部署的一个服务突然之间就不可以访问了。此时第一反应就是登陆机器去看日志，这个时候在机器的日志中发现了如下的一些信息： 1234nio handle failed java.lang.Ou">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/Jetty.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/">
+
+
+
+
+
+  <title>Jetty 服务器的 NIO 机制导致堆外内存溢出 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Jetty 服务器的 NIO 机制导致堆外内存溢出</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-26T11:01:36+08:00">
+                2020-04-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景引入"><a href="#背景引入" class="headerlink" title="背景引入"></a>背景引入</h2><p>这是一个使用 Jetty 作为 Web 服务器的时候在某个非常罕见的场景下发生的一次堆外内存溢出的场景。这种场景其实并不多见，只是给大家介绍一下这种场景的排查方法</p>
+<h3 id="案例发生"><a href="#案例发生" class="headerlink" title="案例发生"></a>案例发生</h3><p>有一天收到线上的一个报警：某台机器部署的一个服务突然之间就不可以访问了。此时第一反应就是登陆机器去看日志，这个时候在机器的日志中发现了如下的一些信息：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nio handle failed java<span class="variable">.lang</span><span class="variable">.OutOfMemoryError</span>: Direct buffer memory</span><br><span class="line">at org<span class="variable">.eclipse</span><span class="variable">.jetty</span><span class="variable">.io</span><span class="variable">.nio</span><span class="variable">.xxx</span></span><br><span class="line">at org<span class="variable">.eclipse</span><span class="variable">.jetty</span><span class="variable">.io</span><span class="variable">.nio</span><span class="variable">.xxx</span></span><br><span class="line">at org<span class="variable">.eclipse</span><span class="variable">.jetty</span><span class="variable">.io</span><span class="variable">.nio</span><span class="variable">.xxx</span></span><br></pre></td></tr></table></figure>
+
+<p>过多的日志信息给省略掉了，因为都是非常杂乱的一些信息，也没太大意义。上述日志中，最主要的就是告诉我们有 OOM 异常，而且还是 <code>Direct buffer memory</code> 这一块内存导致的</p>
+<p>到目前为止，仅仅看到这些日志，我们基本就可以分析出这次 OOM 发生的原因了</p>
+<h2 id="案例分析"><a href="#案例分析" class="headerlink" title="案例分析"></a>案例分析</h2><p>先给大家解释一个东西： Direct buffer memory。这个东西其实就是堆外内存。它是 JVM 堆内存之外的一块内存空间，这块内存空间不是 JVM 管理的，但是你的 Java 代码确实是可以在 JVM 堆之外使用一些内存空间的。</p>
+<p>另外再解释一下 <code>Jetty</code>。这个你大致可以理解为跟 Tomcat 一样的东西，就是 Web 容器。Jetty 本身也是 Java 写的，如果我们写好了一个系统，可以打包放入 Jetty，启动 Jetty 即可。Jetty 启动之后，本身就是一个 JVM 进程，它会监听一个端口号，比如说 9090</p>
+<p>然后你就向 Jetty 监听的 9090 端口发送请求，Jetty 会把请求转交给你用的 Spring MVC 之类的框架，Spring MVC 之类的框架再去调用写好的 Controller 之类的代码。如图，我们简单看下 Jetty 作为一个 JVM 进程运行我们写好的系统的一个流程：</p>
+<p><img src="/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/Jetty.png" alt="Jetty"></p>
+<p>首先可以明确一点，这次 OOM 是 Jetty 这个 Web 服务器在使用堆外内存的时候导致的，即，基本可以推测出，Jetty 服务器可能在不停地使用堆外内存，然后堆外内存空间不足了，此时就会抛出内存溢出的异常。</p>
+<p>至于为什么 Jetty 要不停地使用堆外内存，就暂时别管那么多，那涉及到 Jetty 作为一个 Web 服务器的底层源码细节。我们只要知道它会不停地去使用堆外内存，然后用着堆外内存不够了，就内存溢出了。</p>
+<h3 id="堆外内存是如何申请和释放的"><a href="#堆外内存是如何申请和释放的" class="headerlink" title="堆外内存是如何申请和释放的"></a>堆外内存是如何申请和释放的</h3><p>堆外内存是如何申请和释放的？简单说，如果在 Java 代码里要申请使用一块堆外内存空间，是使用 <code>DirectByteBuffer</code> 这个类，你可以通过这个类构建一个 DirectByteBuffer 对象，这个对象本身是在 JVM 堆内存里的。但是你在构建这个对象的同时，就会在堆外内存中划出来一块内存空间跟这个对象关联起来。因此在分配堆外内存的时候大致就是这个思路。</p>
+<p>那堆外内存是如何释放的？当你的 <code>DirectByteBuffer</code> 对象没人引用了，成了垃圾对象之后，自然会在某一次 young gc 或者是 full gc 的时候把 DirectByteBuffer 对象回收掉。只要回收掉一个 DirectByteBuffer 对象，就会自然释放掉它关联的那块堆外内存。</p>
+<p><img src="/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/%E5%A0%86%E5%A4%96%E5%86%85%E5%AD%98.png" alt="堆外内存"></p>
+<h3 id="为什么会出现堆外内存溢出"><a href="#为什么会出现堆外内存溢出" class="headerlink" title="为什么会出现堆外内存溢出"></a>为什么会出现堆外内存溢出</h3><p>那一般什么情况下回出现堆外内存溢出？如果你创建了很多的 DirectByteBuffer 对象，占用了大量的堆外内存，然后这些 DirectByteBuffer 对象还没有 GC 线程来回收，那么就不会释放堆外内存。久而久之，当堆外内存都被大量的 DirectByteBuffer 对象关联使用了，如果你再要使用更多的堆外内存，那么就会报内存溢出了</p>
+<p>那什么情况下回出现大量的 DirectByteBuffer 对象一直存活着，导致大量的堆外内存无法释放呢？一种可能是系统承载了超高并发，压力很高，瞬时大量请求过来，创建了过多的 DirectByteBuffer 占用了大量的堆外内存，此时再继续想要使用堆外内存，就会内存溢出了。</p>
+<p>但今天的这个案例不是这种情况，因为这个系统的负载其实没有想象中那么高，不会有瞬时大量的请求过来。</p>
+<h3 id="堆外内存溢出原因分析"><a href="#堆外内存溢出原因分析" class="headerlink" title="堆外内存溢出原因分析"></a>堆外内存溢出原因分析</h3><p>这个时候你的思路就要活跃起来了，我们可以去用 <code>jstat</code> 等工具观察一下线上系统的实际运行情况，同时根据日志看看一些请求的处理耗时，综合性地分析一下。当时我们通过 <code>jstat</code> 工具分析 JVM 运行情况，同时分析了过往的 gc 日志，还看了一下系统各个接口的调用耗时之后，分析出了如下思路。</p>
+<p>首先看了一下接口的调用耗时，这个系统并发量不高，但是它每个请求处理较为耗时，平均在每个请求需要一秒多的时间去处理</p>
+<p>然后我们通过 <code>jstat</code> 发现，随着系统不停地被调用会一直创建各种对象，包括 Jetty 本身会不停地创建 DirectByteBuffer 对象去申请堆外内存空间，接着直到年轻代的 Eden 区满了，就会触发 young gc。但是往往在进行垃圾回收的一瞬间，可能有的请求还没处理完毕，此时就会有不少 DirectByteBuffer 对象处于存活状态，不能被回收掉，当然之前不少 DirectByteBuffer 对象对应的请求可能处理完毕了，他们就可以被回收了。</p>
+<p>此时肯定会有一些 DirectByteBuffer 对象以及一些其他的对象是处于存活状态的，那么就需要转入 Survivor 区域中。此时要注意一点，这个系统当时在上线的时候，内存分配地极为不合理。在当时而言，大概就给了年轻代一两百 MB 的空间，老年代反而给了七八百 MB 的空间，进而导致年轻代中的 Survivor 区域只有 10MB 左右的空间。</p>
+<p>因此往往在 young gc 过后，一些存活下来的对象（包括了一些 DirectByteBuffer 在内）会超过 10MB，没法放入 Survivor 中，就会直接进入老年代。因此上述的过程就这么反复执行，会慢慢的导致一些 DirectByteBuffer 对象慢慢地进入老年代中，老年代中的 DirectByteBuffer 对象会越来越多，而且这些 DirectByteBuffer 都是关联了很多堆外内存的。如图：</p>
+<p><img src="/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/%E5%85%B3%E8%81%94%E5%A4%A7%E9%87%8F%E5%A0%86%E5%A4%96%E5%86%85%E5%AD%98.png" alt="关联大量堆外内存"></p>
+<p>这些老年代里的 DirectByteBuffer 其实很多都是可以回收的状态了，但是因为老年代一直没塞满，所以没触发 full gc，也就自然不会回收老年代里的这些 DirectByteBuffer 了，所以老年代里这些没有被回收的 DirectByteBuffer 就一直关联占据了大量的堆外内存空间了</p>
+<p>直到最后，当你要继续使用堆外内存的时候，结果所有的堆外内存都被老年代里大量的 DirectByteBuffer 给占用了，虽然他们可以被回收，但是无奈因为始终没有触发老年代的 full gc，所以堆外内存也始终无法被回收掉。最终就会导致内存溢出问题的发生。</p>
+<h3 id="Java-NIO-如何解决这个问题"><a href="#Java-NIO-如何解决这个问题" class="headerlink" title="Java NIO 如何解决这个问题"></a>Java NIO 如何解决这个问题</h3><p>难道 Java NIO 就没考虑过会有上述问题的产生吗？当时不是，Java NIO 是考虑到的。它知道可能很多 DirectByteBuffer 对象也许没人用了，但是因为没有触发 gc 就导致它们一直占据着堆外内存。</p>
+<p>所以在 Java NIO 的源码中会做如下处理，它每次分配新的堆外内存的时候，都会调用 <code>System.gc()</code> 去提醒 JVM 去主动执行一下 gc 去回收掉一些没人引用的 DirectBYteBuffer 对象，释放堆外内存。只要能触发垃圾回收去回收掉一些没人引用的 DirectByteBuffer，就会释放一些堆外内存，自然就可以分配更多的对象到堆外内存去了。</p>
+<p>但是我们又在 JVM 中设置了如下参数：<code>-XX:+DisabledExplicitGC</code>，导致这个 System.gc() 是不生效的，因此就会导致上述的情况。</p>
+<h3 id="问题的优化"><a href="#问题的优化" class="headerlink" title="问题的优化"></a>问题的优化</h3><p>其实项目问题有两个，一个是内存设置不合理，导致 DirectByteBuffer 对象一直慢慢进入老年代，导致堆外内存一直释放不掉。另一个是设置了 <code>-XX:+DisableExplicitGC</code> 导致 Java NIO 没法主动提醒去回收掉一些垃圾 DirectByteBuffer 对象，同样最终导致堆外内存无法释放。</p>
+<p>因此最终对这个项目做得事情就是：</p>
+<ul>
+<li><p>合理分配内存，给年轻代更多内存，让 Survivor 区域有更大的空间</p>
+</li>
+<li><p>放开 <code>-XX:+DisableExplicitGC</code> 这个限制，让 System.gc() 生效</p>
+</li>
+</ul>
+<p>做完优化之后，DirectByteBuffer 一般就不会不断进入老年代了。只要它停留在年轻代，随着 young gc 就会正常回收释放堆外内存了。另外，放开了 <code>-XX:+DisableExplicitGC</code> 的限制，Java NIO 发现堆外内存不足了，自然会通过 System.gc() 提醒 JVM 去主动垃圾回收，可以回收掉一些 DirectByteBuffer 释放一些堆外内存。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/JVM/" rel="tag"># JVM</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/04/24/RocketMQ-的一些特殊场景解决方案/" rel="next" title="RocketMQ 的一些特殊场景解决方案">
+                <i class="fa fa-chevron-left"></i> RocketMQ 的一些特殊场景解决方案
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/05/04/回溯算法/" rel="prev" title="回溯算法">
+                回溯算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">98</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景引入"><span class="nav-number">1.</span> <span class="nav-text">背景引入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#案例发生"><span class="nav-number">1.1.</span> <span class="nav-text">案例发生</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例分析"><span class="nav-number">2.</span> <span class="nav-text">案例分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#堆外内存是如何申请和释放的"><span class="nav-number">2.1.</span> <span class="nav-text">堆外内存是如何申请和释放的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么会出现堆外内存溢出"><span class="nav-number">2.2.</span> <span class="nav-text">为什么会出现堆外内存溢出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#堆外内存溢出原因分析"><span class="nav-number">2.3.</span> <span class="nav-text">堆外内存溢出原因分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-NIO-如何解决这个问题"><span class="nav-number">2.4.</span> <span class="nav-text">Java NIO 如何解决这个问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题的优化"><span class="nav-number">2.5.</span> <span class="nav-text">问题的优化</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
