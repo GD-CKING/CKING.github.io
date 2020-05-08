@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="分布式,ZooKeeper,">
+  <meta name="keywords" content="MySQL,">
 
 
 
@@ -79,30 +79,21 @@
 
 
 
-<meta name="description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
-<meta name="keywords" content="分布式,ZooKeeper">
+<meta name="description" content="引入数据页当我们要执行 update 之类的 SQL 语句的时候，必然涉及到对数据的更新操作。那么此时对数据是在哪里更新的？此时并不是直接去更新磁盘文件，而是要把磁盘上的一些数据加载到内存里来，然后对内存里的数据进行更新，同时写 redo log 到磁盘上去。如图：  这里就有一个问题，难道我们每次都是把磁盘里的一条数据加载到内存里去进行更新，然后下次要更新别的数据的时候，再从磁盘里加载另外一条数">
+<meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ZooKeeper分布式锁的实现原理">
-<meta property="og:url" content="https://github.com/2019/08/19/ZooKeeper分布式锁的实现原理/index.html">
+<meta property="og:title" content="写入数据库的一行数据在磁盘上是怎么存储的">
+<meta property="og:url" content="https://github.com/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/index.html">
 <meta property="og:site_name" content="Ckin&#39;s Blog">
-<meta property="og:description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
+<meta property="og:description" content="引入数据页当我们要执行 update 之类的 SQL 语句的时候，必然涉及到对数据的更新操作。那么此时对数据是在哪里更新的？此时并不是直接去更新磁盘文件，而是要把磁盘上的一些数据加载到内存里来，然后对内存里的数据进行更新，同时写 redo log 到磁盘上去。如图：  这里就有一个问题，难道我们每次都是把磁盘里的一条数据加载到内存里去进行更新，然后下次要更新别的数据的时候，再从磁盘里加载另外一条数">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF2.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%88.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF3.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%882.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B2.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B3.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%883.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B4.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E4%BB%A3%E7%A0%81.png">
-<meta property="og:updated_time" content="2019-09-04T15:15:43.923Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E7%BC%93%E5%86%B2%E6%B1%A0.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E5%88%B7%E6%95%B0%E6%8D%AE.png">
+<meta property="og:updated_time" content="2020-05-08T03:26:14.593Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ZooKeeper分布式锁的实现原理">
-<meta name="twitter:description" content="ZooKeeper分布式锁机制​        本文将基于常用的ZooKeeper分布锁实现框架–Curator，说一下这个框架对ZooKeeper分布式锁的实现。 ​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：  ​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png">
+<meta name="twitter:title" content="写入数据库的一行数据在磁盘上是怎么存储的">
+<meta name="twitter:description" content="引入数据页当我们要执行 update 之类的 SQL 语句的时候，必然涉及到对数据的更新操作。那么此时对数据是在哪里更新的？此时并不是直接去更新磁盘文件，而是要把磁盘上的一些数据加载到内存里来，然后对内存里的数据进行更新，同时写 redo log 到磁盘上去。如图：  这里就有一个问题，难道我们每次都是把磁盘里的一条数据加载到内存里去进行更新，然后下次要更新别的数据的时候，再从磁盘里加载另外一条数">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E7%BC%93%E5%86%B2%E6%B1%A0.png">
 
 
 
@@ -132,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/2019/08/19/ZooKeeper分布式锁的实现原理/">
+  <link rel="canonical" href="https://github.com/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/">
 
 
 
 
 
-  <title>ZooKeeper分布式锁的实现原理 | Ckin's Blog</title>
+  <title>写入数据库的一行数据在磁盘上是怎么存储的 | Ckin's Blog</title>
   
 
 
@@ -287,7 +278,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -304,7 +295,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">ZooKeeper分布式锁的实现原理</h1>
+          <h1 class="post-title" itemprop="name headline">写入数据库的一行数据在磁盘上是怎么存储的</h1>
         
 
         <div class="post-meta">
@@ -316,8 +307,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-19T17:36:54+08:00">
-                2019-08-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-07T15:45:56+08:00">
+                2020-05-07
               </time>
             
 
@@ -339,19 +330,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/ZooKeeper/" itemprop="url" rel="index">
-                    <span itemprop="name">ZooKeeper</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -392,39 +372,52 @@
       
 
       
-        <h2 id="ZooKeeper分布式锁机制"><a href="#ZooKeeper分布式锁机制" class="headerlink" title="ZooKeeper分布式锁机制"></a>ZooKeeper分布式锁机制</h2><p>​        本文将基于常用的ZooKeeper分布锁实现框架–<strong>Curator</strong>，说一下这个框架对ZooKeeper分布式锁的实现。</p>
-<p>​        首先模拟一下两个客户端一起争抢ZK上的一把分布式锁的场景：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF.png" alt="场景"></p>
-<p>​        ZK里有一把锁，这个锁就是ZK上的一个节点。然后两个客户端都要来获取这个锁。假设客户端A抢先一步，对ZK发起了加分布式锁的请求，这个加锁请求是用到了ZK的“<strong>临时顺序节点</strong>”。简答来说就是直接在“my_lock”这个锁节点下，创建一个顺序节点，这个节点有ZK内部自行维护的一个节点序号。</p>
-<p>​        例如第一个客户端来搞一个顺序节点，ZK内部会起个名字叫xxx-00001。然后第二个客户端搞一个顺序节点，ZK可能会起个名字叫xxx-00002。规律就是<strong>最后一个数字都是依次递增的</strong>，从1开始递增，ZK会维护这个顺序。</p>
-<p>​        所以这个时候，假如客户端A先发起请求，就会搞出一个顺序节点，如图所示：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF2.png" alt="场景2"></p>
-<p>​        客户端A发起一个加锁请求，先会在你要加锁的node下搞一个临时顺序节点，节点名字由Curator框架自己生成出来，但最后一个数字是“1”，因为客户端是第一个发起请求的。</p>
-<p>​        客户端A常见完一个节点后，它会查一下“my_lock”这个锁节点下的所有子节点，并且这些子节点都是按照序号排序的，这个时候他大概会拿到一个集合：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%88.png" alt="集合"></p>
-<p>​        接着客户端A会走一个关键性的判断：我创建的那个顺序节点，是不是排在第一个？如果是的话，那我就可以加锁了。因为我是第一个创建顺序节点的人，所以我是第一个尝试加分布式锁的人。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B.png" alt="流程"></p>
-<p>​        客户端A加完锁了，客户端B过来想要加锁，这时它会先在“my_lock”这个锁节点下创建一个临时顺序节点，此时名字大概会是“xxx-00002”</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E5%9C%BA%E6%99%AF3.png" alt="场景3"></p>
-<p>​    客户端B因为是第二个来创建顺序节点的，所以ZK内部会维护序号为“2”。接着客户端B会走加锁判断逻辑，查询“my_lock”锁节点下的所有子节点，按照顺序排列，类似于：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%882.png" alt="集合2"></p>
-<p>​    同时检查自己创建的顺序节点，是不是集合中的第一个？如果不是，那就<strong>加锁失败</strong>。失败之后，客户端B就会通过ZK的API对他的顺序节点的<strong>上一个顺序节点加一个监听器</strong></p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B2.png" alt="流程2"></p>
-<p>​    接着，客户端A加锁之后，逻辑处理完后就会释放锁，释放锁实际就是把ZK里创建的顺序节点“xxx-00001”给删除掉。删除了节点之后，ZK会负责通知监听这个节点的监听器，也就是客户端B的监听器说锁释放了。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B3.png" alt="流程3"></p>
-<p>​    此时客户端B的监听器感知到了上一个顺序节点被删除，也就是排在他之前的某个客户单释放了锁，此时客户端B重新尝试去获取锁，也就是获取“my_lock”节点下的子节点集合：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E9%9B%86%E5%90%883.png" alt="集合3"></p>
-<p>​    然后客户端B判断自己是否是集合中的第一个顺序节点，如果是，直接完成加锁，运行完业务代码后，再次释放锁。</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E6%B5%81%E7%A8%8B4.png" alt="流程4"></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    总结一下多个客户端争抢一个ZK分布式锁的原理：</p>
-<ul>
-<li>客户端上来直接创建一个锁节点下的一个接一个的临时顺序节点</li>
-<li>如果自己不是第一个节点，就对自己上一个节点加监听器</li>
-<li>只要上一个节点释放锁，自己就排到前面去，相当于一个排队机制。</li>
-</ul>
-<p>​    而且用临时加节点的另一个好处就是，如果某个客户端创建临时顺序节点之后，自己宕机了也没关系，ZK感知到那个客户端宕机，会自动删除对应的临时顺序节点，相当于自动释放锁。</p>
-<p>​    最后看一下用Curator框架进行加锁和释放锁的一个过程：</p>
-<p><img src="/CKING.github.io/2019/08/19/ZooKeeper分布式锁的实现原理/%E4%BB%A3%E7%A0%81.png" alt="代码"></p>
+        <h2 id="引入数据页"><a href="#引入数据页" class="headerlink" title="引入数据页"></a>引入数据页</h2><p>当我们要执行 update 之类的 SQL 语句的时候，必然涉及到对数据的更新操作。那么此时对数据是在哪里更新的？此时并不是直接去更新磁盘文件，而是要把磁盘上的一些数据加载到内存里来，然后对内存里的数据进行更新，同时写 redo log 到磁盘上去。如图：</p>
+<p><img src="/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E7%BC%93%E5%86%B2%E6%B1%A0.png" alt="缓冲池"></p>
+<p>这里就有一个问题，难道我们每次都是把磁盘里的一条数据加载到内存里去进行更新，然后下次要更新别的数据的时候，再从磁盘里加载另外一条数据到内存里去？</p>
+<p>这样效率明显是很差的。所以 InnoDB 存储引擎在这里引入了一个「<strong>数据页</strong>」的概念，也就是把数据组织成一页一页的概念，每一页有 <code>16kb</code>，然后每次加载磁盘的数据到内存里的时候，是至少加载一页数据进去，甚至是多页数据进去。</p>
+<p>假设我们有一次要更新一条 id = 1 的数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update xxx set xxx = xxx where id = 1</span><br></pre></td></tr></table></figure>
+
+<p>那么此时它会把 id = 1 这条数据所在的一页数据都加载到内存里去，这一页数据里，可能还包含了 id = 2，id = 3 等其他数据。然后我们更新完 id = 1 的数据之后，接着更新 id = 2 的数据，那么此时就不用再次读取磁盘里的数据了，因为 id = 2 本身就跟 id = 1 在一页里，之前这一页数据就加载到内存里了，直接更新内存里的数据页中的 id = 2 这条数据即可。</p>
+<p>这就是数据页的意义，磁盘和内存之间的数据交换通过数据页来执行，包括内存里更新后的脏数据。刷回磁盘的时候，也是至少一个数据页刷回去。</p>
+<p><img src="/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E5%88%B7%E6%95%B0%E6%8D%AE.png" alt="刷数据"></p>
+<h2 id="MySQL-物理数据存储格式"><a href="#MySQL-物理数据存储格式" class="headerlink" title="MySQL 物理数据存储格式"></a>MySQL 物理数据存储格式</h2><p>对数据页中的每一行数据，它在磁盘上是怎么存储的？其实这里涉及到一个概念，就是行格式。我们可以对一个表指定它的行存储格式是怎么样的，比如我们这里用 <strong>COMPACT</strong> 格式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">CREATE TABLE <span class="title">table_name</span> <span class="params">(columns)</span> ROW_FORMAT </span>= COMPACT</span><br><span class="line">ALTER TABLE table_name ROW_FORMAT = COMPACT</span><br></pre></td></tr></table></figure>
+
+<p>你可以在建表的时候，就指定一个行存储的格式，也可以后续修改行存储的格式。这里指定了一个 <code>COMPACT</code> 行存储格式，在这种格式下，每一行数据它实际存储的时候，大概格式类似下面：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">变长字段的长度列表, null 值列表, 数据头, column01 的值, column02 的值, column0n 的值...</span><br></pre></td></tr></table></figure>
+
+<p>对于每一行数据，它其实存储的时候都会有一些头字段对这行数据进行一定的描述，然后再放上它这一行数据每一列的具体的值，这就是所谓的行格式。除了 COMPACT 以为，还有其他几种行存储格式，基本都大同小异。</p>
+<h3 id="变长字段在磁盘中的存储"><a href="#变长字段在磁盘中的存储" class="headerlink" title="变长字段在磁盘中的存储"></a>变长字段在磁盘中的存储</h3><p>在 MySQL 里有一些字段的长度是变长的，是不固定的，比如 <code>VARCHAR(10)</code> 之类的这种类型的字段，实际上它里面存放的字符串的长度是不固定的，有可能是 <code>hello</code> 这么一个字符串，也可能是 <code>a</code> 这么一个字符串。</p>
+<p>假设现在有一行数据，它的几个字段的类型为 VARCHAR(10)，CHAR(1)，CHAR(1)。那么它第一个字段是 VARCHAR(10)，这个长度是可能变化的，所以这一行数据可能就是类似于：hello a a。即第一个字段的值是 hello，后面两个字段的值都是一个字符，就是一个 a</p>
+<p>然后另外一行数据，同样也是这几个字段，它的第一个字段的值可能是 「hi」，后面两个字段也是「a」，所以这一行数据可能是类似于：hi a a。一共三个字段，第一个字段的长度是不固定的，后面两个字段的长度都是固定的 1 个字符</p>
+<p>假设你把上述两条数据写入了一个磁盘文件里，两行数据是挨在一起的，那么这个时候在一个磁盘文件里可能有下面的两行数据：</p>
+<p>hello a a hi a a</p>
+<p>其实，平时你看到的表里的很多行数据，最终落地到磁盘里的时候，都是上面那种样子的，一大坨数据放在一个磁盘文件里都挨着存储的。</p>
+<h4 id="存储在磁盘文件里的变长字段为什么难以读取"><a href="#存储在磁盘文件里的变长字段为什么难以读取" class="headerlink" title="存储在磁盘文件里的变长字段为什么难以读取"></a>存储在磁盘文件里的变长字段为什么难以读取</h4><p>现在我们要读取上面的磁盘文件的数据，要读取出来 <code>hello a a</code> 这一行数据，这个过程要更困难一些。第一个问题就是，从这个磁盘文件里读取的时候，到底哪些内容是一行数据？因为这个表里的第一个字段是 VARCHAR(10) 类型的，第一个字段的长度是多少我们是不知道的</p>
+<p>所以有可能你读取出来「hello a a hi」是一行数据，也可能读取出来「hello a」是一行数据。你在不知道一行数据的每个子弹到底是多少长度的情况下，胡乱读取时不现实的，根本不知道磁盘文件里混成一坨的数据里，哪些数据是你要读取的一行？</p>
+<h4 id="引入变长字段的长度列表"><a href="#引入变长字段的长度列表" class="headerlink" title="引入变长字段的长度列表"></a>引入变长字段的长度列表</h4><p>所以说才要在存储每一行数据的时候，都保存一下它的变长字段的长度列表，这样才能解决一行数据的读取问题。即，你在存储「hello a a」这行数据的时候，要带上一些额外的附加信息，比如第一块就是它里面的变长字段的长度列表。</p>
+<p>也就是说，这个 hello 是 VARCHAR(10) 类型的变长字段的额值，那么这个 hello 字段值的长度是多少？我们看到 「hello」的长度是 5，十六进制就是 <code>0x05</code>，所以此时会在 <code>hello a a</code> 前面补充一些额外信息，首先就是变长字段的长度列表，你会看到这样数据在磁盘里存储的时候，其实是类似如下的格式：<code>0x05 null 值列表 数据头 hello a a</code></p>
+<p>这个时候你有两行数据，还有一行数据可能就是：<code>0x02 null 值列表 数据头 hi a a</code>，两行数据放在一起存储在磁盘文件里，看起来是如下所示的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x05 null 值列表 数据头 hello a a 0x02 null 值列表 hi a a</span><br></pre></td></tr></table></figure>
+
+<h4 id="如何读取变长字段"><a href="#如何读取变长字段" class="headerlink" title="如何读取变长字段"></a>如何读取变长字段</h4><p>假设你要读取「hello a a」这行数据，你首先会知道这个表里的三个字段的类型是 VARCHAR(10) CHAR(1) CHAR(1)，那么此时你先要读取第一个字段的值，那么第一个字段是变长的，它的实际长度是多少？</p>
+<p>此时你会发现第一行数据的开头有一个变长字段的长度列表，里面会读取到一个 <code>0x05</code> 这个十六进制的数字，发现第一个变长字段的长度是 5，于是按照长度为 5， 读取出来第一个字段的值，就是 hello。接着你知道后续两个字段都是 CHAR(1)，长度都是固定的 1 个字符，于是此时就以此按照长度为 1 读取出来后续两个字段的值，分别是 a a，于是最终你会读取出 <code>hello a a</code> 这一行数据</p>
+<p>假设你要读取第二行数据，你先看一下第二行数据后的变长字段的长度列表，发现它第一个变长字段的长度是 <code>0x02</code>，于是就读取长度为 2 的字段值，就是 hi，再读取两个长度固定为 1 的字符值，都是 a，此时读取出来 <code>hi a a</code> 这行数据</p>
+<h4 id="多个变长字段，如何存放他们的长度"><a href="#多个变长字段，如何存放他们的长度" class="headerlink" title="多个变长字段，如何存放他们的长度"></a>多个变长字段，如何存放他们的长度</h4><p>如果说有多个变长字段，如何存放它们的长度？比如一行数据有 VARCHAR(10) VARCHAR(5) VARCHAR(20) CHAR(1) CHAR(1) 一共 5 个字段，其中三个是变长字段，此时假设一行数据是这样的：hello hi hao a a</p>
+<p>此时在磁盘中存储的，必须在它开头的变长字段长度列表中存储几个变长字段的长度，一定要注意，<strong>它这里是逆序存储的</strong>。</p>
+<p>也就是说先存放 VARCHAR(20) 这个字段的长度，然后存放 VARCHAR(5) 这个字段的长度，最后存放 VARCHAR(10) 这个字段的长度。现在「hello hi hao」三个字段的长度分别是 0x05 0x02 0x03，但是实际存放在变长字段长度列表的时候，是逆序放的，所以一行数据实际存储可能是下面这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x03 0x02 0x05 null 值列表 头字段 hello hi hao a a</span><br></pre></td></tr></table></figure>
+
+<h3 id="NULL-字段值在磁盘上的存储"><a href="#NULL-字段值在磁盘上的存储" class="headerlink" title="NULL 字段值在磁盘上的存储"></a>NULL 字段值在磁盘上的存储</h3><p>所谓的 NULL 值列表，顾名思义，说的就是你一行数据里可能有的字段是 NULL，比如你有一个 name 字段，它是允许为 NULL 的，那么实际上在存储的时候，如果你没给它赋值，它这个字段的值就是 NULL。</p>
+<p>假设这个字段的 NULL 值我们在磁盘上存储的时候，就是按照 “NULL” 这么个字符串来存储，是不是很浪费空间？本来它就是个 NULL，说明什么值都没有，你还给它存个 “NULL” 字符串，这是何必呢？所以实际在磁盘上存储数据的时候，一行数据里的 NULL 值是肯定不会直接按照字符串的方式存放在磁盘上浪费空间的。</p>
+<h4 id="NULL-值是以二进制-bit-位来存储的"><a href="#NULL-值是以二进制-bit-位来存储的" class="headerlink" title="NULL 值是以二进制 bit 位来存储的"></a>NULL 值是以二进制 bit 位来存储的</h4><p>那 NULL 值列表在磁盘上如何存储呢？其实，对所有的 NULL 值，不通过字符串在磁盘上存储，而是通过二进制的 bit 位来存储，一行数据里假设有多个字段的值都是 NULL，那么这多个字段的 NULL，就会以 bit 位的形式来存放在 NULL 值列表中。</p>
+<p>举个例子，先看下面的建表语句：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">CREATE TABLE <span class="title">customer</span> <span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">	name VARCHAR(<span class="number">10</span>)</span> NOT NULL,</span></span><br><span class="line"><span class="function">	address <span class="title">VARCHAR</span><span class="params">(<span class="number">20</span>)</span>,</span></span><br><span class="line"><span class="function">	gender <span class="title">CHAR</span><span class="params">(<span class="number">1</span>)</span>,</span></span><br><span class="line"><span class="function">	job <span class="title">VARCHAR</span><span class="params">(<span class="number">30</span>)</span>,</span></span><br><span class="line"><span class="function">	school <span class="title">VARCHAR</span><span class="params">(<span class="number">50</span>)</span></span></span><br><span class="line"><span class="function">)ROW_FORMAT </span>= COMPACT;</span><br></pre></td></tr></table></figure>
+
+<p>上面一个客户表，里面有 5 个字段，分别为 name、address、gender、job、school，代表了客户的姓名、地址、性别、工作以及学校。其中有 4 个变长字段，还有一个定长字段，然后第一个 name 字段是声明了 NOT NULL 的，就是不能为 NULL，其它 4 个字段都可能是 NULL 的</p>
+<p>假设这个表里有这么一行数据：<code>jack NULL m NULL xx_school</code>，它的 5 个字段里有两个字段都是 NULL。我们看看它在磁盘上是怎么存储的。</p>
 
       
     </div>
@@ -442,9 +435,7 @@
       
         <div class="post-tags">
           
-            <a href="/CKING.github.io/tags/分布式/" rel="tag"># 分布式</a>
-          
-            <a href="/CKING.github.io/tags/ZooKeeper/" rel="tag"># ZooKeeper</a>
+            <a href="/CKING.github.io/tags/MySQL/" rel="tag"># MySQL</a>
           
         </div>
       
@@ -472,8 +463,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/CKING.github.io/2019/08/19/简单了解ZooKeeper/" rel="next" title="简单了解ZooKeeper">
-                <i class="fa fa-chevron-left"></i> 简单了解ZooKeeper
+              <a href="/CKING.github.io/2020/05/06/MySQL-之存储过程与存储函数/" rel="next" title="MySQL 之存储过程与存储函数">
+                <i class="fa fa-chevron-left"></i> MySQL 之存储过程与存储函数
               </a>
             
           </div>
@@ -481,10 +472,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/CKING.github.io/2019/08/20/Redis分布式锁的实现原理/" rel="prev" title="Redis分布式锁的实现原理">
-                Redis分布式锁的实现原理 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -621,7 +608,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ZooKeeper分布式锁机制"><span class="nav-number">1.</span> <span class="nav-text">ZooKeeper分布式锁机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引入数据页"><span class="nav-number">1.</span> <span class="nav-text">引入数据页</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-物理数据存储格式"><span class="nav-number">2.</span> <span class="nav-text">MySQL 物理数据存储格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#变长字段在磁盘中的存储"><span class="nav-number">2.1.</span> <span class="nav-text">变长字段在磁盘中的存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#存储在磁盘文件里的变长字段为什么难以读取"><span class="nav-number">2.1.1.</span> <span class="nav-text">存储在磁盘文件里的变长字段为什么难以读取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引入变长字段的长度列表"><span class="nav-number">2.1.2.</span> <span class="nav-text">引入变长字段的长度列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何读取变长字段"><span class="nav-number">2.1.3.</span> <span class="nav-text">如何读取变长字段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多个变长字段，如何存放他们的长度"><span class="nav-number">2.1.4.</span> <span class="nav-text">多个变长字段，如何存放他们的长度</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NULL-字段值在磁盘上的存储"><span class="nav-number">2.2.</span> <span class="nav-text">NULL 字段值在磁盘上的存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NULL-值是以二进制-bit-位来存储的"><span class="nav-number">2.2.1.</span> <span class="nav-text">NULL 值是以二进制 bit 位来存储的</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
