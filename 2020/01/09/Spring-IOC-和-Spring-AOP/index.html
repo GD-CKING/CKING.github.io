@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="Spring IOC在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把情趣转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码： 123456789101112131415public class MyServlet &amp;#123;">
+<meta name="description" content="Spring IOC在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把请求转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码： 123456789101112131415public class MyServlet &amp;#123;">
 <meta name="keywords" content="Spring">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring IOC 和 Spring AOP">
 <meta property="og:url" content="https://github.com/2020/01/09/Spring-IOC-和-Spring-AOP/index.html">
 <meta property="og:site_name" content="Ckin&#39;s Blog">
-<meta property="og:description" content="Spring IOC在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把情趣转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码： 123456789101112131415public class MyServlet &amp;#123;">
+<meta property="og:description" content="Spring IOC在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把请求转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码： 123456789101112131415public class MyServlet &amp;#123;">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/09/Spring-IOC-和-Spring-AOP/springIoc.png">
-<meta property="og:updated_time" content="2020-01-26T13:09:41.846Z">
+<meta property="og:updated_time" content="2020-05-13T08:02:51.622Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring IOC 和 Spring AOP">
-<meta name="twitter:description" content="Spring IOC在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把情趣转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码： 123456789101112131415public class MyServlet &amp;#123;">
+<meta name="twitter:description" content="Spring IOC在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把请求转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码： 123456789101112131415public class MyServlet &amp;#123;">
 <meta name="twitter:image" content="https://github.com/CKING.github.io/2020/01/09/Spring-IOC-和-Spring-AOP/springIoc.png">
 
 
@@ -371,7 +371,7 @@
       
 
       
-        <h2 id="Spring-IOC"><a href="#Spring-IOC" class="headerlink" title="Spring IOC"></a>Spring IOC</h2><p>在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把情趣转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码：</p>
+        <h2 id="Spring-IOC"><a href="#Spring-IOC" class="headerlink" title="Spring IOC"></a>Spring IOC</h2><p>在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把请求转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyServlet</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> MyService myService = <span class="keyword">new</span> MyServiceImpl();</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doPost</span><span class="params">(HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 对请求一通处理</span></span><br><span class="line">		<span class="comment">// 调用自己的业务逻辑组件</span></span><br><span class="line">		myService.doService(request);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyService</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyServiceImpl</span> <span class="keyword">implements</span> <span class="title">MyService</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NewServiceManagerImpl</span> <span class="keyword">implements</span> <span class="title">MyService</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
 
 <p>例如我们的一个 Tomcat + servlet 的这样的一个系统里，有几十个地方，都是直接用 <code>MyService myService = new MyServiceImpl()</code> 直接创建，引用和依赖了一个 MyServiceImpl 这样的一个类的对象。那么在这个系统里，就有几十个地方都跟 MyServiceImpl 类直接耦合在一起了。</p>
@@ -550,7 +550,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">101</span>
+                  <span class="site-state-item-count">102</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
