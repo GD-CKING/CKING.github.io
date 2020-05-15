@@ -7,7 +7,7 @@ categories: Spring
 
 ## Spring IOC
 
-在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把情趣转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码：
+在没有 Spring 之前，我们开发 Web 系统基本是使用 Servlet + Tomcat。就是 Tomcat 启动之后，它可以监听一个端口号的 http 请求，然后可以把请求转交给你的 servlet，jsp 配合起来使用，由 servlet 处理请求。大概像下面的代码：
 
 ```java
 public class MyServlet {
