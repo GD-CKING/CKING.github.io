@@ -21,25 +21,25 @@ redo log buffer 也是类似的，它是申请出来的一片连续内存，然�
 
 所以到这里就清楚了，上面我们说过，redo log 都是先写入内存里的 redo log block 数据结构里去的，然后完事了才会把 redo log block 写入到磁盘文件里去。所以当你要写一条 redo log 的时候，就会从第一个 redo log block 开始写入，如图：
 
-![redo-log-buffer](D:/git/CKING.github.io/source/_posts/MySQL-之-redo-日志/redo-log-buffer.png)
+![redo-log-buffer](MySQL-之-redo-log-buffer/redo-log-buffer.png)
 
 
 
 写满了一个 redo log block，就会继续写入下一个 redo log block，以此类推，直到所有的 redo log block 都写满。当 redo log buffer 里所有的 redo log block 都写满了，那么此时会强制把 redo log block 刷入到磁盘中去的。上面说过，其实就是把 512 字节的 redo log block 追加到 redo log 日志文件里去就可以了。如图：
 
-![redo-log-buffer写入磁盘](D:/git/CKING.github.io/source/_posts/MySQL-之-redo-日志/redo-log-buffer写入磁盘.png)
+![redo-log-buffer写入磁盘](MySQL-之-redo-log-buffer/redo-log-buffer写入磁盘.png)
 
 
 
 另外需要知道的是，在我们平时执行一个事务的过程中，每个事务会有多个增删改操作，那么就会有多个 redo log，这多个 redo log 就是一组 redo log，其实每一次 redo log 都是先在别的地方暂存，然后都执行完了，再把一组 redo log 给写入到 redo log 的 block 里去的。如果一组 redo log 实在是太多了，那么可能会存放在两个 redo log block 中，如下图：
 
-![写入多个redo-log-block](D:/git/CKING.github.io/source/_posts/MySQL-之-redo-日志/写入多个redo-log-block.png)
+![写入多个redo-log-block](MySQL-之-redo-log-buffer/写入多个redo-log-block.png)
 
 
 
 但是反之，如果一个 redo log group 比较小，那么也可能多个 redo log group 是在一个 redo log block 里的，如图：
 
-![多组redo-log写到一个block](D:/git/CKING.github.io/source/_posts/MySQL-之-redo-日志/多组redo-log写到一个block.png)
+![多组redo-log写到一个block](MySQL-之-redo-log-buffer/多组redo-log写到一个block.png)
 
 
 
