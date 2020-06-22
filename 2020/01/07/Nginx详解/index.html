@@ -471,7 +471,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf nginx-1.15.tar.gz cd nginx-1.16.1</span><br><span class="line">cd nginx-1.16.1</span><br><span class="line">./configure</span><br><span class="line">make &amp;&amp; sudo make install</span><br></pre></td></tr></table></figure>
 
 <p>4、启动、重启、关闭</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/nginx/ </span><br><span class="line">cd sbin</span><br><span class="line">./nginx</span><br><span class="line"><span class="meta">#</span>关闭命令 </span><br><span class="line">./nginx -s stop</span><br><span class="line"><span class="meta">#</span>重启，热部署</span><br><span class="line">./nginx -s reload</span><br><span class="line"><span class="meta">#</span>修改配置文件后也别嘚瑟，反正我会动不动就写错，检查修改的nginx.conf配置是否正确</span><br><span class="line">./nginx -t</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/nginx/ </span><br><span class="line">cd sbin</span><br><span class="line">./nginx</span><br><span class="line"><span class="meta">#</span><span class="bash">关闭命令 </span></span><br><span class="line">./nginx -s stop</span><br><span class="line"><span class="meta">#</span><span class="bash">重启，热部署</span></span><br><span class="line">./nginx -s reload</span><br><span class="line"><span class="meta">#</span><span class="bash">修改配置文件后也别嘚瑟，反正我会动不动就写错，检查修改的nginx.conf配置是否正确</span></span><br><span class="line">./nginx -t</span><br></pre></td></tr></table></figure>
 
 <p>5、验证（浏览器输入IP）</p>
 <p><img src="/CKING.github.io/2020/01/07/Nginx详解/nginx.png" alt="nginx"></p>
@@ -871,7 +871,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-count">111</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
