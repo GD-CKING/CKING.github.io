@@ -1,5 +1,5 @@
 ---
-title: "详解 MVCC -- 多版本并发控制 \x9A\x81\x81\x91\x9A\x9AⅡ"
+title: "详解 MVCC -- 多版本并发控制Ⅱ"
 date: 2020-06-24 13:42:54
 tags: MySQL
 categories: MySQL
@@ -25,19 +25,19 @@ categories: MySQL
 
 举个例子，我们的数据库里有一行数据， 是事务 id = 50 的一个事务之前就插入进去的，然后活跃着两个事务，一个是事务 A （id = 60） ，一个是事务 B（id = 70）
 
-![RC1](详解-MVCC-多版本并发控制-Ⅱ/RC1.png)
+![RC1](详解-MVCC-多版本并发控制-Ⅱ/RC1.png)
 
 
 
 现在事务 B 发起来一次 update 操作，把这条数据的值修改为了 B，所以此时数据的 trx_id 会变为事务 B 的 id= 70，同时会生成一条 undo log，由 roll_pointer 来指向：
 
-![RC2](详解-MVCC-多版本并发控制-Ⅱ/RC2.png)
+![RC2](详解-MVCC-多版本并发控制-Ⅱ/RC2.png)
 
 
 
 此时，事务 A 要发起一次查询操作，此时它一发起查询操作，就会生成一个 ReadView，此时 ReadView 里的 min_trx_id = 60，max_trx_id = 71，creator_trx_id = 60
 
-![RC3](详解-MVCC-多版本并发控制-Ⅱ/RC3.png)
+![RC3](详解-MVCC-多版本并发控制-Ⅱ/RC3.png)
 
 
 
@@ -47,7 +47,7 @@ categories: MySQL
 
 接着就顺着 undo log 版本链条往下查找，就会找到一个原始值，发现它的 trx_id 是 50，小于当前 ReadView 里的 min_trx_id，说明是它生成 ReadView 之前，就有一个事务插入了这个值并且早就提交了，因此可以查到这个原始值。如下图：
 
-![RC4](详解-MVCC-多版本并发控制-Ⅱ/RC4.png)
+![RC4](详解-MVCC-多版本并发控制-Ⅱ/RC4.png)
 
 
 
@@ -57,13 +57,13 @@ categories: MySQL
 
 那么怎么让事务 A 能够读到提交的事务 B 修改过的值呢？其实就是让事务 A 下次发起查询，再次生成一个 ReadView。此时再次生成 ReadView，数据库内活跃的事务只有事务 A 了，因此 min_trx_id 是 60，max_trx_id 是 71，但是 m_ids 这个活跃事务列表里，只会有一个 60 了，事务 B 的事务 id = 70 不会出现在 m_ids 活跃事务列表里了，如图：
 
-![RC5](详解-MVCC-多版本并发控制-Ⅱ/RC5.png)
+![RC5](详解-MVCC-多版本并发控制-Ⅱ/RC5.png)
 
 
 
 此时事务 A 再次基于这个 ReadView 去查询，会发现这条数据的 trx_id = 70，虽然在 ReadView 的 min_trx_id 和 max_trx_id 范围之间，但是此时并不在 m_ids 列表内，说明事务 B 在生成本次 ReadView 之前就已经提交了。那么既然在生成本次 ReadView 之前，事务 B 就已经提交了，就说明这次你查询就可以查到事务 B 修改过的这个值了，此时事务 A 就会查到值 B
 
-![RC6](详解-MVCC-多版本并发控制-Ⅱ/RC6.png)
+![RC6](详解-MVCC-多版本并发控制-Ⅱ/RC6.png)
 
 
 
@@ -95,19 +95,19 @@ categories: MySQL
 
 这个时候，事务 A 发起了一个查询，它就是第一次查询会生成一个 ReadView，此时 ReadView 里的 creator_trx_id 是 60，min_trx_id 是 60， max_trx_id 是 71， m_ids 是 [60, 70]。如图：
 
-![RR1](详解-MVCC-多版本并发控制-Ⅱ/RR1.png)
+![RR1](详解-MVCC-多版本并发控制-Ⅱ/RR1.png)
 
 
 
 这是时候事务 A 基于这个 ReadView 去查这条数据，会发现这条数据的 trx_id 为 50，是小于 ReadView 里的 min_trx_id 的，说明它发起查询之前，早就有事务插入这条数据还提交了，所以此时可以查到这条原始数据的。如图：
 
-![RR2](详解-MVCC-多版本并发控制-Ⅱ/RR2.png)
+![RR2](详解-MVCC-多版本并发控制-Ⅱ/RR2.png)
 
 
 
 接着事务 B 此时更新了这条数据的值为值 B，此时会修改 trx_id 为 70，同时生成一个 undo log，而且关键是事务 B 此时还提交了，也就是说此时事务 B 已经结束了
 
-![RR3](详解-MVCC-多版本并发控制-Ⅱ/RR3.png)
+![RR3](详解-MVCC-多版本并发控制-Ⅱ/RR3.png)
 
 
 
@@ -121,7 +121,7 @@ categories: MySQL
 
 接着事务 A 顺着指针找到下面一条数据，trx_id 为 50，是小于 ReadView 的 min_trx_id，说明在它开启查询之前，就已经提交了这个事务了，所以事务 A 是可以查询到这个值的，此时事务 A 查询到的是原始值。
 
-![RR4](详解-MVCC-多版本并发控制-Ⅱ/RR4.png)
+![RR4](详解-MVCC-多版本并发控制-Ⅱ/RR4.png)
 
 
 
@@ -131,13 +131,13 @@ categories: MySQL
 
 接着我们看幻读是怎么解决的。假设事务 A 先用 `SELECT * FROM x  WHERE id > 10` 来查询，此时可能查到的就是一条数据，而且读到的是这条数据的原始值的那个版本。
 
-![RR5](详解-MVCC-多版本并发控制-Ⅱ/RR5.png)
+![RR5](详解-MVCC-多版本并发控制-Ⅱ/RR5.png)
 
 
 
 现在有一个事务 C 插入了一条数据，然后提交了
 
-![RR6](详解-MVCC-多版本并发控制-Ⅱ/RR6.png)
+![RR6](详解-MVCC-多版本并发控制-Ⅱ/RR6.png)
 
 
 
@@ -147,7 +147,7 @@ categories: MySQL
 
 因此事务 A 本次查询，还是只能查到原始值一条数据，如图：
 
-![RR7](详解-MVCC-多版本并发控制-Ⅱ/RR7.png)
+![RR7](详解-MVCC-多版本并发控制-Ⅱ/RR7.png)
 
 
 
