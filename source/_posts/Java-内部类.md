@@ -375,7 +375,7 @@ public class TestInnerClass {
 
 
 
-```
+```java
 public class ClassOuter {
 
     private int noStaticInt = 1;
