@@ -92,12 +92,12 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF1.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF2.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF3.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1-TCC-Saga-%E5%85%A5%E9%97%A8%E7%BA%A7%E7%90%86%E8%A7%A3%5Ctcc%E6%AD%A3%E5%B8%B8%E9%80%BB%E8%BE%91.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/tcc%E6%AD%A3%E5%B8%B8%E9%80%BB%E8%BE%91.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/try%E5%A4%B1%E8%B4%A5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/confirm%E5%A4%B1%E8%B4%A5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/cancel%E5%A4%B1%E8%B4%A5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E8%A1%A5%E5%81%BF%E8%B0%83%E7%94%A8.png">
-<meta property="og:updated_time" content="2021-02-07T10:39:07.193Z">
+<meta property="og:updated_time" content="2021-02-07T11:36:06.080Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="分布式事务 -- TCC Saga 入门级理解">
 <meta name="twitter:description" content="业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作 用电商场景来说就是以下几个步骤：  用户在订单平台操作下单  占库存  占钱款  生成一笔订单   如图所示：  分布式系统上图是">
@@ -467,7 +467,7 @@
 <p>在宕机重启系统后，会启动一个线程去读取保存的现场数据，基于现场数据去做回滚，因此现场数据应该包含有几个信息：<strong>被调用模块、传递参数、状态</strong>。判断该数据是否已经用于回滚处理，如果已经进行回滚则为已处理，否则为待处理</p>
 <h2 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h2><p>什么是 TCC 框架？TCC 其实是三个单词的首字母，分别是：<code>try</code>、<code>confirm</code>、<code>cancel</code>。try 就是尝试一下，confirm 就是确认，cancel 就是取消。例如你晚上约几个朋友去吃宵夜，然后就约了几个朋友预定了座位，这就是 try；朋友约到了座位预约到了，准时六点下班去吃饭，这就是 confirm；因为你要修 bug 不得不加班，或者朋友都在加班，或者没有预约到座位，那就没有宵夜了，这就是 cancel</p>
 <p>让我们结合业务场景来讲一下</p>
-<h3 id="正常逻辑"><a href="#正常逻辑" class="headerlink" title="正常逻辑"></a>正常逻辑</h3><p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1-TCC-Saga-%E5%85%A5%E9%97%A8%E7%BA%A7%E7%90%86%E8%A7%A3%5Ctcc%E6%AD%A3%E5%B8%B8%E9%80%BB%E8%BE%91.png" alt="tcc正常逻辑"></p>
+<h3 id="正常逻辑"><a href="#正常逻辑" class="headerlink" title="正常逻辑"></a>正常逻辑</h3><p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/tcc%E6%AD%A3%E5%B8%B8%E9%80%BB%E8%BE%91.png" alt="tcc正常逻辑"></p>
 <h4 id="阶段一：try"><a href="#阶段一：try" class="headerlink" title="阶段一：try"></a>阶段一：try</h4><p>在 <code>try</code> 阶段，「<strong>调用方</strong>」会分别调用多个「<strong>被调用方</strong>」，只有当多个被调用方都返回成功的时候，才会进行 <code>confirm</code>，否则就会进行 <code>cancel</code>。也就是说 try 阶段是一个预备类的操作，锁定某个资源、冻结部分数据，是在真正的扣除之前进行一个预占、冻结的动作</p>
 <p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/try%E5%A4%B1%E8%B4%A5.png" alt="try失败"></p>
 <h4 id="阶段二：confirm"><a href="#阶段二：confirm" class="headerlink" title="阶段二：confirm"></a>阶段二：confirm</h4><p>在该阶段，confirm 就是对 try 成功了之后的一个后续处理，将冻结、预占的数据进行真正的扣除（该业务场景是扣除，当然其他场景也可能是增加），这里就要考虑两种场景：</p>
