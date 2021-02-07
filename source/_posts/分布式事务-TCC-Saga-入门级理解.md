@@ -211,7 +211,7 @@ CAP 理论通常用于分布式系统中，CAP 分别指「**C（Consistency 一
 
 ### 正常逻辑
 
-![tcc正常逻辑](分布式事务-TCC-Saga-入门级理解\tcc正常逻辑.png)
+![tcc正常逻辑](分布式事务-TCC-Saga-入门级理解/tcc正常逻辑.png)
 
 
 
