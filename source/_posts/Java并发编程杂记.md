@@ -111,7 +111,7 @@ public class MyObject {
 
 ## 简单说一下AQS
 
-​		AQS，全称`Abstract Queue Synchronizer`，中文名叫抽象队列同步器。java并发包中的Semahore和部分Lock底层的实现原理都是利用AQS，例如可重入锁`ReentrantLock`。现在简单说一下AQS的原理。
+​		AQS，全称 `Abstract Queue Synchronizer`，中文名叫抽象队列同步器。java 并发包中的 Semahore 和部分Lock底层的实现原理都是利用AQS，例如可重入锁`ReentrantLock`。现在简单说一下AQS的原理。
 
 ​		AQS内部主要包含`state`变量，一个存储当前加锁线程的变量和一个等待队列。当多个线程访问时，先通过CAS尝试更新state的变量，如果成功了，将加锁线程的变量更改为自己，并进行后续操作。如果失败了，进入队列等待，等待拥有锁的线程释放锁后唤醒。大概如下图：
 
