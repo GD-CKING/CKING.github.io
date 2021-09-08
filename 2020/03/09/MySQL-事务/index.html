@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/03/09/MySQL-事务/%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/03/09/MySQL-事务/%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB.png">
-<meta property="og:updated_time" content="2020-03-09T10:06:53.642Z">
+<meta property="og:updated_time" content="2020-07-25T06:24:26.430Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL 事务">
 <meta name="twitter:description" content="MySQL 的特性 — ACIDMySQL 的特性，就是大家常常听到的 ACID。  Atomic：原子性。就是一堆SQL，要么一起成功，要么一起失败。不允许某个 SQL 执行成功了，某个 SQL 却失败了。这样就不是原子性了。  Consistency：一致性。这个是针对数据一致性来说的，就是一组 SQL 执行之前，数据必须是准确的，执行之后，数据也必须是准确的。别搞了半天，执行完 SQL，结果">
@@ -391,7 +391,7 @@
 <p><img src="/CKING.github.io/2020/03/09/MySQL-事务/%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB.png" alt="不可重复读"></p>
 <p>3、<strong>可重复读</strong>，Read Repeatable。这个比上面那个再好一点。就是说事务 A 在执行的过程中，对某个数据的值，无论读多少次都是值 1。哪怕这个过程中事务 B 修改了数据的值还提交了，但是事务 A 读到的还是自己事务开始时这个数据的值。如图：</p>
 <p><img src="/CKING.github.io/2020/03/09/MySQL-事务/%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB.png" alt="可重复读"></p>
-<p>幻读，不可重复读和可重复都是针对两个事物同时对某条数据在修改，但是幻读针对的是插入。比如某个事物把所有行的某个字段都修改为了 2，结果另一个事务插入了一条数据，那个字段的值是 1。然后就尴尬了，第一个事务会突然发现多出来一条数据，那个数据的字段是 1。</p>
+<p><strong>幻读</strong>，不可重复读和可重复读都是针对两个事物同时对某条数据在修改，但是幻读针对的是插入。比如某个事物把所有行的某个字段都修改为了 2，结果另一个事务插入了一条数据，那个字段的值是 1。然后就尴尬了，第一个事务会突然发现多出来一条数据，那个数据的字段是 1。</p>
 <p>幻读会带来什么问题？在此隔离级别下，例如，事务 1 要插入一条数据，我先查询一下有没有相同的数据，但是这时事务 2 添加了这条数据，这就会导致事务 1 插入失败，并且它就算再一次查询，也无法查询到与其插入相冲突的数据，同时自身死活都插入不了。</p>
 <p>4、<strong>串行化</strong>，如果要解决幻读，就需要使用串行化级别的隔离级别，所有事务都串行起来，不允许多个事务并行操作。</p>
 <p>MySQL 的默认隔离级别是 Read Repeatable，就是可重复读，就是说每个事务都会开启一个自己要操作的某个数据的快照，事务期间，读到的都是这个数据的快照而已，对一个数据的多次读都是一样的。</p>
@@ -617,7 +617,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">102</span>
+                  <span class="site-state-item-count">124</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -692,7 +692,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

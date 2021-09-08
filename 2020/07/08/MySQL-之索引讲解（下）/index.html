@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="之前讲了 MySQL 数据库的索引结构，让大家清楚不同索引的结构，大致是如何建立的，搜索的时候是如何根据不同的索引去查找数据的。现在，我们说说在插入数据的时候，是如何维护不同索引的 B+ 树的 首先，刚开始你一个表搞出来以后，它就一个数据页，这个数据页是属于聚簇索引的一部分，而且目前还是空的。此时如果你插入数据，就是直接在这个数据页里插入就可以了，没必要弄什么索引页  这个初始的数据页其实就是一个">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL-之索引讲解（下）">
+<meta property="og:url" content="https://github.com/2020/07/08/MySQL-之索引讲解（下）/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="之前讲了 MySQL 数据库的索引结构，让大家清楚不同索引的结构，大致是如何建立的，搜索的时候是如何根据不同的索引去查找数据的。现在，我们说说在插入数据的时候，是如何维护不同索引的 B+ 树的 首先，刚开始你一个表搞出来以后，它就一个数据页，这个数据页是属于聚簇索引的一部分，而且目前还是空的。此时如果你插入数据，就是直接在这个数据页里插入就可以了，没必要弄什么索引页  这个初始的数据页其实就是一个">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%95%B0%E6%8D%AE%E9%A1%B5.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%A0%B9%E9%A1%B5.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%90%9C%E7%B4%A21.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%9C%80%E7%BB%88%E6%95%B0%E6%8D%AE.png">
+<meta property="og:updated_time" content="2020-07-25T06:24:26.419Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL-之索引讲解（下）">
+<meta name="twitter:description" content="之前讲了 MySQL 数据库的索引结构，让大家清楚不同索引的结构，大致是如何建立的，搜索的时候是如何根据不同的索引去查找数据的。现在，我们说说在插入数据的时候，是如何维护不同索引的 B+ 树的 首先，刚开始你一个表搞出来以后，它就一个数据页，这个数据页是属于聚簇索引的一部分，而且目前还是空的。此时如果你插入数据，就是直接在这个数据页里插入就可以了，没必要弄什么索引页  这个初始的数据页其实就是一个">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%95%B0%E6%8D%AE%E9%A1%B5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/07/08/MySQL-之索引讲解（下）/">
+
+
+
+
+
+  <title>MySQL-之索引讲解（下） | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MySQL-之索引讲解（下）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-08T11:27:52+08:00">
+                2020-07-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前讲了 MySQL 数据库的索引结构，让大家清楚不同索引的结构，大致是如何建立的，搜索的时候是如何根据不同的索引去查找数据的。现在，我们说说在插入数据的时候，是如何维护不同索引的 B+ 树的</p>
+<p>首先，刚开始你一个表搞出来以后，它就一个数据页，这个数据页是属于聚簇索引的一部分，而且目前还是空的。此时如果你插入数据，就是直接在这个数据页里插入就可以了，没必要弄什么索引页</p>
+<p><img src="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%95%B0%E6%8D%AE%E9%A1%B5.png" alt="数据页"></p>
+<p>这个初始的数据页其实就是一个根页，每个数据页内部默认就有一个基于主键的页目录，所以此时你根据主键来搜索时没有问题的，直接在唯一一个数据页里根据页目录找就可以了</p>
+<p>然后你表里的数据越来越多，此时你的数据页满了，就会搞一个新的数据页，然后把你根页面里的数据都拷贝过去，同时再搞一个新的数据页，根据你的主键值的大小进行挪动，让两个新的数据页根据主键值排序，第二个数据页的主键值都大于第一个数据页的主键值。</p>
+<p><img src="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8.png" alt="双向链表"></p>
+<p>那么此时那个根页在哪？此时根页就升级为索引页，这个根页里存放的是两个数据页的页号和它们里面最小的主键值。如下图，根页就成了索引页，引用两个数据页</p>
+<p><img src="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%A0%B9%E9%A1%B5.png" alt="根页"></p>
+<p>接着会不停地往表里灌入数据，然后数据页不停地页分裂，分裂出来越来越多的数据页。此时你的唯一一个索引页，也就是根页里存放的数据页索引条目越来越多，连你的索引页都放不下了，那你就让一个索引页分裂成两个索引页，然后根页继续往上走一个层级引用两个索引页</p>
+<p>接着就是以此类推，你的数据页越多，那么根页指向的索引页也会不停地分裂，分裂出更多的索引页，当你下层的索引页数量太多的时候，会导致你的根页指向的索引页太多了，此时根页继续分裂成多个索引页，根页再次往上提上去一个层级</p>
+<p>例如你 name 字段有一个索引，那么刚开始的时候你插入一个数据，一方面在聚簇索引的唯一的数据页里插入，一方面在 name 字段的索引 B+ 树唯一的数据页里插入。然后数据越来越多，你的 name 字段的索引 B+ 树里唯一的数据页也会分裂，整个分裂的过程跟上面说的是一样的，所以你插入数据的时候，本身就会维护你各个索引的 B+树</p>
+<p>另外补充一点，你的 name 字段的索引 B+ 树里的索引页中，其实除了存放页号和最小 name 字段值以外，每个索引页里还会存放那个最小 name 字段值对应的主键值。这是因为有时候会出现多个索引页指向的下层页号的最小 name 字段值是一样的，此时就必须根据主键判断一下</p>
+<p>例如你插入一个新的 name 字段值，此时它需要根据 name 字段的 B+ 树索引的根页面开始，去逐层寻找和定位自己这个新的 name 字段值应该插入到哪个叶子节点的哪个数据页里去。此时万一遇到一层里不同的索引页指向不同的下层页号，但是 name 字段值一样，此时就得根据主键值比较一下，新的 name 字段值肯定是插入到主键值较大的那个数据页里去的</p>
+<h2 id="索引不是越多越好"><a href="#索引不是越多越好" class="headerlink" title="索引不是越多越好"></a>索引不是越多越好</h2><p>默认情况下 MySQL 给我们建立的聚簇索引都是基于主键的值来组织索引的，聚簇索引的叶子节点都是数据页，里面放的就是我们插入的一行一行的完整的数据。在一个索引 B+ 树中，它有一些特性，就是数据页/索引页里面的记录都是组成一个单向链表的，而且是按照数据大小有序排列的；然后数据页/索引页互相之间是组成双向链表的，而且也都是按照数据大小有序排列的，所以其实 B+ 树索引是一个完全有序的数据结构，无论是页内还是页之间</p>
+<p>正是因为这个有序的 B+ 树索引结构，才能让我们查找数据的时候，直接从根节点开始按照数据值大小一层一层往下找，这个效率是非常高的</p>
+<p>然后如果是针对主键之外的字段建立索引的话，实际上本质就是为那个字段的值重新建立另外一棵 B+ 树索引，那个索引 B+ 树的叶子节点，存放的都是数据页，里面放的都是你字段的值和主键值，然后每一层索引页里存放的都是下层页的引用，包括页内的排序规则，页之间的排序规则，B+ 树索引的搜索规则，都是一样的</p>
+<p>但是，如果我们要根据其它字段的索引来搜索，那么只能基于其它字段的索引 B+ 树快速查找到那个值所对应的主键，接着再次做回表查询，基于主键在聚簇索引的 B+ 树里，重新从根节点开始查找那个主键值，找到主键值对应的完整数据</p>
+<p>那么，你在 MySQL 的表里建立一些字段对应的索引，好处是什么？好处是显而易见的，你可以直接根据某个字段的索引 B+ 树来查找数据，不需要全表搜索，性能提升是很高的。但坏处呢？索引主要有两个缺点，一个是空间上的，一个是时间上的</p>
+<p>空间上而言，你要是给很多字段创建很多的索引，那你会有很多棵索引 B+ 树，每一棵 B+ 树都要占用很多的磁盘空间。如果你建的索引太多，是很耗费磁盘空间的。其次，如果你建了很多索引，那么你在进行增删改的时候，每次都需要维护各个索引的数据有序性，因为每个索引 B+ 树都要求页内是按照值大小排序的，页之间也是有序的，下一个页的所有值必须大于上一个页的所有值</p>
+<p>所以你不停地增删改，必然会导致各个数据页之间的值大小可能会没有顺序，此时只能进行数据页的挪动，维护页之间的顺序；或者你不停地插入数据，各个索引的数据页就要不停地分裂，不停地增加新的索引页，这个过程都是耗费时间的</p>
+<p>所以你一个表里建的索引太多，很可能就会导致你的增删改的速度就比较差。因此，我们是不建议在一个表里建太多索引的</p>
+<h2 id="联合索引查询原理和全值匹配规则"><a href="#联合索引查询原理和全值匹配规则" class="headerlink" title="联合索引查询原理和全值匹配规则"></a>联合索引查询原理和全值匹配规则</h2><p>之所以讲联合索引，是因为我们设计系统的时候一般是设计联合索引，很少用单个字段做索引，原因是我们要尽可能让索引数量少一些，避免磁盘占用太多，增删改性能太差</p>
+<p>假设我们有一个表是存储学习成绩的，这个表有 id，这个 id 是一个自增主键，默认就会基于它做一个聚簇索引。然后就是包含了「学生班级」「学生姓名」「科目名称」「成绩分数」四个字段，平时查询，比较多的就是查找某个班级的某个学生的某个科目的成绩。所以，我们针对「学生班级、学生姓名和科目名称」建一个联合索引</p>
+<p>我们用一个图展示这三个字段组成的联合索引的部分内容，如下：</p>
+<p><img src="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95.png" alt="联合索引"></p>
+<p>上图有两个数据页，第一个数据页里有三条数据，每条数据都包含了联合索引的三个字段的值和主键值，数据页内部都是按照顺序排序的。首先按照班级字段的值来排序，如果一样就按照学生姓名字段来排序，如果一样泽按照科目名称来排序，所以数据页内部都是按照三个字段的值来排序的，而且还组成了单向链表</p>
+<p>然后数据页之间也是有顺序的，第二个数据页里的三个字段的值都一定大于上一个数据页里三个字段的值，比较方法也是按照班级名称、学生姓名、科目名称依次来比较，数据页之间组成双向链表</p>
+<p>索引页里就是两条数据，分别指向两个数据页，索引存放的是每个数据页里最小的那个数据的值。而且，索引页里指向两个数据页的索引项里都是存放了那个数据页里最小的值。索引页内部的数据页是组成单向链表有序的，如果你有多个索引页，那么索引页之间也是有序的，组成了双向链表</p>
+<p>现在我们要搜索「1 班 + 张小强 + 数学」的成绩，SQL 语句为</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student_score <span class="keyword">WHERE</span> class_name = <span class="string">'1班'</span> <span class="keyword">AND</span> student_name = <span class="string">'张小强'</span> <span class="keyword">and</span> subject_name = <span class="string">'数学'</span></span><br></pre></td></tr></table></figure>
+
+<p>这就涉及到一个索引的使用规则，那就是你发起的 SQL 语句里，where 条件里的几个字段都是基于等值来查询的，都是用的等于号。而且 where 条件里的几个字段的名称和顺序也跟你的联合索引一模一样，此时就是等值匹配规则，上面的 SQL 语句是可以用联合索引查询的</p>
+<p>那么查询的过程也简单，首先到索引页里去找，索引页里有多个数据页的最小值记录，此时直接在索引页里基于二分查找来找就可以了，先是根据班级名称来找 1 班这个值对应的数据页，直接可以定位到它所在的数据页</p>
+<p><img src="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%90%9C%E7%B4%A21.png" alt="搜索1"></p>
+<p>然后你就直接找到索引指向的那个数据页就可以了，在数据页内部本身也是一个单向链表，你也是直接二份查找就可以了。先按 1 班这个值找，你会发现几条数据都是 1 班；此时就可以按照「张小强」这个姓名来二分查找，此时会发现多条数据都是张小强，接着就按照「科目名称」数学来二分查找、很快就可以定位到下图中的一条数据，1 班的张小强的数学科目，它对应的数据 id 是127</p>
+<p><img src="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/%E6%9C%80%E7%BB%88%E6%95%B0%E6%8D%AE.png" alt="最终数据"></p>
+<p>然后就根据主键 id = 127 到聚簇索引里按照一样的思路，从索引根节点开始二分查找迅速定位下个层级的页，再不停地找，很快就可以找到 id = 127 的那条数据，然后从里面提取所有字段就可以了</p>
+<p>上面整个过程就是联合索引的查找过程，以及全值匹配规则。假设你的 SQL 语句的 where 条件里用的几个字段和顺序，都跟你的索引的字段一样，同时你还是用等号在做等值匹配，那么直接就会按照上述过程来找。</p>
+<p>对于联合索引而言，就是依次按照各个字段来进行二分查找，先定位到第一个字段对应的值在哪个页里，然后如果第一个字段有多条数据值都一样，就根据第二个字段来找，以此类推，就可以定位到某条或者某几条数据</p>
+<h2 id="索引使用规则"><a href="#索引使用规则" class="headerlink" title="索引使用规则"></a>索引使用规则</h2><p>接着我们讲一下几个基本的索引使用规则。还是用上面的那个例子来做说明</p>
+<p>上面我们讲的是等值匹配原则，就是你 where 语句中的几个字段名称和联合索引名称的字段完全一样，而且都是基于等号的等值匹配，那百分百会用上我们的索引。<strong>即使你 where 语句里写的顺序和联合索引里的字段顺序不一致，也没关系，MySQL 会自动优化为按联合索引的字段顺序去找</strong></p>
+<p>第二个规则是<strong>最左侧列匹配</strong>。假设我们联合索引是 <code>KEY(class_name, student_name, subject_name)</code>，那么不一定必须要在 where 语句根据三个字段来查，其实只要根据最左侧的部分字段来查，也是可以的</p>
+<p>例如你可以写下面的 SQL 语句，就差某个学生所有科目的成绩，这是没问题的</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student_score <span class="keyword">WHERE</span> class_name = <span class="string">''</span> <span class="keyword">and</span> student_name = <span class="string">''</span></span><br></pre></td></tr></table></figure>
+
+<p>但是如果你写一个 <code>select * from student_score where subject_name = &#39;&#39;</code>，那就不行了，因为联合索引的 B+ 树里，是必须先按 <code>class_name</code> 查，再按 <code>student_name</code> 查，不能跳过前面两个字段，直接按最后一个 <code>subject_name</code>  查的</p>
+<p>另外，如果你写一个 <code>select * from student_score where class_name = &#39;&#39; and subject_name = &#39;&#39;</code>，那么只有 <code>class_name</code> 的值可以在索引里搜索，剩下的 <code>subject_name</code> 是没法在索引里找的，道理同上。</p>
+<p>所以在建立索引的时候，必须考虑好联合索引字段的顺序，以及平时写 SQL 的时候要按哪几个字段来查</p>
+<p>第三个规则是<strong>最左前缀匹配原则</strong>，即如果你要用 <code>LIKE</code> 语法去查，比如 <code>SELECT * FROM student_score WHERE class_name LIKE &#39;1%&#39;</code>，查找所有 1 打头的班级的分数，那么可以用到索引的。因为你的联合索引 B+ 树里，都是按照 <code>class_name</code> 排序的，所以你给出 <code>class_name</code> 的确定的最左前缀是 1，然后后面的给一个模糊匹配符合，那也是可以基于索引来查找的</p>
+<p>但是你如果写 <code>class_name LIKE &#39;%班&#39;</code>，在左侧用一个模糊匹配符，那他就没法用索引了，因为不知道你最左前缀是什么，没办法去索引里找</p>
+<p>第四个就是<strong>范围查找规则</strong>，这个意思是我们可以用 <code>SELECT * FROM student_score WHERE class_name &gt; &#39;1班&#39; and class_name &lt; &#39;5班&#39;</code> 这样的语句来范围查找某几个班级的分数。这个时候也是会用到索引的，因为我们的索引的最下层的数据页都是按顺序组成双向链表的，所以完全可以先找到「1 班」对应的数据页，再找到「5 班」对应的数据页，两个数据页中间的那些数据页，就都是在你的范围内的数据了</p>
+<p>但是如果你要是写 <code>SELECT * FROM student_score WHERE class_name &gt; &#39;1 班&#39; AND class_name  &lt; &#39;5 班&#39; AND student_name &gt; &#39;&#39;</code> 这里只有 class_name 是可以基于索引来找的，student_name 的范围查询时没法用到索引的</p>
+<p>这也是一条规则，就是你的 where 语句里如果有范围查询，那只有对联合索引里最左侧的列进行范围查询才能用到索引</p>
+<p>第五个规则，就是<strong>等值匹配 + 范围匹配的规则</strong>。如果你是用 <code>SELECT * FROM student_score WHERE class_name = &#39;1班&#39; AND student_name &gt; &#39;&#39; AND subject_name &lt;  &#39;&#39;</code> ，那么此时你首先可以用 class_name 在索引里精准定位到一波数据，接着这波数据里的 student_name 都是按照顺序排列的，所以 <code>student_name &gt; &#39;&#39;</code> 也会基于索引来查找，但是接下来的 <code>subject_name &lt; &#39;&#39;</code> 是不能用索引的</p>
+<p>综上所述，一般我们写 SQL 语句，都是用联合索引的最左侧的多个字段来进行等值匹配 + 范围搜索，或者是基于最左侧的部分字段来进行最左前缀模糊匹配，或者基于最左侧字段来进行范围搜索，这就要写符合规则的 SQL 语句，才能用上联合索引</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/MySQL/" rel="tag"># MySQL</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/" rel="next" title="MySQL-之索引讲解（中）">
+                <i class="fa fa-chevron-left"></i> MySQL-之索引讲解（中）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/07/09/MySQL-索引的使用扩展/" rel="prev" title="MySQL 索引的使用扩展">
+                MySQL 索引的使用扩展 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">124</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#索引不是越多越好"><span class="nav-number">1.</span> <span class="nav-text">索引不是越多越好</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#联合索引查询原理和全值匹配规则"><span class="nav-number">2.</span> <span class="nav-text">联合索引查询原理和全值匹配规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引使用规则"><span class="nav-number">3.</span> <span class="nav-text">索引使用规则</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

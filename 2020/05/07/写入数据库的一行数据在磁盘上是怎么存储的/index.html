@@ -89,7 +89,8 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E7%BC%93%E5%86%B2%E6%B1%A0.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E5%88%B7%E6%95%B0%E6%8D%AE.png">
-<meta property="og:updated_time" content="2020-05-11T09:12:35.349Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E8%A1%8C%E6%BA%A2%E5%87%BA.png">
+<meta property="og:updated_time" content="2020-06-06T14:18:14.956Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="写入数据库的一行数据在磁盘上是怎么存储的">
 <meta name="twitter:description" content="引入数据页当我们要执行 update 之类的 SQL 语句的时候，必然涉及到对数据的更新操作。那么此时对数据是在哪里更新的？此时并不是直接去更新磁盘文件，而是要把磁盘上的一些数据加载到内存里来，然后对内存里的数据进行更新，同时写 redo log 到磁盘上去。如图：  这里就有一个问题，难道我们每次都是把磁盘里的一条数据加载到内存里去进行更新，然后下次要更新别的数据的时候，再从磁盘里加载另外一条数">
@@ -452,7 +453,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x09 0x04 00000101 0000000000000000000010000000000000011001 jack m xx_school</span><br></pre></td></tr></table></figure>
 
 <p>刚开始先是它的变长字段的长度，用十六进制来存储，然后是 NULL 值列表，指出了谁是 NULL，接着是 40 个 bit 位的数据头，然后是真实的数据值，就放在后面。</p>
-<p>在读取这个数据的时候，它会根据变长字段的长度，先读取出来这个 jack 这个值，因为它的长度是 4，就读取 4 个长度的数，jack 就出来了。然后发现第二个字段是 NULL，就不用读取了。第三个子段是变长字段，直接读取 1 个字符就可以了，就是 m 这个值。第四个字段是 NULL，不用读取了。第五个字段是变长字段长度是 9，读取出来 xx_school 就可以了。</p>
+<p>在读取这个数据的时候，它会根据变长字段的长度，先读取出来这个 jack 这个值，因为它的长度是 4，就读取 4 个长度的数，jack 就出来了。然后发现第二个字段是 NULL，就不用读取了。第三个字段是变长字段，直接读取 1 个字符就可以了，就是 m 这个值。第四个字段是 NULL，不用读取了。第五个字段是变长字段长度是 9，读取出来 xx_school 就可以了。</p>
 <p>但是，真正在磁盘上存储的时候，我们那些字符串不是直接这么存储在磁盘上的。<strong>实际上字符串这些东西都是根据我们数据库指定的字符集编码</strong>，就行编码之后在存储的，所以大致看起来一行数据是如下所示的：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x09 0x04 00000101 000000000000000000010000000000000011001 616161 636320 6262626262</span><br></pre></td></tr></table></figure>
 
@@ -465,6 +466,13 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">0x09 0x04 00000101 000000000000000100000000000001 10010000000094C (DB_ _ROW_ ID)</span><br><span class="line">00000000032D (DB_ TRX_ ID) EA000010078E (DB_ ROL PTR) 616161 636320 6262626262</span><br></pre></td></tr></table></figure>
 
 <p>上面几个隐藏字段都加了括号说明了，那基本就是最终在磁盘上一行数据的样子了。</p>
+<h2 id="行溢出"><a href="#行溢出" class="headerlink" title="行溢出"></a>行溢出</h2><p>通过上面我们初步了解到，实际上我们每一行数据都是放在一个数据页里的，这个数据页默认的大小是 16KB。但是，万一一行数据的大小超过了页的大小怎么办呢？</p>
+<p>比如有一个表的字段类型是 VARCHAR(65532)，意思就是最大可以包含 65532 个字符，这就远大于 16KB 的大小了，也就是说这一行的数据的这个字段远超一个数据页的大小了</p>
+<p>这个时候实际上会在那一页里存储你这行数据，然后在那个字段中，仅仅包含它一部分数据，同时包含一个 20 个字节的指针，指向了其他的一些数据页，那些数据页用链表串联起来，存放这个 VARCHAR(65532) 超大字段里的数据。如图：</p>
+<p><img src="/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/%E8%A1%8C%E6%BA%A2%E5%87%BA.png" alt="行溢出"></p>
+<p>上面的这个过程，其实就是 <strong>行溢出</strong>，就是说一行数据存储的内容太多了，一个数据页都放不下，此时只能溢出这个数据页，把数据页存放到其他数据页里去，那些数据页就叫做溢出页。包括其他的一些字段类型都是一样的，比如 TEXT、BLOB 这种类型的字段，都有可能出现溢出，然后一行数据就会存储在多个数据页里。</p>
+<p>讲到这里，我们可以做一点总结。当我们在数据库插入一行数据的时候，实际上是在内存里插入一个有复杂存储结构的一行数据，然后随着一些条件的发生，这行数据会被刷到磁盘文件里去。在磁盘文件里存储的时候，这行数据也是按照复杂的存储结构去存放的。</p>
+<p>而且每一行数据都是放在数据页里的，如果一行数据太大，就会产生行溢出问题，导致一行数据溢出到多个数据页里去，那么这行数据在 Buffer Pool 可能就是存在于多个缓存页里的，刷入到磁盘的时候，也是用磁盘上的多个数据页来存放这行数据的。</p>
 
       
     </div>
@@ -604,7 +612,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">102</span>
+                  <span class="site-state-item-count">124</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -659,7 +667,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引入数据页"><span class="nav-number">1.</span> <span class="nav-text">引入数据页</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-物理数据存储格式"><span class="nav-number">2.</span> <span class="nav-text">MySQL 物理数据存储格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#变长字段在磁盘中的存储"><span class="nav-number">2.1.</span> <span class="nav-text">变长字段在磁盘中的存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#存储在磁盘文件里的变长字段为什么难以读取"><span class="nav-number">2.1.1.</span> <span class="nav-text">存储在磁盘文件里的变长字段为什么难以读取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引入变长字段的长度列表"><span class="nav-number">2.1.2.</span> <span class="nav-text">引入变长字段的长度列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何读取变长字段"><span class="nav-number">2.1.3.</span> <span class="nav-text">如何读取变长字段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多个变长字段，如何存放他们的长度"><span class="nav-number">2.1.4.</span> <span class="nav-text">多个变长字段，如何存放他们的长度</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NULL-字段值在磁盘上的存储"><span class="nav-number">2.2.</span> <span class="nav-text">NULL 字段值在磁盘上的存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NULL-值是以二进制-bit-位来存储的"><span class="nav-number">2.2.1.</span> <span class="nav-text">NULL 值是以二进制 bit 位来存储的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结合案例看一行数据的磁盘存储格式"><span class="nav-number">2.2.2.</span> <span class="nav-text">结合案例看一行数据的磁盘存储格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#磁盘上的一行数据如何读取"><span class="nav-number">2.2.3.</span> <span class="nav-text">磁盘上的一行数据如何读取</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#磁盘文件中，40个-bit-位的数据头以及真实数据是如何存储的"><span class="nav-number">2.3.</span> <span class="nav-text">磁盘文件中，40个 bit 位的数据头以及真实数据是如何存储的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#每一行的实际数据在磁盘上是如何存储的"><span class="nav-number">2.4.</span> <span class="nav-text">每一行的实际数据在磁盘上是如何存储的</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引入数据页"><span class="nav-number">1.</span> <span class="nav-text">引入数据页</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-物理数据存储格式"><span class="nav-number">2.</span> <span class="nav-text">MySQL 物理数据存储格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#变长字段在磁盘中的存储"><span class="nav-number">2.1.</span> <span class="nav-text">变长字段在磁盘中的存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#存储在磁盘文件里的变长字段为什么难以读取"><span class="nav-number">2.1.1.</span> <span class="nav-text">存储在磁盘文件里的变长字段为什么难以读取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引入变长字段的长度列表"><span class="nav-number">2.1.2.</span> <span class="nav-text">引入变长字段的长度列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何读取变长字段"><span class="nav-number">2.1.3.</span> <span class="nav-text">如何读取变长字段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多个变长字段，如何存放他们的长度"><span class="nav-number">2.1.4.</span> <span class="nav-text">多个变长字段，如何存放他们的长度</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NULL-字段值在磁盘上的存储"><span class="nav-number">2.2.</span> <span class="nav-text">NULL 字段值在磁盘上的存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NULL-值是以二进制-bit-位来存储的"><span class="nav-number">2.2.1.</span> <span class="nav-text">NULL 值是以二进制 bit 位来存储的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结合案例看一行数据的磁盘存储格式"><span class="nav-number">2.2.2.</span> <span class="nav-text">结合案例看一行数据的磁盘存储格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#磁盘上的一行数据如何读取"><span class="nav-number">2.2.3.</span> <span class="nav-text">磁盘上的一行数据如何读取</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#磁盘文件中，40个-bit-位的数据头以及真实数据是如何存储的"><span class="nav-number">2.3.</span> <span class="nav-text">磁盘文件中，40个 bit 位的数据头以及真实数据是如何存储的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#每一行的实际数据在磁盘上是如何存储的"><span class="nav-number">2.4.</span> <span class="nav-text">每一行的实际数据在磁盘上是如何存储的</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#行溢出"><span class="nav-number">3.</span> <span class="nav-text">行溢出</span></a></li></ol></div>
             
 
           </div>
@@ -679,7 +687,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
