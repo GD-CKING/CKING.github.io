@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：  getSingleton createBean getObjectForBeanInstance  getSingleton我们先看一下 getSingleton的源码 1234567891011121314151617181920212223242526272829303132333435363738394041">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring 单例 Bean 创建">
+<meta property="og:url" content="https://github.com/2021/09/08/Spring-单例-Bean-创建/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：  getSingleton createBean getObjectForBeanInstance  getSingleton我们先看一下 getSingleton的源码 1234567891011121314151617181920212223242526272829303132333435363738394041">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/getSingleton.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/doCreateBean.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/getEarlyBeanReference.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/addSingletonFactory.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/addEarlySingletonObject.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/%E5%88%9D%E5%A7%8B%E5%8C%96bean.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/populateBean.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/%E5%88%9B%E5%BB%BA%E5%AE%9E%E4%BE%8B.png">
+<meta property="og:updated_time" content="2021-10-15T00:16:21.955Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring 单例 Bean 创建">
+<meta name="twitter:description" content="本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：  getSingleton createBean getObjectForBeanInstance  getSingleton我们先看一下 getSingleton的源码 1234567891011121314151617181920212223242526272829303132333435363738394041">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/getSingleton.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2021/09/08/Spring-单例-Bean-创建/">
+
+
+
+
+
+  <title>Spring 单例 Bean 创建 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring 单例 Bean 创建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T16:17:32+08:00">
+                2021-09-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：</p>
+<ol>
+<li><strong>getSingleton</strong></li>
+<li><strong>createBean</strong></li>
+<li><strong>getObjectForBeanInstance</strong></li>
+</ol>
+<h2 id="getSingleton"><a href="#getSingleton" class="headerlink" title="getSingleton"></a>getSingleton</h2><p>我们先看一下 <code>getSingleton</code>的源码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getSingleton</span><span class="params">(String beanName, ObjectFactory&lt;?&gt; singletonFactory)</span> </span>&#123;</span><br><span class="line">    Assert.notNull(beanName, <span class="string">"Bean name must not be null"</span>);</span><br><span class="line">    <span class="comment">// 加锁</span></span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>.singletonObjects) &#123;</span><br><span class="line">        <span class="comment">// 检查 singletonObjects 缓存中是否有</span></span><br><span class="line">        Object singletonObject = <span class="keyword">this</span>.singletonObjects.get(beanName);</span><br><span class="line">        <span class="keyword">if</span> (singletonObject == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 检查是否在执行销毁</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.singletonsCurrentlyInDestruction) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationNotAllowedException(beanName,</span><br><span class="line">                        <span class="string">"Singleton bean creation not allowed while singletons of this factory are in destruction "</span> +</span><br><span class="line">                        <span class="string">"(Do not request a bean from a BeanFactory in a destroy method implementation!)"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">                logger.debug(<span class="string">"Creating shared instance of singleton bean '"</span> + beanName + <span class="string">"'"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 将 Bean 添加到 singletonsCurrentlyInCreation 集合中, 表示正在创建</span></span><br><span class="line">            beforeSingletonCreation(beanName);</span><br><span class="line">            <span class="keyword">boolean</span> newSingleton = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">boolean</span> recordSuppressedExceptions = (<span class="keyword">this</span>.suppressedExceptions == <span class="keyword">null</span>);</span><br><span class="line">            <span class="keyword">if</span> (recordSuppressedExceptions) &#123;</span><br><span class="line">                <span class="keyword">this</span>.suppressedExceptions = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 调用工厂方法</span></span><br><span class="line">                <span class="comment">// 也就是调用 createBean(beanName, mbd, args)</span></span><br><span class="line">                singletonObject = singletonFactory.getObject();</span><br><span class="line">                newSingleton = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (IllegalStateException ex) &#123;</span><br><span class="line">                <span class="comment">// Has the singleton object implicitly appeared in the meantime -&gt;</span></span><br><span class="line">                <span class="comment">// if yes, proceed with it since the exception indicates that state.</span></span><br><span class="line">                singletonObject = <span class="keyword">this</span>.singletonObjects.get(beanName);</span><br><span class="line">                <span class="keyword">if</span> (singletonObject == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> ex;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (BeanCreationException ex) &#123;</span><br><span class="line">                <span class="keyword">if</span> (recordSuppressedExceptions) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (Exception suppressedException : <span class="keyword">this</span>.suppressedExceptions) &#123;</span><br><span class="line">                        ex.addRelatedCause(suppressedException);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">throw</span> ex;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">finally</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (recordSuppressedExceptions) &#123;</span><br><span class="line">                    <span class="keyword">this</span>.suppressedExceptions = <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 创建成功, 从 singletonsCurrentlyInCreation 移除</span></span><br><span class="line">                afterSingletonCreation(beanName);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (newSingleton) &#123;</span><br><span class="line">                <span class="comment">// 将给定的单例对象添加到该工厂的单例缓存中</span></span><br><span class="line">                <span class="comment">//  this.singletonObjects.put(beanName, singletonObject);</span></span><br><span class="line">                <span class="comment">//  this.singletonFactories.remove(beanName);</span></span><br><span class="line">                <span class="comment">//  this.earlySingletonObjects.remove(beanName);</span></span><br><span class="line">                <span class="comment">//  this.registeredSingletons.add(beanName);</span></span><br><span class="line">                addSingleton(beanName, singletonObject);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> singletonObject;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的大概意思是：<strong>返回以给定名称注册的（原始）单例对象，如果尚未注册，则创建并注册一个新对象</strong></p>
+<p>这一块一共可以拆分为三部分来理解：</p>
+<p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/getSingleton.png" alt="getSingleton"></p>
+<h3 id="1、从-singletonObjects-缓存中获取"><a href="#1、从-singletonObjects-缓存中获取" class="headerlink" title="1、从 singletonObjects 缓存中获取"></a>1、从 singletonObjects 缓存中获取</h3><p><code>singletonOjbects</code> 是什么？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** Cache of singleton objects: bean name to bean instance. */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Object&gt; singletonObjects = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>singletonObjects</code> 是一个 ConcurrentHashMap，用来缓存单例对象的实例</p>
+<h3 id="2、创建-singletonObject"><a href="#2、创建-singletonObject" class="headerlink" title="2、创建 singletonObject"></a>2、创建 singletonObject</h3><p>如果从缓存中没有获取到 <code>singletonObject</code>，则创建新的对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">singletonObject = singletonObjects.getOjbect();</span><br></pre></td></tr></table></figure>
+
+<p>这一步其实是调用外边的 <code>createBean(beanName, mbd, args)</code> 方法，这是一个工厂方法。通过 <code>createBean</code> 方法，会创建一个新的 <code>singletonObject</code> </p>
+<h3 id="3、将创建的-singletonObject-添加到缓存中"><a href="#3、将创建的-singletonObject-添加到缓存中" class="headerlink" title="3、将创建的 singletonObject 添加到缓存中"></a>3、将创建的 singletonObject 添加到缓存中</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">addSingleton</span><span class="params">(String beanName, Object singletonObject)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>.singletonObjects) &#123;</span><br><span class="line">        <span class="keyword">this</span>.singletonObjects.put(beanName, singletonObject);</span><br><span class="line">        <span class="keyword">this</span>.singletonFactories.remove(beanName);</span><br><span class="line">        <span class="keyword">this</span>.earlySingletonObjects.remove(beanName);</span><br><span class="line">        <span class="comment">// 已经成功创建的单例</span></span><br><span class="line">        <span class="keyword">this</span>.registeredSingletons.add(beanName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一步涉及到三个缓存，以及一个成功创建的单例列表</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** Cache of singleton objects: bean name to bean instance. */</span></span><br><span class="line"><span class="comment">/** 缓存单例对象， K-V -&gt; BeanName - Bean 实例 */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Object&gt; singletonObjects = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Cache of singleton factories: bean name to ObjectFactory. */</span></span><br><span class="line"><span class="comment">/** 缓存 Bean 工厂 */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, ObjectFactory&lt;?&gt;&gt; singletonFactories = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">16</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Cache of early singleton objects: bean name to bean instance. */</span></span><br><span class="line"><span class="comment">/** 缓存早期单例对象 */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Object&gt; earlySingletonObjects = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">16</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Set of registered singletons, containing the bean names in registration order. */</span></span><br><span class="line"><span class="comment">/** 已注册的单例列表，按注册顺序保存 BeanName。 */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Set&lt;String&gt; registeredSingletons = <span class="keyword">new</span> LinkedHashSet&lt;&gt;(<span class="number">256</span>);</span><br></pre></td></tr></table></figure>
+
+<p>将创建的单例对象，添加到<strong>单例缓存</strong>中，同事将<strong>工厂缓存</strong>以及<strong>早期单例对象缓存</strong>中的对应对象删除</p>
+<h2 id="createBean"><a href="#createBean" class="headerlink" title="createBean"></a>createBean</h2><p>我们看一下 <code>creaetBean</code> 的源码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Object <span class="title">createBean</span><span class="params">(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)</span></span></span><br><span class="line"><span class="function">   <span class="keyword">throws</span> BeanCreationException </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (logger.isTraceEnabled()) &#123;</span><br><span class="line">        logger.trace(<span class="string">"Creating instance of bean '"</span> + beanName + <span class="string">"'"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    RootBeanDefinition mbdToUse = mbd;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Make sure bean class is actually resolved at this point, and</span></span><br><span class="line">    <span class="comment">// clone the bean definition in case of a dynamically resolved Class</span></span><br><span class="line">    <span class="comment">// which cannot be stored in the shared merged bean definition.</span></span><br><span class="line">    <span class="comment">// 获取真实的类型</span></span><br><span class="line">    Class&lt;?&gt; resolvedClass = resolveBeanClass(mbd, beanName);</span><br><span class="line">    <span class="keyword">if</span> (resolvedClass != <span class="keyword">null</span> &amp;&amp; !mbd.hasBeanClass() &amp;&amp; mbd.getBeanClassName() != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 创建新的 mbd 防止 其他线程修改</span></span><br><span class="line">        mbdToUse = <span class="keyword">new</span> RootBeanDefinition(mbd);</span><br><span class="line">        mbdToUse.setBeanClass(resolvedClass);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Prepare method overrides.</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 验证并准备为此bean定义的方法替代。 检查是否存在具有指定名称的方法。</span></span><br><span class="line">        mbdToUse.prepareMethodOverrides();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (BeanDefinitionValidationException ex) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> BeanDefinitionStoreException(mbdToUse.getResourceDescription(),</span><br><span class="line">                beanName, <span class="string">"Validation of method overrides failed"</span>, ex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.</span></span><br><span class="line">        <span class="comment">// 应用实例化之前的后处理器，以解决指定的bean是否存在实例化快捷方式。</span></span><br><span class="line">        <span class="comment">// InstantiationAwareBeanPostProcessor 后置处理器 </span></span><br><span class="line">        <span class="comment">// postProcessBeforeInstantiation 方法可能会已经实例化 Bean</span></span><br><span class="line">        Object bean = resolveBeforeInstantiation(beanName, mbdToUse);</span><br><span class="line">        <span class="keyword">if</span> (bean != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> bean;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(mbdToUse.getResourceDescription(), beanName,</span><br><span class="line">                <span class="string">"BeanPostProcessor before instantiation of bean failed"</span>, ex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 实例化 Bean</span></span><br><span class="line">        Object beanInstance = doCreateBean(beanName, mbdToUse, args);</span><br><span class="line">        <span class="keyword">if</span> (logger.isTraceEnabled()) &#123;</span><br><span class="line">            logger.trace(<span class="string">"Finished creating instance of bean '"</span> + beanName + <span class="string">"'"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> beanInstance;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (BeanCreationException | ImplicitlyAppearedSingletonException ex) &#123;</span><br><span class="line">        <span class="comment">// A previously detected exception with proper bean creation context already,</span></span><br><span class="line">        <span class="comment">// or illegal singleton state to be communicated up to DefaultSingletonBeanRegistry.</span></span><br><span class="line">        <span class="keyword">throw</span> ex;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(</span><br><span class="line">                mbdToUse.getResourceDescription(), beanName, <span class="string">"Unexpected exception during bean creation"</span>, ex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个方法涉及到：创建 Bean 实例、填充 Bean、应用 PostProcessor</p>
+<p>其中实例化 Bean 是在 <code>doCreateBean</code> 中。现在重点看一下 <code>doCreateBean</code> 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Object <span class="title">doCreateBean</span><span class="params">(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)</span></span></span><br><span class="line"><span class="function">   <span class="keyword">throws</span> BeanCreationException </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Instantiate the bean.</span></span><br><span class="line">    <span class="comment">// Bean 的 对象包装</span></span><br><span class="line">    BeanWrapper instanceWrapper = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (mbd.isSingleton()) &#123;</span><br><span class="line">        <span class="comment">// 从缓存中获取</span></span><br><span class="line">        instanceWrapper = <span class="keyword">this</span>.factoryBeanInstanceCache.remove(beanName);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (instanceWrapper == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 缓存中获取不到则直接创建, 这里创建的 BeanInstance !!!</span></span><br><span class="line">        instanceWrapper = createBeanInstance(beanName, mbd, args);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 获取 Bean 实例以及类型</span></span><br><span class="line">    Object bean = instanceWrapper.getWrappedInstance();</span><br><span class="line">    Class&lt;?&gt; beanType = instanceWrapper.getWrappedClass();</span><br><span class="line">    <span class="keyword">if</span> (beanType != NullBean.class) &#123;</span><br><span class="line">        mbd.resolvedTargetType = beanType;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Allow post-processors to modify the merged bean definition.</span></span><br><span class="line">    <span class="keyword">synchronized</span> (mbd.postProcessingLock) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!mbd.postProcessed) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 如果允许修改 mbd</span></span><br><span class="line">                <span class="comment">// 调用 MergedBeanDefinitionPostProcessor 后置处理器的</span></span><br><span class="line">                <span class="comment">// postProcessMergedBeanDefinition(mbd, beanType, beanName);</span></span><br><span class="line">                applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(mbd.getResourceDescription(), beanName,</span><br><span class="line">                        <span class="string">"Post-processing of merged bean definition failed"</span>, ex);</span><br><span class="line">            &#125;</span><br><span class="line">            mbd.postProcessed = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Eagerly cache singletons to be able to resolve circular references</span></span><br><span class="line">    <span class="comment">// even when triggered by lifecycle interfaces like BeanFactoryAware.</span></span><br><span class="line">    <span class="comment">// mbd 是单例 且 允许循环引用, (默认 true) 且在创建</span></span><br><span class="line">    <span class="keyword">boolean</span> earlySingletonExposure = (mbd.isSingleton() &amp;&amp; <span class="keyword">this</span>.allowCircularReferences &amp;&amp;</span><br><span class="line">            isSingletonCurrentlyInCreation(beanName));</span><br><span class="line">    <span class="keyword">if</span> (earlySingletonExposure) &#123;</span><br><span class="line">        <span class="keyword">if</span> (logger.isTraceEnabled()) &#123;</span><br><span class="line">            logger.trace(<span class="string">"Eagerly caching bean '"</span> + beanName +</span><br><span class="line">                    <span class="string">"' to allow for resolving potential circular references"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 先获取 之前的 Bean 的引用, 从 beanPostProcessorCache 中 获取 SmartInstantiationAwareBeanPostProcessor</span></span><br><span class="line">        <span class="comment">// 然后从 SmartInstantiationAwareBeanPostProcessor#getEarlyBeanReference 获取之前的引用</span></span><br><span class="line">        addSingletonFactory(beanName, () -&gt; getEarlyBeanReference(beanName, mbd, bean));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initialize the bean instance.</span></span><br><span class="line">    Object exposedObject = bean;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 属性赋值</span></span><br><span class="line">        populateBean(beanName, mbd, instanceWrapper);</span><br><span class="line">        <span class="comment">// 执行 init 方法</span></span><br><span class="line">        exposedObject = initializeBean(beanName, exposedObject, mbd);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">        <span class="keyword">if</span> (ex <span class="keyword">instanceof</span> BeanCreationException &amp;&amp; beanName.equals(((BeanCreationException) ex).getBeanName())) &#123;</span><br><span class="line">            <span class="keyword">throw</span> (BeanCreationException) ex;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(</span><br><span class="line">                    mbd.getResourceDescription(), beanName, <span class="string">"Initialization of bean failed"</span>, ex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里允许循环依赖</span></span><br><span class="line">    <span class="keyword">if</span> (earlySingletonExposure) &#123;</span><br><span class="line">        <span class="comment">// 获取早期的 Bean, 如果没有循环依赖 则获取不到</span></span><br><span class="line">        Object earlySingletonReference = getSingleton(beanName, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 有循环依赖</span></span><br><span class="line">        <span class="keyword">if</span> (earlySingletonReference != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 创建的是不是同一个，可能会有代理对象</span></span><br><span class="line">            <span class="keyword">if</span> (exposedObject == bean) &#123;</span><br><span class="line">                exposedObject = earlySingletonReference;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (!<span class="keyword">this</span>.allowRawInjectionDespiteWrapping &amp;&amp; hasDependentBean(beanName)) &#123;</span><br><span class="line">                <span class="comment">// 获取依赖的 Bean 并 循环放入到 actualDependentBeans</span></span><br><span class="line">                String[] dependentBeans = getDependentBeans(beanName);</span><br><span class="line">                Set&lt;String&gt; actualDependentBeans = <span class="keyword">new</span> LinkedHashSet&lt;&gt;(dependentBeans.length);</span><br><span class="line">                <span class="keyword">for</span> (String dependentBean : dependentBeans) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) &#123;</span><br><span class="line">                        actualDependentBeans.add(dependentBean);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (!actualDependentBeans.isEmpty()) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> BeanCurrentlyInCreationException(beanName,</span><br><span class="line">                            <span class="string">"Bean with name '"</span> + beanName + <span class="string">"' has been injected into other beans ["</span> +</span><br><span class="line">                            StringUtils.collectionToCommaDelimitedString(actualDependentBeans) +</span><br><span class="line">                            <span class="string">"] in its raw version as part of a circular reference, but has eventually been "</span> +</span><br><span class="line">                            <span class="string">"wrapped. This means that said other beans do not use the final version of the "</span> +</span><br><span class="line">                            <span class="string">"bean. This is often the result of over-eager type matching - consider using "</span> +</span><br><span class="line">                            <span class="string">"'getBeanNamesForType' with the 'allowEagerInit' flag turned off, for example."</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Register bean as disposable.</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 注册销毁方法</span></span><br><span class="line">        registerDisposableBeanIfNecessary(beanName, bean, mbd);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (BeanDefinitionValidationException ex) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(</span><br><span class="line">                mbd.getResourceDescription(), beanName, <span class="string">"Invalid destruction signature"</span>, ex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> exposedObject;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样是代码很长，分步骤阅读：</p>
+<p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/doCreateBean.png" alt="doCreateBean"></p>
+<p>如果这个 Bean 是单例 Bean 且允许循环使用且在创建中，则说明有循环引用。则调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addSingletonFactory(beanName, () -&gt; getEarlyBeanReference(beanName, mbd, bean));</span><br></pre></td></tr></table></figure>
+
+<p>这一行代码涉及到两个方法，分别是 <code>getEarlyBeanReference</code> 和 <code>addSingletonFactory</code>。源码如下：</p>
+<p><strong>• getEarlyBeanReference</strong></p>
+<p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/getEarlyBeanReference.png" alt="getEarlyBeanReference"></p>
+<p><strong>• addSingletonFactory</strong></p>
+<p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/addSingletonFactory.png" alt="addSingletonFactory"></p>
+<p>这一块可以看到将创建的一个单例对象的 <code>singletonFactory</code> 添加到了 <code>singletonFactories</code> 缓存中，同时将 <code>earlySingletonObjects</code> 缓存中的单例对象移除</p>
+<p>那什么时候添加到 <code>earlySingletonObjects</code> 缓存中呢？</p>
+<p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/addEarlySingletonObject.png" alt="addEarlySingletonObject"></p>
+<p>在这里将缓存从 <code>singletonFactories</code> 移到了 <code>earlySingletonObjects</code></p>
+<p>Spring 的 Bean 实例化的时候用到的三级缓存是：</p>
+<ul>
+<li><strong>singletonObjects</strong>：一级缓存，存储单例对象。Bean 已经实例化，初始化完成</li>
+<li><strong>earlySingletonObjects</strong>：二级缓存，存储 singletonObject，这个 Bean 实例化了，还没有初始化</li>
+<li><strong>singletonFactories</strong>：三级缓存，存储 singletonFactory</li>
+</ul>
+<p><strong>接着会初始化 Bean</strong>。重点关注下面一部分：</p>
+<p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/%E5%88%9D%E5%A7%8B%E5%8C%96bean.png" alt="初始化bean"></p>
+<p><strong>• populateBean</strong></p>
+<p>对 Bean 的属性进行赋值</p>
+<p>这块需要注意的是，在对属性进行赋值，发现依赖了其他 Bean，就会去先创建其他 Bean。我这边使用的注解 <code>@Autowired</code> 就会执行下面一部分：</p>
+<p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/populateBean.png" alt="populateBean"></p>
+<p>在这里解析属性的时候，就会去创建内部依赖的 Bean</p>
+<h2 id="getObjectForBeanInstance"><a href="#getObjectForBeanInstance" class="headerlink" title="getObjectForBeanInstance"></a>getObjectForBeanInstance</h2><p>获取给定的 bean 实例对象，如果是 FactoryBean，则为 bean 实例本身或其创建的对象</p>
+<p>这一块逻辑相对比较简单，就是根据前面你创建的 beanInstance，判断其类型，从而创建 Bean 实例</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png" alt="思维导图"></p>
+<p><img src="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/%E5%88%9B%E5%BB%BA%E5%AE%9E%E4%BE%8B.png" alt="创建实例"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Spring/" rel="tag"># Spring</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2021/09/08/前缀和技巧/" rel="next" title="前缀和技巧">
+                <i class="fa fa-chevron-left"></i> 前缀和技巧
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2021/09/09/Spring-依赖循环/" rel="prev" title="Spring 依赖循环">
+                Spring 依赖循环 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#getSingleton"><span class="nav-number">1.</span> <span class="nav-text">getSingleton</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、从-singletonObjects-缓存中获取"><span class="nav-number">1.1.</span> <span class="nav-text">1、从 singletonObjects 缓存中获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、创建-singletonObject"><span class="nav-number">1.2.</span> <span class="nav-text">2、创建 singletonObject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、将创建的-singletonObject-添加到缓存中"><span class="nav-number">1.3.</span> <span class="nav-text">3、将创建的 singletonObject 添加到缓存中</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#createBean"><span class="nav-number">2.</span> <span class="nav-text">createBean</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#getObjectForBeanInstance"><span class="nav-number">3.</span> <span class="nav-text">getObjectForBeanInstance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/差分数组技巧/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/" itemprop="url">详解 MVCC -- 多版本并发控制</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/差分数组技巧/" itemprop="url">差分数组技巧</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-23T16:56:57+08:00">
-                2020-06-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
+                2021-09-08
               </time>
             
 
@@ -328,8 +328,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -367,12 +367,13 @@
       
         
           
-          MySQL 默认的事务隔离级别是 RR（Read Repeatable 可重复读），即脏写、脏读、不可重复读、幻读都不会发生，这是怎么做到的？这就是由经典的 MVCC 多版本并发控制机制实现的。在讲解 MVCC 机制之前，我们得先讲讲 undo log 版本连。
-理解 MVCC 机制的前奏：undo log 版本链简单来说，我们每条数据其实都有两个子段，一个是 trx_id，一个是 roll_po
+          本文将一个和前缀和思想非常类似的算法技巧：差分数组。前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和；而差分数组主要适用场景是频繁对原始数组的某个区间的元素进行增减
+比如，我给你输入一个数组 nums，然后要求给区间 nums[2..6] 全部加 1，再给 nums[3..9] 全部减 3，再给 nums[0..4] 全部加 2，再给..
+一通操作之后，然后问你，最后 n
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/差分数组技巧/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -423,7 +424,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/22/适配器模式/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -442,7 +443,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/22/适配器模式/" itemprop="url">适配器模式</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/" itemprop="url">Spring Ioc 容器初始化</a></h1>
         
 
         <div class="post-meta">
@@ -454,8 +455,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-22T16:53:18+08:00">
-                2020-06-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-11T17:29:18+08:00">
+                2021-08-11
               </time>
             
 
@@ -477,8 +478,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -516,12 +517,12 @@
       
         
           
-          有的笔记本电脑的工作电压是 20V，而我国的家庭用电是 220V，如何让 20V 的笔记本电脑能够在 220V 的电压下工作？答案是引入一个电源适配器（AC Adapter），俗称充电器或者变压器。有了这个电源适配器，生活用电和笔记本电脑即可兼容。
-在软件开发中，有时也存在这种不兼容的情况，也可以像引入一个电源适配器一样引入一个称之为适配器的角色来协调这些不兼容的结构，这种设计方案即为适配器模式。
+          思维导图![Spring Ioc 容器初始化](Spring-Ioc-容器初始化/Spring Ioc 容器初始化.png)
+Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spring 容器，该容器会读取配置文件 /beans.xml，并统一管理由该文件中定义好的 bean 实例对象，如果要获取某个 bean 实例，使用 getBean 方法就行。假设将 Us
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/22/适配器模式/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -572,7 +573,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/22/MySQL-多事务运行场景/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/04/08/Spring-事务同步机制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -591,7 +592,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/22/MySQL-多事务运行场景/" itemprop="url">MySQL 多事务运行场景</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/" itemprop="url">Spring 事务同步机制</a></h1>
         
 
         <div class="post-meta">
@@ -603,8 +604,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-22T10:53:35+08:00">
-                2020-06-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-08T11:00:09+08:00">
+                2021-04-08
               </time>
             
 
@@ -626,8 +627,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -665,12 +666,15 @@
       
         
           
-          平时我们执行增删改的时候，无非就是从磁盘加载数据到 buffer pool 的缓存页里去，对缓存页进行更新，同时记录下来 undo log 回滚日志和 redo log 重做日志，应对的是事务提交之后 MySQL 挂了恢复数据的场景，以及事务回滚的场景
-接下来我们就要理解到「事务」这个层面了。平时我们一般都是写一个业务系统，然后业务系统对去对数据库执行增删改查，然后通常而言，我们都是在业务系统里开
+          Spring 事务极简介绍Spring 有「声明式事务」和「编程式事务」：
+
+声明式事务只需要提供 Transactional 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可
+
+编程式事务则需要使用 Spring 提供的模板，如 TransactionTemplate，或者直接使用底层的 PlatformTransactionManage
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/22/MySQL-多事务运行场景/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -721,7 +725,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/18/MySQL-之-undo-日志/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/03/29/I-0-多路复用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -740,7 +744,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/18/MySQL-之-undo-日志/" itemprop="url">MySQL 之 undo 日志</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/03/29/I-0-多路复用/" itemprop="url">I/0 多路复用</a></h1>
         
 
         <div class="post-meta">
@@ -752,8 +756,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-18T19:37:58+08:00">
-                2020-06-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-29T15:12:56+08:00">
+                2021-03-29
               </time>
             
 
@@ -775,8 +779,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
                   </a>
                 </span>
 
@@ -814,11 +818,12 @@
       
         
           
-          之前我们已经讲了在执行增删改操作时候的 redo log 的重做日志原理，说白了就是你对 buffer pool 里的缓存页执行增删改操作的时候，必须要写对应的 redo log 记录下来你做了哪些修改。而 redo log 都是先进入 redo log buffer 中的一个 block，然后事务提交的时候就会刷入磁盘文件里去。这样万一你提交事务了，结果事务修改的缓存页还没来得及刷入磁盘上的数据
+          最基本的 Socket 模型要想客户端和服务器能在网络中通信，必须要使用 Socket 编程，它是进程间通信里比较特别的方式，特别之处在于它是可以跨主机间通信
+Socket 的中文名叫「插口」。事实上，双方要进行网络通信前，各自得创建一个 Socket，这相当于客户端和服务器都开了一个「口子」，双方读取和发送数据的时候，都通过这个口子。这样，是不是觉得很像弄了一根网线，一头插在客户端，一头插在服务
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/18/MySQL-之-undo-日志/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/03/29/I-0-多路复用/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -869,7 +874,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -888,7 +893,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/" itemprop="url">MySQL 之 redo log buffer</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/" itemprop="url">大规模集群下 Hadoop NameNode 如何承受每秒上千万的高并发访问</a></h1>
         
 
         <div class="post-meta">
@@ -900,8 +905,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-16T10:53:23+08:00">
-                2020-06-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-10T14:23:12+08:00">
+                2021-02-10
               </time>
             
 
@@ -923,8 +928,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -962,12 +967,21 @@
       
         
           
-          redo log buffer之前说了一下 redo log block 这个概念，现在都知道平时我们执行完增删改之后，要写入磁盘的 redo log，其实应该是先进入到 redo log block 这个数据结构里去的，然后再进入到磁盘文件里。
-那么 redo log 是如何通过内存缓冲之后，再进入磁盘文件里去的？这就涉及到了一个新的组件，redo log buffer，它就是 MySQL 专门
+          我们分析一下，高并发请求 NameNode 会遇到什么问题
+我们知道，每次请求 NameNode 修改一条元数据（比如说申请上传一个文件，那么就需要在内存目录树种加入一个文件），都要写一条 edits log，包括两个步骤：
+
+写入本地磁盘
+
+通过网络传输给 JournalNodes 集群
+
+
+但是这存在多线程并发安全问题。NameNode 在写 edits log 时的第一条原则：
+
+必须保证每
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1018,7 +1032,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/11/MySQL-之-redo-日志/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/09/Hadoop-基本架构原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1037,7 +1051,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/11/MySQL-之-redo-日志/" itemprop="url">MySQL 之 redo 日志</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/" itemprop="url">Hadoop 基本架构原理</a></h1>
         
 
         <div class="post-meta">
@@ -1049,8 +1063,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-11T15:13:56+08:00">
-                2020-06-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-09T16:37:37+08:00">
+                2021-02-09
               </time>
             
 
@@ -1072,8 +1086,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -1111,11 +1125,14 @@
       
         
           
-          之前我们说过，在我们执行增删改操作的时候，首先会在 Buffer Pool 中更新缓存页。而在更新完 Buffer Pool 中的缓存页之后，必须要写一条 redo log，这样才能记录下来我们对数据库做的修改。redo log 可以保证我们事务提交之后，如果事务中的增删改 SQL 语句更新的缓存页还没刷到磁盘上去，此时 MySQL 宕机了，那么 MySQL 重启之后，就可以把 redo log 
+          Hadoop 是目前大数据领域最主流的一套技术体系，包含了多种技术。包括 HDFS（分布式文件系统）、YARN（分布式资源调度系统）、MapReduce（分布式计算系统）等等
+我们用一个简单的场景来阐述一下 Hadoop。假如你现在公司里的数据都是放在 MySQL 里的，并且全部放在一台数据库服务器上，假设这台服务器的磁盘空间有 2T ，如下：
+
+如果你不停地往这台服务器的 MySQL 里放数据，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/11/MySQL-之-redo-日志/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1166,7 +1183,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/11/MySQL-的一些生产案例/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1185,7 +1202,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/11/MySQL-的一些生产案例/" itemprop="url">MySQL 的一些生产案例</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/" itemprop="url">分布式事务 -- TCC Saga 入门级理解</a></h1>
         
 
         <div class="post-meta">
@@ -1197,8 +1214,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-11T14:26:16+08:00">
-                2020-06-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-05T14:51:46+08:00">
+                2021-02-05
               </time>
             
 
@@ -1220,8 +1237,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
                   </a>
                 </span>
 
@@ -1259,12 +1276,25 @@
       
         
           
-          RAID 锂电池充放电导致的 MySQL 性能抖动曾经有一个业务，它的数据库是部署在高配置服务器上的，磁盘就是用 RAID10 的阵列技术，用了 6 块磁盘组成了 RAID10 磁盘阵列架构。那么 RAID10 是什么？
-在知道 RAID10 之前，我们先看一下什么是 RAID0。RAID0，就是你有很多磁盘组成了一个阵列，然后你所有的数据都是分散写入不同磁盘的。因为有多块磁盘，所以你的磁盘阵列的
+          业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作
+用电商场景来说就是以下几个步骤：
+
+用户在订单平台操作下单
+
+占库存
+
+占钱款
+
+生成一笔订单
+
+
+如图所示：
+
+分布式系统上图是
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/11/MySQL-的一些生产案例/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1315,7 +1345,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/06/ZooKeeper-的一些知识点/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/03/公司的分布式缓存架构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1334,7 +1364,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/06/ZooKeeper-的一些知识点/" itemprop="url">ZooKeeper 的一些知识点</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/" itemprop="url">公司的分布式缓存架构</a></h1>
         
 
         <div class="post-meta">
@@ -1346,8 +1376,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-06T23:06:40+08:00">
-                2020-06-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-03T15:11:32+08:00">
+                2021-02-03
               </time>
             
 
@@ -1369,8 +1399,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/ZooKeeper/" itemprop="url" rel="index">
-                    <span itemprop="name">ZooKeeper</span>
+                  <a href="/CKING.github.io/categories/杂记/" itemprop="url" rel="index">
+                    <span itemprop="name">杂记</span>
                   </a>
                 </span>
 
@@ -1408,17 +1438,21 @@
       
         
           
-          ZooKeeper 的应用ZooKeeper 是一个分布式协调系统，封装了分布式架构中所有核心和主流的需求和功能。主要有如下作用：
+          Spring Cache在讨论公司的分布式缓存架构之前，我们先拿 Spring Cache 缓存作为一个参考系。简单来说，Spring Cache 有两个优点：
 
-分布式锁：运用于分布式的 Java 业务系统中
+基于 Spring AOP 注解
+上手简单
+对业务侵入性低
 
-元数据管理：Kafka、Canal，本身都是分布式架构，分布式集群在运行，它需要一个地方集中式地存储和管理分布式集群的核心元数据，所以它们都选择把核心元数据放在 ZooKeeper 中
 
-分布式协调：如果有人对 ZK
+提供标准的 Cache 抽象（JSR 107），具体的 Cache、CacheManager 依赖各自实现
+
+
+SpaceStation 实践在 Spring Cache 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/06/ZooKeeper-的一些知识点/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1469,7 +1503,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/02/MySQL-杂记/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/01/Spring-Cache/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1488,7 +1522,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/02/MySQL-杂记/" itemprop="url">MySQL 杂记</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/01/Spring-Cache/" itemprop="url">Spring Cache</a></h1>
         
 
         <div class="post-meta">
@@ -1500,8 +1534,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-02T11:39:35+08:00">
-                2020-06-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-01T15:55:27+08:00">
+                2021-02-01
               </time>
             
 
@@ -1523,8 +1557,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1562,12 +1596,11 @@
       
         
           
-          Linux 操作系统的存储系统软件层原理今天我们讲讲 MySQL 数据库在执行底层磁盘读写 IO 操作的原理，这其实就涉及到了 Linux 操作系统的磁盘 IO 原理了，不管是 MySQL 执行磁盘随机读写，还是磁盘顺序读写，其实在底层的 Linux 层面，原理几乎是一致的。
-所谓的操作系统，无论是 Linux ，还是 Windows，本质上它们自己也是软件系统，之所以需要操作系统，是因为我们不可
+          Spring Cache 简介在 Spring 3.1 中引入了多 Cache 的支持，在 spring - context 包中定义了 org.springframework.cache.Cache 和 org.springframework.cache.CacheManager 两个接口来统一不同的缓存技术。Cache 接口包含缓存的常用操作：增加、删除、读取等。CacheManager 是 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/02/MySQL-杂记/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/01/Spring-Cache/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1618,7 +1651,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/02/MySQL-数据库的日志顺序读写以及数据文件随机读写的原理/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/12/25/Java-内部类/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1637,7 +1670,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/02/MySQL-数据库的日志顺序读写以及数据文件随机读写的原理/" itemprop="url">MySQL 数据库的日志顺序读写以及数据文件随机读写的原理</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/12/25/Java-内部类/" itemprop="url">Java 内部类</a></h1>
         
 
         <div class="post-meta">
@@ -1649,8 +1682,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-02T09:50:21+08:00">
-                2020-06-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-25T18:20:52+08:00">
+                2020-12-25
               </time>
             
 
@@ -1672,8 +1705,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
                   </a>
                 </span>
 
@@ -1711,12 +1744,26 @@
       
         
           
-          今天给大家剖析一下 MySQL 在实际工作的时候两种数据读写机制，一种是对 redo log、binlog 这种日志进行的磁盘顺序读写，一种是对表空间的磁盘文件里的数据页进行的磁盘随机读写。
-磁盘随机读简单来说，MySQL 在工作的时候，尤其是执行增删改操作的时候，肯定会先从表空间的磁盘文件里读取数据页出来，这个过程其实就是典型的磁盘随机读操作。如图，图里有一个磁盘文件的示意，里面有很多数据页，然
+          内部类的作用首先我们要知道什么事内部类
+
+内部类（inner class）：定义在另一个类中的类
+
+内部类有什么作用：
+
+内部类方法可以访问该类定义所在作用域中的数据，包括 private 修饰的私有数据
+
+
+内部类可以对同一包中的其他类隐藏起来
+
+
+内部类可以实现 Java 单继承的缺陷
+
+内部类方法可以访问该类定义所在作用域中的数据我们看下面的代码
+1234567891011121314151
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/02/MySQL-数据库的日志顺序读写以及数据文件随机读写的原理/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/12/25/Java-内部类/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1758,7 +1805,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="page-number current">2</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/13/">13</a><a class="extend next" rel="next" href="/CKING.github.io/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="page-number current">2</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1806,7 +1853,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">124</span>
+                  <span class="site-state-item-count">161</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1817,7 +1864,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1828,7 +1875,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

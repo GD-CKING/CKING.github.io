@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文主要谈一下 Synchronized 锁的各种优化：包括偏向锁、轻量级锁、重量级锁，以及它们之间是如何获取和释放锁、锁之间是如何进行升级和膨胀的 偏向锁从 JDK 1.6 开始，JVM 对比较重的 Synchronized 就引入了各种锁优化的机制，偏向锁算是最轻的一种锁，应用的场景也是最简单的，即偏向锁是专门为了优化线程多次获取同一把锁的场景量身打造的 比如说方式 A 是被 Synchron">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Synchronized 锁升级优化的全流程">
+<meta property="og:url" content="https://github.com/2021/09/30/Synchronized-锁升级优化的全流程/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="本文主要谈一下 Synchronized 锁的各种优化：包括偏向锁、轻量级锁、重量级锁，以及它们之间是如何获取和释放锁、锁之间是如何进行升级和膨胀的 偏向锁从 JDK 1.6 开始，JVM 对比较重的 Synchronized 就引入了各种锁优化的机制，偏向锁算是最轻的一种锁，应用的场景也是最简单的，即偏向锁是专门为了优化线程多次获取同一把锁的场景量身打造的 比如说方式 A 是被 Synchron">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E9%94%81%E5%AF%B9%E8%B1%A1.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E6%97%A0%E9%94%81%E7%8A%B6%E6%80%81.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E8%8E%B7%E5%8F%96%E5%81%8F%E5%90%91%E9%94%81.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E5%81%8F%E5%90%91%E6%88%90%E5%8A%9F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E5%81%8F%E5%90%91%E9%94%81%E9%87%8A%E6%94%BE.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E8%8E%B7%E5%8F%96%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E5%8F%98%E4%B8%BA%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E8%8E%B7%E5%8F%96%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E9%87%8D%E9%87%8F%E7%BA%A7%E5%8A%A0%E9%94%81%E6%88%90%E5%8A%9F.png">
+<meta property="og:updated_time" content="2021-10-15T00:16:21.968Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Synchronized 锁升级优化的全流程">
+<meta name="twitter:description" content="本文主要谈一下 Synchronized 锁的各种优化：包括偏向锁、轻量级锁、重量级锁，以及它们之间是如何获取和释放锁、锁之间是如何进行升级和膨胀的 偏向锁从 JDK 1.6 开始，JVM 对比较重的 Synchronized 就引入了各种锁优化的机制，偏向锁算是最轻的一种锁，应用的场景也是最简单的，即偏向锁是专门为了优化线程多次获取同一把锁的场景量身打造的 比如说方式 A 是被 Synchron">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E9%94%81%E5%AF%B9%E8%B1%A1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2021/09/30/Synchronized-锁升级优化的全流程/">
+
+
+
+
+
+  <title>Synchronized 锁升级优化的全流程 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Synchronized 锁升级优化的全流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-30T15:49:20+08:00">
+                2021-09-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文主要谈一下 Synchronized 锁的各种优化：包括偏向锁、轻量级锁、重量级锁，以及它们之间是如何获取和释放锁、锁之间是如何进行升级和膨胀的</p>
+<h2 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h2><p>从 JDK 1.6 开始，JVM 对比较重的 Synchronized 就引入了各种锁优化的机制，偏向锁算是最轻的一种锁，应用的场景也是最简单的，即偏向锁是专门为了优化线程多次获取同一把锁的场景量身打造的</p>
+<p>比如说方式 A 是被 Synchronized 修饰的，线程 1 可能会多次调用方法 A，这样每次都要加锁和释放锁，而获取锁和释放锁是切切实实伴随着性能的损耗的</p>
+<p>因为我们现在已经知道当前场景，即一个线程多次来获取一把锁，能不能说第一次获取锁成功之后，后面要是同一个线程再来获取锁时，就可以快点获取锁。根据这个想法，偏向锁机制被提出来了</p>
+<h3 id="偏向锁的获取"><a href="#偏向锁的获取" class="headerlink" title="偏向锁的获取"></a>偏向锁的获取</h3><p>Synchronized 加锁时，肯定是要加锁的，对谁加锁呢？</p>
+<ul>
+<li>访问 Synchronized 修饰的实例方法，锁对象就是方法对应的实例对象</li>
+<li>访问 Synchronized 修饰的静态方法，锁对象就是方法所在的类，即类的字节码对象</li>
+<li>访问 Synchronized 代码块，那锁对象就是 Synchronized 当前指定的对象</li>
+</ul>
+<p>而偏向锁的具体实现细节，得要从锁对象的结构中进一步寻找答案</p>
+<p>首先锁对象包含对象头以及其他的一些成员变量，包括成员变量、实例方法等，重点我们关注<strong>对象头</strong></p>
+<p>对象头里面包含的内容比较多，比如 <code>Mark Work</code>、<code>ClassMetadata Address</code>（就是当前锁对象的类在方法区中的地址）等，如下图：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E9%94%81%E5%AF%B9%E8%B1%A1.png" alt="锁对象"></p>
+<p>而偏向锁实现的关键主要依附于 <code>Mark Word</code> 来实现：Mark Word 中有一个标志位用来记录当前锁的状态，比如当前是无锁状态还是偏向锁状态呢？</p>
+<p>另外当一个线程获取锁成功后，Mark Word 中还有一个指向那个获取锁成功的线程指针；一开始获取锁的线程的指针当然为空，并且锁的状态为无锁状态，如下图：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E6%97%A0%E9%94%81%E7%8A%B6%E6%80%81.png" alt="无锁状态"></p>
+<p>此时线程 1 过来获取 Synchronized 锁，线程 1 先看下锁的状态，如果为无锁状态，就直接将偏向锁的线程指针 CAS 改为指向线程 1，然后将锁标记 CAS 为偏向锁标记，标志这线程 1 获取偏向锁成功，如下所示：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E8%8E%B7%E5%8F%96%E5%81%8F%E5%90%91%E9%94%81.png" alt="获取偏向锁"></p>
+<p>如果说线程 1 以后再要对同一个 Synchronized 加锁，此时就到锁对象头中的 Mark Word 中看一下，发现当前已经是偏向锁标记了，并且当前偏向锁线程指针也是指向自己，此时就可以几乎零性能损耗获取锁成功了。如下：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E5%81%8F%E5%90%91%E6%88%90%E5%8A%9F.png" alt="偏向成功"></p>
+<p>现在应该能感受到偏向锁的好处了吧。偏向锁，偏的是同一个线程，一个线程只在第一次获取锁时，需要 CAS 修改下锁的的标记以及线程指针，耗费一点性能，而往后的重复加锁都是以极低的代价直接获取锁成功的</p>
+<h3 id="竞争释放偏向锁"><a href="#竞争释放偏向锁" class="headerlink" title="竞争释放偏向锁"></a>竞争释放偏向锁</h3><p>偏向锁的使用场景我们提到过一点，它是适合线程多次获取同一把锁而做的优化措施，适用于竞争不是很激烈的场景，一旦多线程竞争激烈了，此时就会导致偏向锁的释放和锁的升级</p>
+<p>此时，如果线程 2 也过来对同一个 Synchronized 加锁会怎样？那就要看下之前的线程 1 是否还存活：</p>
+<ul>
+<li>如果线程 1 已经执行结束了，那么此时线程 2 过来一看锁标记依然为偏向锁，但是线程指针指向的线程 1 已经没了，此时就将偏向锁的指针指向线程 2，线程 2 获取偏向锁成功，偏向锁后续就偏向线程 2 了</li>
+<li>如果当前锁标记为偏向锁，并且当前线程 1 依然是存活的，此时线程 2 过来要对同一个 Synchronized 获取锁，此时就构成竞争，也就不符合偏向锁的适用的场景了。此时就会释放线程 1 获取的偏向锁，并且就锁标记 CAS 改为轻量级锁</li>
+</ul>
+<p>从这里我们可以感受到，偏向锁的使用场景并不是很狭义的只有一个线程工作的场景，而不是竞争非常小，小道不足以发生竞争，这样对单个线程的多次获取同一个锁优化效率就可以充分发挥出来了</p>
+<p>此时释放偏向锁的场景如下图所示：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E5%81%8F%E5%90%91%E9%94%81%E9%87%8A%E6%94%BE.png" alt="偏向锁释放"></p>
+<h2 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h2><h3 id="轻量级锁的获取"><a href="#轻量级锁的获取" class="headerlink" title="轻量级锁的获取"></a>轻量级锁的获取</h3><p>前面我们分析到线程 2 过来加锁时，和线程 1 产生冲突，线程 1 的偏向锁释放并被迫升级为了轻量级锁，那此时线程 1 和线程 2 都没有获取到锁，线程 1 和线程 2 都会同时 CAS 去获取轻量级锁</p>
+<p><strong>偏向锁的加锁机制为修改 Mark Word 中锁标记位为偏向锁，并且线程指针指向当前线程</strong>，那么轻量级锁的加锁机制是怎样的呢？我们继续看下</p>
+<p>比如现在是线程 2 过来加锁，此时就会在线程 2 对应栈帧中开辟一块所记录的内存空间，然后将锁对象中的 Mark Word 复制一份到栈帧的锁记录中，并且将锁对象中的线程指针指向栈帧中的锁记录空间，这样轻量级锁算是加成功了。如下：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E8%8E%B7%E5%8F%96%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81.png" alt="获取轻量级锁"></p>
+<h3 id="轻量级锁释放锁"><a href="#轻量级锁释放锁" class="headerlink" title="轻量级锁释放锁"></a>轻量级锁释放锁</h3><p>当线程 2 的轻量级锁释放时，此时就会逆向操作，将线程 2 栈帧锁记录中的 Mark Word CAS 替换回锁对象中的 Mark Word，如果替换成功，就表示释放轻量级锁成功</p>
+<p>到这里我们发现，之所以轻量级锁比偏向锁稍微重那么一点，就是下你比较于偏向锁而言，轻量级锁每次都要先加锁，然后还需要再释放锁。不想偏向锁，只要不产生竞争，那么第一次加锁一次即可，后续再次获取锁的性能耗费极低，并且也不需要释放锁，自然也就不用承担释放锁性能损耗了</p>
+<h2 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h2><h3 id="什么时候会膨胀为重量级锁"><a href="#什么时候会膨胀为重量级锁" class="headerlink" title="什么时候会膨胀为重量级锁"></a>什么时候会膨胀为重量级锁</h3><h4 id="情况-1：其他线程-CAS-自旋失败导致膨胀为重量级锁"><a href="#情况-1：其他线程-CAS-自旋失败导致膨胀为重量级锁" class="headerlink" title="情况 1：其他线程 CAS 自旋失败导致膨胀为重量级锁"></a>情况 1：其他线程 CAS 自旋失败导致膨胀为重量级锁</h4><p>假设线程 2 还没有释放轻量级锁，此时线程 3 过来加锁，线程 3 和线程 2 一样，先把 Mark Word 复制一份到自己线程栈帧中的锁记录空间，然后在修改锁记录的指针时，因为锁记录的指针已经指向了线程 2，所以此时线程 3 的 CAS 修改锁记录指针就会失败</p>
+<p>此时线程 3 的 CAS 操作失败并不会像偏向锁一样直接导致锁升级，而是会先 CAS 自旋一会，如果自旋获取锁失败的次数过多，此时才会升级为重量级锁</p>
+<h4 id="情况-2：三个线程竞争导致直接膨胀为重量级锁"><a href="#情况-2：三个线程竞争导致直接膨胀为重量级锁" class="headerlink" title="情况 2：三个线程竞争导致直接膨胀为重量级锁"></a>情况 2：三个线程竞争导致直接膨胀为重量级锁</h4><p>假设此时也是线程 2 获取了轻量级锁，线程 3 过来 CAS 加锁，修改锁记录指针时失败了，然后线程 3 正在自旋获取锁，这时正好线程 4 也来获取锁了，此时 JVM 会毫不犹豫地将锁膨胀为重量级锁</p>
+<p>毕竟线程 3 在那自旋时，要是线程 2 能快点释放锁，那么线程 3 还是有机会在最大允许自旋次数内获取到轻量级锁的，这下倒好，线程 4 直接掺和进来，JVM 会认为现在线程 3 获取锁的希望不大，竞争太激烈了，所以就直接膨胀为重量级锁了</p>
+<p>以下两种膨胀情况如下所示：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E5%8F%98%E4%B8%BA%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81.png" alt="变为重量级锁"></p>
+<h3 id="重量级锁的获取"><a href="#重量级锁的获取" class="headerlink" title="重量级锁的获取"></a>重量级锁的获取</h3><p>现在由于锁膨胀为重量级锁，原本的锁记录的指针将会变为指向重量级锁 Monitor 对象的指针了，并且当前所有没获取到锁的线程优先进入到 Monitor 对象中 entrylist 中获取等待锁，如下：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E8%8E%B7%E5%8F%96%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81.png" alt="获取重量级锁"></p>
+<p>然后多线程依次去获取锁，比如现在线程 3 开始获取锁，此时底层会执行 <code>monitorenter</code> 指令，然后在 Object Monitor 中锁的计数器加 1，并且记录当前持有锁的线程为线程 3，后面如果线程 3 再次过来加锁时发现当前持有锁的线程正是线程 3，直接将计数器加 1，表示又重入了一次锁，如下：</p>
+<p><img src="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/%E9%87%8D%E9%87%8F%E7%BA%A7%E5%8A%A0%E9%94%81%E6%88%90%E5%8A%9F.png" alt="重量级加锁成功"></p>
+<h3 id="重量级锁的释放"><a href="#重量级锁的释放" class="headerlink" title="重量级锁的释放"></a>重量级锁的释放</h3><p>重量级锁的释放比较简单，直接递减加锁次数 count：</p>
+<ul>
+<li>递减后如果 count 为 0，表示当前线程该释放的都释放完了，此时直接将线程指针 owner 置空，释放锁完毕</li>
+<li>如果递减后 count 还不为 0，那就表示线程之前对这个锁重入过好几次，那还得线程再次执行释放锁操作，直到 count 为 0 才算释放彻底了，才能将线程指针置空</li>
+</ul>
+<h2 id="JIT-编译器的优化"><a href="#JIT-编译器的优化" class="headerlink" title="JIT 编译器的优化"></a>JIT 编译器的优化</h2><p>Java 代码编译生成 class 字节码文件是静态编译过程，那么 class 字节码文件编译成计算机能执行的机器指令，这个阶段就包含了 JIT 编译</p>
+<p>Synchronized 加锁时，除了对不同竞争程度做的各种锁优化之外，在最开始的 JIT 编译阶段也会 Synchronized 也做了一定程度的优化</p>
+<h3 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h3><p>优化点之一就是锁消除，锁消除顾名思义就是不要你加的锁，把你加的 Synchronized 锁删除掉，免得加锁还要浪费性能，那什么场景下要锁消除呢？、</p>
+<p>一般是在不需要加 Synchronized 锁的地方加锁。比如一个方法内，涉及到的变量都是局部变量，并且要是根据逃逸分析技术分析，发现完全没有将当前线程资源暴露给其他线程看见的可能，既然其他线程没有任何看见当前线程的资源，也就不会出现并发的问题，既然没有并发的问题，那你还莫名加个锁岂不是浪费性能了</p>
+<p>所以 JIT 底层默默为该现象把了倒关，即锁消除的优化，要是在没有多线程并发冲突的地方还加 Synchronized 锁，底层就不会执行 <code>monitorenter</code> 和 <code>monitorexit</code> 相关的指定了</p>
+<h3 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h3><p>我们知道 Synchronized 锁比较重，也是比较消费性能的。比如有个场景，你在一个方法内，对同一个对象加了多次 Synchronized 锁，此时可能就对应有多个 Synchronized 代码块。正常我们看到这种情况，都会优化成：将多个 Synchronized 代码块合并在一个 Synchronized 代码块中，否则你就要先加锁在释放锁，重复多次这种耗费性能的操作</p>
+<p> 确实 JIT 编译时也是这样设计的，底层不会多次执行 <code>monitorenter</code> 和 <code>monitorexit</code> 指令，如果发现居然是对同一个对象多次加 Synchronized 锁，底层将会把他们合并成一个 Synchronized 代码块，然后只会执行一次 monitorenter 和 monitorexit，达到了优化的目的，底层这里又对代码的性能把了道关</p>
+<p>现在我们可以知道，锁粗化，顾名思义就是多个 Synchronized 代码块在底层 JIT 编译时合并成一个，好似一个锁变粗了一样，尽可能地避免了不必要的。多次加锁和释放锁带来的性能损耗</p>
+<h3 id="自适应加锁"><a href="#自适应加锁" class="headerlink" title="自适应加锁"></a>自适应加锁</h3><p>我们前面看到了，在前面多个线程获取锁的时候，如果获取锁失败，都会自旋一会，然后再去尝试获取锁，也就是自旋加锁</p>
+<p>其实这个做法已经比较先进了，相比于一旦获取锁失败就阻塞，然后线程上下文切换执行其他线程而言，确实已经很好了，毕竟线程上下文切换时很耗费性能的，如果说你能够自旋一会，等到其他线程释放锁之后就能获取到锁，虽然自旋一会耗费了点 CPU，但是相比于线程上下文切换的代价，自旋一会就可以获取到锁还是更好的</p>
+<p>但是问题来了，要是当前的环境竞争非常激烈，我一直自旋都获取锁失败，可能都超过了线程上下文切换带来的性能损耗，那自旋获取锁岂不是性能更差？面对这个问题，提出了自适应加锁的概念</p>
+<p>即根据最近几次线程自旋获取锁成功的概率，来决定当前线程是自旋一会来获取锁，还是直接阻塞切换线程上下文让其他线程执行</p>
+<p>如果最近一段时间线程竞争程度比较激烈，那就不适合一直自旋等待；如果最近几次线程竞争很小，自旋获取锁的成功率比较高，那可以自旋等待一会来获取锁，通过这样比较智能的自适应过程，来权衡自旋加锁和线程上下文切换带来的性能损耗</p>
+<h2 id="题目剖析"><a href="#题目剖析" class="headerlink" title="题目剖析"></a>题目剖析</h2><h3 id="偏向锁的加锁流程能简单说下吗？一般适用于什么场景？"><a href="#偏向锁的加锁流程能简单说下吗？一般适用于什么场景？" class="headerlink" title="偏向锁的加锁流程能简单说下吗？一般适用于什么场景？"></a>偏向锁的加锁流程能简单说下吗？一般适用于什么场景？</h3><p>偏向锁加锁时，首先会在 Synchronized 对应锁对象的对象头中的 Work Mark 中，先看一下锁的标记：</p>
+<ul>
+<li>如果是无锁状态，CAS 修改为偏向锁标记，然后将 Mark Word 中的线程指针指向当前线程，表示当前线程已经获取到了一个偏向锁；那么后续该线程再来加锁时，发现自己已经获取偏向锁了，那么此时几乎零成本获取偏向锁成功</li>
+<li>如果已经是偏向锁状态，那就看下当前的 Mark Word 中，线程指针指向的线程是不是自己，如果是自己，当然直接获取偏向锁成功了如果指针指向的线程不是当前线程，但恰好该指向的线程已经结束了，那么直接将 Mark Word 中，线程指针指向当前线程自己，表示现在改为偏向当前新来的线程了</li>
+</ul>
+<p>从偏向锁的加锁流程我们可以看到，偏向锁只适合于竞争不激烈的场景，主要是优化同一个线程多次获取同一个锁的性能，如果说线程 1 已经获取偏向锁成功，并且在线程 1 还没有结束时，紧接着线程 2 又过来获取锁，这下一看锁标记为偏向锁，还被线程 1 持有，那就直接发生竞争了</p>
+<h3 id="轻量级锁时如何加锁的？为什么说轻量级锁会比偏向锁更重一点呢？"><a href="#轻量级锁时如何加锁的？为什么说轻量级锁会比偏向锁更重一点呢？" class="headerlink" title="轻量级锁时如何加锁的？为什么说轻量级锁会比偏向锁更重一点呢？"></a>轻量级锁时如何加锁的？为什么说轻量级锁会比偏向锁更重一点呢？</h3><p>首先线程会在自己线程的栈帧中创建一个锁记录空间，然后将 Mark Word 复制一份到这个锁记录空间中，然后将锁对象中的 Mark Word 指向这个锁记录空间，轻量级锁就算获取成功了</p>
+<p>因为轻量级锁相比较于偏向锁而言，每次加锁使用完毕后都需要释放锁，也就是说每次都需要老老实实地执行加锁和释放锁。而偏向锁只有在线程第一次过来加锁时，</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2021/09/26/Spring-事务失效情况/" rel="next" title="Spring 事务失效情况">
+                <i class="fa fa-chevron-left"></i> Spring 事务失效情况
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#偏向锁"><span class="nav-number">1.</span> <span class="nav-text">偏向锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#偏向锁的获取"><span class="nav-number">1.1.</span> <span class="nav-text">偏向锁的获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#竞争释放偏向锁"><span class="nav-number">1.2.</span> <span class="nav-text">竞争释放偏向锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#轻量级锁"><span class="nav-number">2.</span> <span class="nav-text">轻量级锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#轻量级锁的获取"><span class="nav-number">2.1.</span> <span class="nav-text">轻量级锁的获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#轻量级锁释放锁"><span class="nav-number">2.2.</span> <span class="nav-text">轻量级锁释放锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重量级锁"><span class="nav-number">3.</span> <span class="nav-text">重量级锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么时候会膨胀为重量级锁"><span class="nav-number">3.1.</span> <span class="nav-text">什么时候会膨胀为重量级锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#情况-1：其他线程-CAS-自旋失败导致膨胀为重量级锁"><span class="nav-number">3.1.1.</span> <span class="nav-text">情况 1：其他线程 CAS 自旋失败导致膨胀为重量级锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#情况-2：三个线程竞争导致直接膨胀为重量级锁"><span class="nav-number">3.1.2.</span> <span class="nav-text">情况 2：三个线程竞争导致直接膨胀为重量级锁</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重量级锁的获取"><span class="nav-number">3.2.</span> <span class="nav-text">重量级锁的获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重量级锁的释放"><span class="nav-number">3.3.</span> <span class="nav-text">重量级锁的释放</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JIT-编译器的优化"><span class="nav-number">4.</span> <span class="nav-text">JIT 编译器的优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#锁消除"><span class="nav-number">4.1.</span> <span class="nav-text">锁消除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#锁粗化"><span class="nav-number">4.2.</span> <span class="nav-text">锁粗化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自适应加锁"><span class="nav-number">4.3.</span> <span class="nav-text">自适应加锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题目剖析"><span class="nav-number">5.</span> <span class="nav-text">题目剖析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#偏向锁的加锁流程能简单说下吗？一般适用于什么场景？"><span class="nav-number">5.1.</span> <span class="nav-text">偏向锁的加锁流程能简单说下吗？一般适用于什么场景？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#轻量级锁时如何加锁的？为什么说轻量级锁会比偏向锁更重一点呢？"><span class="nav-number">5.2.</span> <span class="nav-text">轻量级锁时如何加锁的？为什么说轻量级锁会比偏向锁更重一点呢？</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -100,7 +100,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RR5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RR6.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RR7.png">
-<meta property="og:updated_time" content="2020-07-25T06:24:26.445Z">
+<meta property="og:updated_time" content="2021-10-15T00:16:22.081Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="详解 MVCC -- 多版本并发控制Ⅱ">
 <meta name="twitter:description" content="Read Committed（读已提交）隔离级别现在我们讲讲基于 ReadView 机制是如何实现 Read Committed 隔离级别的。所谓的Read Committed 隔离级别，简称为 RC，是说你事务运行期间，只要别的事务修改数据还提交了，你就是可以读到人家修改的数据的，所以是会发生不可重复读的问题，包括幻读的问题，都会有的。 而 ReadView 机制，它是基于 undo log 版">
@@ -406,7 +406,7 @@
 <h2 id="Read-Repeatable（可重复读）隔离级别"><a href="#Read-Repeatable（可重复读）隔离级别" class="headerlink" title="Read Repeatable（可重复读）隔离级别"></a>Read Repeatable（可重复读）隔离级别</h2><p>现在我们讲讲 MySQL 中的 RR（Read Repeatable 可重复读）隔离级别，是如何同时避免不可重复读问题和幻读问题的。</p>
 <p>在 MySQL 中让多个事务并发执行的时候能够相互隔离，避免同时读写一条数据的时候有影响，是依托 undo log 版本链条和 ReadView 机制来实现的。而 RR 级别，就是你这个事务读一条数据，无论读多少次，都是一个值，别的事务修改数据之后哪怕提交了，你也是看不到人家修改的值的，这就避免了不可重复读的问题。</p>
 <p>同时如果别的事务插入了一些新的数据，你也是读不到的，这样你就可以避免幻读问题。</p>
-<p>那么如何实现？举个例子，假设有一条数据是事务 id = 5 的一个事务插入的，同时此时有事务 A 和事务 B 同时在运行，事务 A 的 id 是 60， 事务 B 的 id 是70</p>
+<p>那么如何实现？举个例子，假设有一条数据是事务 id = 50 的一个事务插入的，同时此时有事务 A 和事务 B 同时在运行，事务 A 的 id 是 60， 事务 B 的 id 是70</p>
 <p>这个时候，事务 A 发起了一个查询，它就是第一次查询会生成一个 ReadView，此时 ReadView 里的 creator_trx_id 是 60，min_trx_id 是 60， max_trx_id 是 71， m_ids 是 [60, 70]。如图：</p>
 <p><img src="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RR1.png" alt="RR1"></p>
 <p>这是时候事务 A 基于这个 ReadView 去查这条数据，会发现这条数据的 trx_id 为 50，是小于 ReadView 里的 min_trx_id 的，说明它发起查询之前，早就有事务插入这条数据还提交了，所以此时可以查到这条原始数据的。如图：</p>
@@ -571,7 +571,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">124</span>
+                  <span class="site-state-item-count">161</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -582,7 +582,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -593,7 +593,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

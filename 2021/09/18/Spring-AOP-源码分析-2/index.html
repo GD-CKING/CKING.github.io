@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="JDK 动态代理源码分析接着我们通过源码分析介绍 Spring AOP JDK 动态代理实现的原理。内容包括：  invoke：实现 AOP 中具体的逻辑 getProxy：获取产生的代理类  invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lang.reflect 包中 Proxy 和 InvocationHandler 两个接口来实现的。对于 Invoca">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring AOP 源码分析 2">
+<meta property="og:url" content="https://github.com/2021/09/18/Spring-AOP-源码分析-2/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="JDK 动态代理源码分析接着我们通过源码分析介绍 Spring AOP JDK 动态代理实现的原理。内容包括：  invoke：实现 AOP 中具体的逻辑 getProxy：获取产生的代理类  invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lang.reflect 包中 Proxy 和 InvocationHandler 两个接口来实现的。对于 Invoca">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/invoke.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/getAdvice.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/%E9%93%BE%E5%BC%8F%E5%A2%9E%E5%BC%BA.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/JDK%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/CGLIB%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86.png">
+<meta property="og:updated_time" content="2021-10-15T00:16:21.858Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring AOP 源码分析 2">
+<meta name="twitter:description" content="JDK 动态代理源码分析接着我们通过源码分析介绍 Spring AOP JDK 动态代理实现的原理。内容包括：  invoke：实现 AOP 中具体的逻辑 getProxy：获取产生的代理类  invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lang.reflect 包中 Proxy 和 InvocationHandler 两个接口来实现的。对于 Invoca">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/invoke.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2021/09/18/Spring-AOP-源码分析-2/">
+
+
+
+
+
+  <title>Spring AOP 源码分析 2 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring AOP 源码分析 2</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-18T11:08:38+08:00">
+                2021-09-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="JDK-动态代理源码分析"><a href="#JDK-动态代理源码分析" class="headerlink" title="JDK 动态代理源码分析"></a>JDK 动态代理源码分析</h2><p>接着我们通过源码分析介绍 Spring AOP JDK 动态代理实现的原理。内容包括：</p>
+<ul>
+<li><strong>invoke</strong>：实现 AOP 中具体的逻辑</li>
+<li><strong>getProxy</strong>：获取产生的代理类</li>
+</ul>
+<h3 id="invoke：实现-AOP-中具体的逻辑"><a href="#invoke：实现-AOP-中具体的逻辑" class="headerlink" title="invoke：实现 AOP 中具体的逻辑"></a>invoke：实现 AOP 中具体的逻辑</h3><p>JDK 中的 AOP 的实现是基于 java.lang.reflect 包中 <code>Proxy</code> 和 <code>InvocationHandler</code> 两个接口来实现的。对于 InvocationHandler 的创建，需要我们重写三个方法：</p>
+<ul>
+<li>构造函数：将目标代理对象传入</li>
+<li>invoke：实现 AOP 中具体的逻辑</li>
+<li>getProxy：获取产生的代理类</li>
+</ul>
+<p>而在 Spring 框架中，JDK 方式的代理也是实现了上述过程</p>
+<p><strong>JDK 动态代理时通过 <code>proxyFactory.getProxy</code> 获取代理的</strong>，如下，通过 <code>createAopProxy()</code> 生成对应的 ProxyFactory，然后在调用其中的 getProxy 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getProxy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.createAopProxy().getProxy();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>createAopProxy</code> 中决定的实现类为 <code>JdkDynamicAopProxy</code>，如下面代码所示，它实现了 <code>AopProxy</code> 和 <code>InvocationHandler</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">JdkDynamicAopProxy</span> <span class="keyword">implements</span> <span class="title">AopProxy</span>, <span class="title">InvocationHandler</span>, <span class="title">Serializable</span></span></span><br></pre></td></tr></table></figure>
+
+<p>由于我们会调用 <code>InvocationHandler</code>，并且 override 其中的 invoke 方法，然后通过 <code>InvocationHandler</code> 中的 getProxy 方法获取代理类，通过对代理类调用 <code>process</code> 方法执行 AOP 的相关操作</p>
+<p>我们先来看看 override 的 invoke 方法的源码，如下图所示，在 invoke 方法中我们需要关注红框标注的部分：</p>
+<ul>
+<li>在获取目标类以后，通过目标类获取要执行方法的拦截器链，这里的变量为 chain</li>
+<li>如果 chain 为空，说明没有在方法上进行拦截，那么直接调用切点方法就行了</li>
+<li>如果 chain 不为空，说明在方法上有拦截，于是将拦截器封装在 <code>ReflectiveMethodInvocation</code>，并执行，这部分也是 AOP 需要关注的</li>
+</ul>
+<p><img src="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/invoke.png" alt="invoke"></p>
+<p>上面通过了 <code>getInterceptorsAndDynamicInterceptionAdvice</code> 获取目标类执行方法的拦截器链 chain，这里对 <code>getInterceptorsAndDynamicInterceptionAdvice</code> 进行解析，如下图，依旧关注红框的部分：</p>
+<p>收到获取此方法的拦截器链，依然将 Advisor 分为三种类型：</p>
+<ul>
+<li>PointcutAdvisor：当前 class、method 与 Pointcut 匹配时，才获取并保存 MethodInterceptor 的 List</li>
+<li>IntroductionAdvisor：当前 class 与 Pointcut 匹配时，获取并保存 MethodInterceptor 的 List</li>
+<li>其他类型：直接获取并保存 MethodInterceptor 的 List</li>
+</ul>
+<p><img src="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/getAdvice.png" alt="getAdvice"></p>
+<p>从上图可以知道，处理 PointcutAdvisor 类型的时候会用到 getInterceptors 方法获取 MethodInterceptor 的数组类型，这里看看 getInterceptors 内部的实现是如何的</p>
+<p>如下，使用 <code>advisor.getAdvice()</code> 获取 Advice。假设注解 Advisor 以 @Before 注解形式存在，那么此时得到的 Advice 应该是 AspectJMethodBeforeAdvice，进入的是 <code>interceptors.add(adapter.getInterceptor(advisor))</code> 这行代码，将 AspectJMethodBeforeAdvice 包装成 MethodInterceptor 类型，并返回</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> MethodInterceptor[] getInterceptors(Advisor advisor) <span class="keyword">throws</span> UnknownAdviceTypeException &#123;</span><br><span class="line">    List&lt;MethodInterceptor&gt; interceptors = <span class="keyword">new</span> ArrayList(<span class="number">3</span>);</span><br><span class="line">    Advice advice = advisor.getAdvice();</span><br><span class="line">    <span class="keyword">if</span> (advice <span class="keyword">instanceof</span> MethodInterceptor) &#123;</span><br><span class="line">        interceptors.add((MethodInterceptor)advice);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Iterator var4 = <span class="keyword">this</span>.adapters.iterator();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(var4.hasNext()) &#123;</span><br><span class="line">        AdvisorAdapter adapter = (AdvisorAdapter)var4.next();</span><br><span class="line">        <span class="keyword">if</span> (adapter.supportsAdvice(advice)) &#123;</span><br><span class="line">            interceptors.add(adapter.getInterceptor(advisor));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (interceptors.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> UnknownAdviceTypeException(advisor.getAdvice());</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (MethodInterceptor[])interceptors.toArray(<span class="keyword">new</span> MethodInterceptor[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面说的是如何获取方法拦截链 chain，接下来看看拦截链为空和不为空的情况。拦截链为空，如下代码所示，表示当前的 Method 并没有 Advice 逻辑需要增强</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);</span><br><span class="line">retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);</span><br></pre></td></tr></table></figure>
+
+<p>拦截链不为空，如图 4 所示，需要创建 <code>ReflectiveMethodInvocation</code> 对象。如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="title">ReflectiveMethodInvocation</span><span class="params">(Object proxy, @Nullable Object target, Method method, @Nullable Object[] arguments, @Nullable Class&lt;?&gt; targetClass, List&lt;Object&gt; interceptorsAndDynamicMethodMatchers)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.proxy = proxy;</span><br><span class="line">    <span class="keyword">this</span>.target = target;</span><br><span class="line">    <span class="keyword">this</span>.targetClass = targetClass;</span><br><span class="line">    <span class="keyword">this</span>.method = BridgeMethodResolver.findBridgedMethod(method);</span><br><span class="line">    <span class="keyword">this</span>.arguments = AopProxyUtils.adaptArgumentsIfNecessary(method, arguments);</span><br><span class="line">    <span class="keyword">this</span>.interceptorsAndDynamicMethodMatchers = interceptorsAndDynamicMethodMatchers;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有了 ReflectiveMethodInvocation 对象就要通过 <code>proceed</code> 方法对拦截链上的拦截器进行递归执行，也是一种对当前 Method 的链式增强。如下，proceed 方法中会在拦截链上通过 <code>currentInterceptorIndex</code> 获取一个拦截器，然后对其进行动态代理方法的匹配，如果匹配通过了，执行拦截器中的方法，否则跳过该拦截器，执行拦截器链上的下一个拦截器</p>
+<p>如果是一个拦截器，就通过静态的方式执行，不用执行其中的嵌入方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">proceed</span><span class="params">()</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.currentInterceptorIndex == <span class="keyword">this</span>.interceptorsAndDynamicMethodMatchers.size() - <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.invokeJoinpoint();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// currentInterceptorIndex 用来递归执行 MethodInvocation.proceed，从而进入到下一个拦截器</span></span><br><span class="line">        Object interceptorOrInterceptionAdvice = <span class="keyword">this</span>.interceptorsAndDynamicMethodMatchers.get(++<span class="keyword">this</span>.currentInterceptorIndex);</span><br><span class="line">        <span class="keyword">if</span> (interceptorOrInterceptionAdvice <span class="keyword">instanceof</span> InterceptorAndDynamicMethodMatcher) &#123;</span><br><span class="line">            <span class="comment">// 进行动态代理方法的匹配，如果匹配上了执行加入拦截器以后的方法，否则跳过拦截器执行下一个拦截器链的拦截器</span></span><br><span class="line">            InterceptorAndDynamicMethodMatcher dm = (InterceptorAndDynamicMethodMatcher)interceptorOrInterceptionAdvice;</span><br><span class="line">            Class&lt;?&gt; targetClass = <span class="keyword">this</span>.targetClass != <span class="keyword">null</span> ? <span class="keyword">this</span>.targetClass : <span class="keyword">this</span>.method.getDeclaringClass();</span><br><span class="line">            <span class="comment">// 如果动态匹配失败，跳过拦截器到拦截链的下一个拦截器</span></span><br><span class="line">            <span class="keyword">return</span> dm.methodMatcher.matches(<span class="keyword">this</span>.method, targetClass, <span class="keyword">this</span>.arguments) ? dm.interceptor.invoke(<span class="keyword">this</span>) : <span class="keyword">this</span>.proceed();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// 只是一个拦截器就通过静态的方式执行，不用执行其中嵌入的方法</span></span><br><span class="line">            <span class="keyword">return</span> ((MethodInterceptor)interceptorOrInterceptionAdvice).invoke(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>proceed</code> 方法中无论是否匹配上动态代理方法都会运行 invoke。这里以前置增强为例，实现类为 MethodBeforeAdviceInterceptor。如下，在 invoke 方法中执行 advice 的 before 方法实现增强内容</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MethodBeforeAdviceInterceptor</span> <span class="keyword">implements</span> <span class="title">MethodInterceptor</span>, <span class="title">BeforeAdvice</span>, <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> MethodBeforeAdvice advice;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MethodBeforeAdviceInterceptor</span><span class="params">(MethodBeforeAdvice advice)</span> </span>&#123;</span><br><span class="line">        Assert.notNull(advice, <span class="string">"Advice must not be null"</span>);</span><br><span class="line">        <span class="keyword">this</span>.advice = advice;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(MethodInvocation mi)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());</span><br><span class="line">        <span class="keyword">return</span> mi.proceed();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里把 JDK 的链式增强做一个总结。如下图，首先根据 <code>Advisor</code> 中的 Advice 创建 MethodInterceptor 拦截器链，这个链中保存对目标类对应方法的所有增强，这些增强以拦截器链的方式放到拦截器链中。然后创建 MethodInvocation 用来保存上述的 MethodInterceptor 拦截器链</p>
+<p>接着执行 MethodInvocation.proceed 的递归方法，在方法中通过 IterceptorIndex 对拦截器链上的拦截器进行遍历。在拦截器链中的逻辑都执行完毕了，通过 invoke 执行目标类的原方法</p>
+<p><img src="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/%E9%93%BE%E5%BC%8F%E5%A2%9E%E5%BC%BA.png" alt="链式增强"></p>
+<h3 id="getProxy：获取产生的代理类"><a href="#getProxy：获取产生的代理类" class="headerlink" title="getProxy：获取产生的代理类"></a>getProxy：获取产生的代理类</h3><p>接着我们看通过 getProxy 获取代理对原方法和增强方法执行的过程。如下所示，getProxy 接收 ClassLoader 作为参数，方法体中调用了 AopProxyUtils 的 completeProxiedInterfaces 生成代理接口，然后通过 Proxy 中的 <code>newProxyInstance</code> 方法将代理实例化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getProxy</span><span class="params">(@Nullable ClassLoader classLoader)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (logger.isTraceEnabled()) &#123;</span><br><span class="line">        logger.trace(<span class="string">"Creating JDK dynamic proxy: "</span> + <span class="keyword">this</span>.advised.getTargetSource());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Class&lt;?&gt;[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(<span class="keyword">this</span>.advised, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">this</span>.findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);</span><br><span class="line">    <span class="keyword">return</span> Proxy.newProxyInstance(classLoader, proxiedInterfaces, <span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们看看 getProxy 中调用的 <code>completeProxiedInterfaces</code> 方法，该方法体中获取 AdvisedSupport 代理配置中目标类中需要被代理的接口</p>
+<p>在当前目标类中，如果需要被代理的接口数为0 的情况下，做如下处理：</p>
+<ul>
+<li>如果目标类它自身就是个接口，将其加到目标 Interface</li>
+<li>如果目标类本身已经是一个代理类（根据 Proxy.isProxyClass 判断），是 JDK 动态代理创建的代理对象，那么将其所有的接口都加到目标 Interface</li>
+<li>重新获取目标接口</li>
+</ul>
+<p><code>addSpringProxy</code>、<code>addAdvised</code> 用于判断目标类是否是特殊接口：SpringProxy、Advised。一般情况下两个 boolean 都是 true</p>
+<p>将目标代理类、SpringProxy、Advised 三个接口填入 proxiedInterfaces 中，返回此数组</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> Class&lt;?&gt;[] completeProxiedInterfaces(AdvisedSupport advised, <span class="keyword">boolean</span> decoratingProxy) &#123;</span><br><span class="line">    Class&lt;?&gt;[] specifiedInterfaces = advised.getProxiedInterfaces();</span><br><span class="line">    <span class="keyword">if</span> (specifiedInterfaces.length == <span class="number">0</span>) &#123;</span><br><span class="line">        Class&lt;?&gt; targetClass = advised.getTargetClass();</span><br><span class="line">        <span class="keyword">if</span> (targetClass != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (targetClass.isInterface()) &#123;</span><br><span class="line">                advised.setInterfaces(<span class="keyword">new</span> Class[]&#123;targetClass&#125;);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Proxy.isProxyClass(targetClass)) &#123;</span><br><span class="line">                advised.setInterfaces(targetClass.getInterfaces());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            specifiedInterfaces = advised.getProxiedInterfaces();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">boolean</span> addSpringProxy = !advised.isInterfaceProxied(SpringProxy.class);</span><br><span class="line">    <span class="keyword">boolean</span> addAdvised = !advised.isOpaque() &amp;&amp; !advised.isInterfaceProxied(Advised.class);</span><br><span class="line">    <span class="keyword">boolean</span> addDecoratingProxy = decoratingProxy &amp;&amp; !advised.isInterfaceProxied(DecoratingProxy.class);</span><br><span class="line">    <span class="keyword">int</span> nonUserIfcCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (addSpringProxy) &#123;</span><br><span class="line">        ++nonUserIfcCount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (addAdvised) &#123;</span><br><span class="line">        ++nonUserIfcCount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (addDecoratingProxy) &#123;</span><br><span class="line">        ++nonUserIfcCount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Class&lt;?&gt;[] proxiedInterfaces = <span class="keyword">new</span> Class[specifiedInterfaces.length + nonUserIfcCount];</span><br><span class="line">    System.arraycopy(specifiedInterfaces, <span class="number">0</span>, proxiedInterfaces, <span class="number">0</span>, specifiedInterfaces.length);</span><br><span class="line">    <span class="keyword">int</span> index = specifiedInterfaces.length;</span><br><span class="line">    <span class="keyword">if</span> (addSpringProxy) &#123;</span><br><span class="line">        proxiedInterfaces[index] = SpringProxy.class;</span><br><span class="line">        ++index;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (addAdvised) &#123;</span><br><span class="line">        proxiedInterfaces[index] = Advised.class;</span><br><span class="line">        ++index;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (addDecoratingProxy) &#123;</span><br><span class="line">        proxiedInterfaces[index] = DecoratingProxy.class;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> proxiedInterfaces;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><img src="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/JDK%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86.png" alt="JDK动态代理"></p>
+<h2 id="CGLIB-动态代理源码分析"><a href="#CGLIB-动态代理源码分析" class="headerlink" title="CGLIB 动态代理源码分析"></a>CGLIB 动态代理源码分析</h2><p>CGLIB 是通过字节码增强处理器框架 <strong>ASM</strong>，来生成字节码并装载到 JVM。和 JDK 代理基于接口实现方式不同，CGLIB 没有局限于接口，采用的是生成子类的方式。这个子类本质上就是一个 Class 对象，即，原来是执行原有的 Class，CGLIB 会通过字节码增强的方式，在字节码的层面生成一个子类去继承需要增强的类，在子类中加入需要增强的方法，让这个子类代替原有的类，完成增强的操作</p>
+<p>我们将 CGLIB 生成 Class 对象分为三个步骤：</p>
+<ol>
+<li>生成指定类的 Class 对象字节数组</li>
+<li>将 Class 对象字节数组转换为 Class 对象</li>
+<li>通过 Class.forName 方法将 Class 对象装载到 JVM</li>
+</ol>
+<h3 id="生成指定类的-Class-对象字节数组"><a href="#生成指定类的-Class-对象字节数组" class="headerlink" title="生成指定类的 Class 对象字节数组"></a>生成指定类的 Class 对象字节数组</h3><p>如下，在创建 Enhance 对象会调用 create 方法从而生成超类的子类。深入到 create 方法内部可以看到，先通过 getClassLoader 获取当前类加载器，通过 AbstractClassGenerator 中的 ClassLoaderData 方法传入到加载器，获取加载类的内容 data。并且将其放到缓存中，接下来利用 data 中的 get 方法获取字节码信息并且返回</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Object <span class="title">create</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 获取当前类加载器，应用类加载器</span></span><br><span class="line">        ClassLoader loader = <span class="keyword">this</span>.getClassLoader();</span><br><span class="line">        Map&lt;ClassLoader, AbstractClassGenerator.ClassLoaderData&gt; cache = CACHE;</span><br><span class="line">        AbstractClassGenerator.ClassLoaderData data = (AbstractClassGenerator.ClassLoaderData)cache.get(loader);</span><br><span class="line">        <span class="keyword">if</span> (data == <span class="keyword">null</span>) &#123;</span><br><span class="line">            Class var5 = AbstractClassGenerator.class;</span><br><span class="line">            <span class="keyword">synchronized</span>(AbstractClassGenerator.class) &#123;</span><br><span class="line">                cache = CACHE;</span><br><span class="line">                data = (AbstractClassGenerator.ClassLoaderData)cache.get(loader);</span><br><span class="line">                <span class="keyword">if</span> (data == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    Map&lt;ClassLoader, AbstractClassGenerator.ClassLoaderData&gt; newCache = <span class="keyword">new</span> WeakHashMap(cache);</span><br><span class="line">                    <span class="comment">// 创建 AbstractClassGenerator</span></span><br><span class="line">                    data = <span class="keyword">new</span> AbstractClassGenerator.ClassLoaderData(loader);</span><br><span class="line">                    newCache.put(loader, data);</span><br><span class="line">                    CACHE = newCache;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">        <span class="comment">// 调用 get 方法获取字节码，如果没有字节码，则会创建字节码</span></span><br><span class="line">        Object obj = data.get(<span class="keyword">this</span>, <span class="keyword">this</span>.getUseCache());</span><br><span class="line">        <span class="keyword">return</span> obj <span class="keyword">instanceof</span> Class ? <span class="keyword">this</span>.firstInstance((Class)obj) : <span class="keyword">this</span>.nextInstance(obj);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Error | RuntimeException var9) &#123;</span><br><span class="line">        <span class="keyword">throw</span> var9;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception var10) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> CodeGenerationException(var10);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>顺着 data 中的 get 方法查看代码，get 中会判断是否开启缓存，如果没有使用缓存就调用 <code>generate</code> 方法，否则直接从缓存中获取对象。这里的缓存可以通过 enhancer.setUserCache 方法设置，默认为 true</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">get</span><span class="params">(AbstractClassGenerator gen, <span class="keyword">boolean</span> useCache)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 判断是否开启缓存，可直接设置：enhancer.setUserCache(false); 默认为 true</span></span><br><span class="line">    <span class="keyword">if</span> (!useCache) &#123;</span><br><span class="line">        <span class="keyword">return</span> gen.generate(<span class="keyword">this</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        Object cachedValue = <span class="keyword">this</span>.generatedClasses.get(gen);</span><br><span class="line">        <span class="keyword">return</span> gen.unwrapCachedValue(cachedValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>继续跟进 generate方法中传入 data 作为参数，生成对应的代理类名称，然后通过类加载器和类名称尝试加载类。如果之前没有生成对应的字节码，那么创建字节码。接着通过生成字节码的策略生成字节码，当前对象即为 <code>Enhancer</code> 对象，字节数组的形式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Class <span class="title">generate</span><span class="params">(AbstractClassGenerator.ClassLoaderData data)</span> </span>&#123;</span><br><span class="line">    Object save = CURRENT.get();</span><br><span class="line">    CURRENT.set(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    Class var8;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        ClassLoader classLoader = data.getClassLoader();</span><br><span class="line">        <span class="keyword">if</span> (classLoader == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"ClassLoader is null while trying to define class "</span> + <span class="keyword">this</span>.getClassName() + <span class="string">". It seems that the loader has been expired from a weak reference somehow. Please file an issue at cglib's issue tracker."</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String className;</span><br><span class="line">        <span class="comment">// 生成代理类名称</span></span><br><span class="line">        <span class="keyword">synchronized</span>(classLoader) &#123;</span><br><span class="line">            className = <span class="keyword">this</span>.generateClassName(data.getUniqueNamePredicate());</span><br><span class="line">            data.reserveName(className);</span><br><span class="line">            <span class="keyword">this</span>.setClassName(className);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Class gen;</span><br><span class="line">        <span class="comment">// 这里通过应用类加载器和类名称尝试加载，如果加载不到，才开始创建字节码</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.attemptLoad) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                gen = classLoader.loadClass(<span class="keyword">this</span>.getClassName());</span><br><span class="line">                Class var23 = gen;</span><br><span class="line">                <span class="keyword">return</span> var23;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ClassNotFoundException var19) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 通过生成策略创建字节码，当前对象即为 Enhancer 对象，字节数组形式</span></span><br><span class="line">        <span class="keyword">byte</span>[] b = <span class="keyword">this</span>.strategy.generate(<span class="keyword">this</span>);</span><br><span class="line">        className = ClassNameReader.getClassName(<span class="keyword">new</span> ClassReader(b));</span><br><span class="line">        ProtectionDomain protectionDomain = <span class="keyword">this</span>.getProtectionDomain();</span><br><span class="line">        <span class="keyword">synchronized</span>(classLoader) &#123;</span><br><span class="line">            <span class="comment">// 将字节码加载到 JVM 内存，同时会触发代理对象初始化</span></span><br><span class="line">            gen = ReflectUtils.defineClass(className, b, classLoader, protectionDomain, <span class="keyword">this</span>.contextClass);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        var8 = gen;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Error | RuntimeException var20) &#123;</span><br><span class="line">        <span class="keyword">throw</span> var20;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception var21) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> CodeGenerationException(var21);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        CURRENT.set(save);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> var8;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们看 <code>getClassName</code> 方法中时如何生成代理类名称的。由下可以看出，生成字节码文件的规则：<strong>真实类路径 + 来源（EnhancerByCGLIB）+ key 的 hash 值的 16 进制</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getClassName</span><span class="params">(String prefix, String source, Object key, Predicate names)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (prefix == <span class="keyword">null</span>) &#123;</span><br><span class="line">        prefix = <span class="string">"org.springframework.cglib.empty.Object"</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (prefix.startsWith(<span class="string">"java"</span>)) &#123;</span><br><span class="line">        prefix = <span class="string">"$"</span> + prefix;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">// 拼接类路径</span></span><br><span class="line">    String base = prefix + <span class="string">"$$"</span> + source.substring(source.lastIndexOf(<span class="number">46</span>) + <span class="number">1</span>) + <span class="keyword">this</span>.getTag() + <span class="string">"$$"</span> + Integer.toHexString(STRESS_HASH_CODE ? <span class="number">0</span> : key.hashCode());</span><br><span class="line">    String attempt = base;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> var7 = <span class="number">2</span>; names.evaluate(attempt); attempt = base + <span class="string">"_"</span> + var7++) &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> attempt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>生成文件的结果入好像如下所示：</p>
+<p>com.example.cglib.RealService$$EnhancerByCGLIB$$a9ba5c5e</p>
+<p>具体生成的字节码的方式就是和通过 asm 的工具类 DefaultGeneratorStrategy 来生成，另外提供了一个 DebuggingClassWriter 来写入到指定目录，默认的目录为空，所以生成的代理类只存在于内存中</p>
+<h3 id="将-Class-对象字节数组转换为-Class-对象"><a href="#将-Class-对象字节数组转换为-Class-对象" class="headerlink" title="将 Class 对象字节数组转换为 Class 对象"></a>将 Class 对象字节数组转换为 Class 对象</h3><p>通过上面的源代码分析已经生成了 Class 对象字节数组，接下来就要将这个字节数组转换成 Class 对象。跟进 ReflectUtils.defineClass 继续看，如下，方法 defineClass 传入了 byte[] b，这个 b 的数组中存放的就是字节数组。通过 new object 将字节数组赋值给 args，然后通过 DEFINE_CLASS.invoke 方法将字节数组转化为 Class 对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Class <span class="title">defineClass</span><span class="params">(String className, <span class="keyword">byte</span>[] b, ClassLoader loader, ProtectionDomain protectionDomain, Class&lt;?&gt; contextClass)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    Class c = <span class="keyword">null</span>;</span><br><span class="line">    Lookup lookup;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (c == <span class="keyword">null</span> &amp;&amp; classLoaderDefineClassMethod != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (protectionDomain == <span class="keyword">null</span>) &#123;</span><br><span class="line">            protectionDomain = PROTECTION_DOMAIN;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 其中 b 为 cglib 生成的字节数组</span></span><br><span class="line">        Object[] args = <span class="keyword">new</span> Object[]&#123;className, b, <span class="number">0</span>, b.length, protectionDomain&#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (!classLoaderDefineClassMethod.isAccessible()) &#123;</span><br><span class="line">                classLoaderDefineClassMethod.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            c = (Class)classLoaderDefineClassMethod.invoke(loader, args);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException var10) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> CodeGenerationException(var10.getTargetException());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable var11) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!var11.getClass().getName().endsWith(<span class="string">"InaccessibleObjectException"</span>)) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> CodeGenerationException(var11);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> CodeGenerationException(THROWABLE);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    	<span class="comment">// 正式加载到 JVM 内存</span></span><br><span class="line">        Class.forName(className, <span class="keyword">true</span>, loader);</span><br><span class="line">        <span class="keyword">return</span> c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过 Class.forName 方法将 Class 对象装载到 JVM</p>
+<p>从上面的代码可以知道，在 defineClass 的最后调用了 <code>Class.forName</code> 方法传入 className 以及加载器，将 Class 对象装载到 JVM 中以供使用。以后这个 Class 对象就代替了源 Class 对象，完成 AOP 增强的操作</p>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h3><p><img src="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/CGLIB%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86.png" alt="CGLIB动态代理"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Spring/" rel="tag"># Spring</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/" rel="next" title="Spring AOP 源码分析">
+                <i class="fa fa-chevron-left"></i> Spring AOP 源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/" rel="prev" title="Spring 同步和异步事件的使用场景">
+                Spring 同步和异步事件的使用场景 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK-动态代理源码分析"><span class="nav-number">1.</span> <span class="nav-text">JDK 动态代理源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#invoke：实现-AOP-中具体的逻辑"><span class="nav-number">1.1.</span> <span class="nav-text">invoke：实现 AOP 中具体的逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getProxy：获取产生的代理类"><span class="nav-number">1.2.</span> <span class="nav-text">getProxy：获取产生的代理类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CGLIB-动态代理源码分析"><span class="nav-number">2.</span> <span class="nav-text">CGLIB 动态代理源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成指定类的-Class-对象字节数组"><span class="nav-number">2.1.</span> <span class="nav-text">生成指定类的 Class 对象字节数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将-Class-对象字节数组转换为-Class-对象"><span class="nav-number">2.2.</span> <span class="nav-text">将 Class 对象字节数组转换为 Class 对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结-1"><span class="nav-number">2.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

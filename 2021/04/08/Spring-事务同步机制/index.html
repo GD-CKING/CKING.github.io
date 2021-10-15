@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Spring 事务极简介绍Spring 有「声明式事务」和「编程式事务」：  声明式事务只需要提供 Transactional 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可  编程式事务则需要使用 Spring 提供的模板，如 TransactionTemplate，或者直接使用底层的 PlatformTransactionManage">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring 事务同步机制">
+<meta property="og:url" content="https://github.com/2021/04/08/Spring-事务同步机制/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="Spring 事务极简介绍Spring 有「声明式事务」和「编程式事务」：  声明式事务只需要提供 Transactional 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可  编程式事务则需要使用 Spring 提供的模板，如 TransactionTemplate，或者直接使用底层的 PlatformTransactionManage">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-10-15T00:16:21.873Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring 事务同步机制">
+<meta name="twitter:description" content="Spring 事务极简介绍Spring 有「声明式事务」和「编程式事务」：  声明式事务只需要提供 Transactional 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可  编程式事务则需要使用 Spring 提供的模板，如 TransactionTemplate，或者直接使用底层的 PlatformTransactionManage">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2021/04/08/Spring-事务同步机制/">
+
+
+
+
+
+  <title>Spring 事务同步机制 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/04/08/Spring-事务同步机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring 事务同步机制</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-08T11:00:09+08:00">
+                2021-04-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Spring-事务极简介绍"><a href="#Spring-事务极简介绍" class="headerlink" title="Spring 事务极简介绍"></a>Spring 事务极简介绍</h2><p>Spring 有「声明式事务」和「编程式事务」：</p>
+<ul>
+<li><p><strong>声明式事务</strong>只需要提供 <code>Transactional</code> 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可</p>
+</li>
+<li><p><strong>编程式事务</strong>则需要使用 Spring 提供的模板，如 <code>TransactionTemplate</code>，或者直接使用底层的 <code>PlatformTransactionManager</code> 手动控制提交、回滚</p>
+</li>
+</ul>
+<p>声明式事务最大的优点就是对代码的<strong>侵入性小</strong>，只需要在方法上加 <code>@Transcational</code>的注解就可以实现事务；编程式事务的最大优点是对事务的<strong>管控粒度较细</strong>，可以实现代码块级别的事务</p>
+<h2 id="前提介绍"><a href="#前提介绍" class="headerlink" title="前提介绍"></a>前提介绍</h2><p>Spring 把 JDBC 的 <code>Connection</code> 或者 <code>Hibernate</code> 的 <code>Session</code> 等数据库的链接（会话）都统一称为资源。我们知道 <code>Connection</code> 是线程不安全的，同一时刻是不能被多个线程共享的</p>
+<blockquote>
+<p>同一时刻，我们每个线程持有的 Connection 应该是独立的，且都是互不干扰和互不相同的</p>
+</blockquote>
+<p><strong>但是 Spring 管理的 Service、Dao 等都是无状态的单例 Bean</strong>，如何保证单例 Bean 里面使用的 <code>Connection</code> 都能够独立？Spring 引入一个类：事务同步管理器 <code>TransactionSynchronizationManager</code> 来解决这个问题。它的做法是内部使用了很多的 <code>ThreadLocal</code> 为不同的事务线程提供了独立的资源副本，<strong>并同时维护这些事务的配置属性和运行状态信息（比如强大的事务嵌套、传播属性等）</strong></p>
+<p>同步管理器 <code>TransactionSynchronizationManager</code> 是掌管这一切的大脑，它管理的 <code>TransactionSynchronization</code> 是开放给调用者一个非常重要的扩展点</p>
+<p><code>TransactionSynchronizationManager</code> 将 <code>Dao</code>、<code>Service</code> 中影响线程安全的所有 “状态” 都统一抽取到该类中，并用 <code>ThreadLocal</code> 进行封装，这样一来，Dao（基于模板类或资源获取工具类创建的 Dao）和 Service（采用 Spring 事务管理机制）就不用自己来保存一些事务状态了，从而就变成了线程安全的单例对象了</p>
+<h3 id="DataSourceUtils"><a href="#DataSourceUtils" class="headerlink" title="DataSourceUtils"></a>DataSourceUtils</h3><p>在这里我们先介绍一下 <code>DataSourceUtils</code> 这个工具类。在一些场景里，比如使用 Mybatis 的时候，可能无法使用 Spring 提供的模板来达到效果，而是需要直接操作原生 API <code>Connection</code> </p>
+<p>那如何拿到这个链接 <code>Connection</code> 呢（这里有个前提：必须保证和当前 Mybatis 线程使用的是同一个链接，这样才接收本事务的控制）。这个事务 <code>DataSourceUtils</code> 这个工具类就闪亮登场了，它提供了这个能力：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSourceUtils</span> </span>&#123;</span><br><span class="line">	...</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Connection <span class="title">getConnection</span><span class="params">(DataSource dataSource)</span> <span class="keyword">throws</span> CannotGetJdbcConnectionException </span>&#123; ... &#125;</span><br><span class="line">	...</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 把definition和connection进行一些准备工作~</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">prepareConnectionForTransaction</span><span class="params">(Connection con, @Nullable TransactionDefinition definition)</span> <span class="keyword">throws</span> SQLException </span>&#123; ...&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Reset the given Connection after a transaction,</span></span><br><span class="line">	<span class="comment">// con.setTransactionIsolation(previousIsolationLevel);和con.setReadOnly(false);等等</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">resetConnectionAfterTransaction</span><span class="params">(Connection con, @Nullable Integer previousIsolationLevel)</span> </span>&#123; ... &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 该JDBC Connection 是否是当前事务内的链接~</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isConnectionTransactional</span><span class="params">(Connection con, @Nullable DataSource dataSource)</span> </span>&#123; ... &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Statement 给他设置超时时间  不传timeout表示不超时</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">applyTransactionTimeout</span><span class="params">(Statement stmt, @Nullable DataSource dataSource)</span> <span class="keyword">throws</span> SQLException </span>&#123; ... &#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">applyTimeout</span><span class="params">(Statement stmt, @Nullable DataSource dataSource, <span class="keyword">int</span> timeout)</span> <span class="keyword">throws</span> SQLException </span>&#123; ... &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 此处可能是归还给连接池，也有可能是close~（和连接池参数有关）</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">releaseConnection</span><span class="params">(@Nullable Connection con, @Nullable DataSource dataSource)</span> </span>&#123; ... &#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">doReleaseConnection</span><span class="params">(@Nullable Connection con, @Nullable DataSource dataSource)</span> <span class="keyword">throws</span> SQLException </span>&#123; ... &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 这个是真close</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">doCloseConnection</span><span class="params">(Connection con, @Nullable DataSource dataSource)</span> <span class="keyword">throws</span> SQLException </span>&#123; ... &#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 如果链接是代理，会拿到最底层的connection</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Connection <span class="title">getTargetConnection</span><span class="params">(Connection con)</span> </span>&#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>getConnection()</code> 这个方法就是从 <code>TransactionSynchronizationManager</code> 里拿到一个现成的 <code>Connection</code>，若没有现成的，会用 <code>DataSource</code> 创建一个链接然后放进去</p>
+<p>其实 Spring 不就为 JDBC 提供了这个工具类，还有 Hibernate、JPA、JDO 等提供了类似的工具类</p>
+<ul>
+<li>org.springframework.orm.hibernate.SessionFactoryUtils.getSession()</li>
+<li>org.springframework.orm.jpa.EntityManagerFactoryUtils.getTransactionalEntityManager()</li>
+<li>org.springframework.orm.jdo.PersistenceManagerFactoryUtils.getPersistenceManager()</li>
+</ul>
+<h2 id="问题场景模拟"><a href="#问题场景模拟" class="headerlink" title="问题场景模拟"></a>问题场景模拟</h2><p>为了更好地解释和说明，此处模拟出这样的一个场景：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloServiceImpl</span> <span class="keyword">implements</span> <span class="title">HelloService</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jdbcTemplates;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">hello</span><span class="params">(Integer id)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 向数据库插入一条记录</span></span><br><span class="line">        String sql = <span class="string">"insert into user(id, name, age) values("</span> + id + <span class="string">", 'fsx', 21)"</span>;</span><br><span class="line">        jdbcTemplate.update(sql);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 做其余的事情，可能抛出异常</span></span><br><span class="line">        System.out.println(<span class="number">1</span> / <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"service hello"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如上 Demo，因为 <code>1 / 0</code> 会报错，因为有事务，所以最终这个插入是不会成功的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Ojbect <span class="title">hello</span><span class="params">(Integer id)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 向数据库插入一条记录</span></span><br><span class="line">    String sql = <span class="string">"insert into user(id, name, age) values("</span> + id + <span class="string">", 'fsx', 21)"</span>;</span><br><span class="line">    jdbcTemplage.update(sql);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 根据id去查询获取总数（若查询到了肯定是 count = 1）</span></span><br><span class="line">    String query = <span class="string">"select count(1) from user where id = "</span> + id;</span><br><span class="line">    Integer count = jdbcTemplate.queryForObject(query, Integer.class);</span><br><span class="line">    log.info(count.toString());</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="string">"service hello"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>稍微改造一下，按照上面那么写，count 永远是返回 1 的。前面 insert 一条记录，下面是可以立马去查询出来的</p>
+<p>下面把它改造如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Ojbect <span class="title">hello</span><span class="params">(Integer id)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 向数据库插入一条记录</span></span><br><span class="line">    String sql = <span class="string">"insert into user(id, name, age) values("</span> + id + <span class="string">", 'fsx', 21)"</span>;</span><br><span class="line">    jdbcTemplage.update(sql);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 生产环境，一般会把这些操作交给线程池，这里只是模拟一下效果</span></span><br><span class="line">    <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">   		 String query = <span class="string">"select count(1) from user where id = "</span> + id;</span><br><span class="line">    	Integer count = jdbcTemplate.queryForObject(query, Integer.class);</span><br><span class="line">    	log.info(count.toString());     </span><br><span class="line">    &#125;).start();</span><br><span class="line">   </span><br><span class="line">    <span class="comment">// 把问题放大</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="string">"service hello"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经过上面的改造，这样我们的 count 的值就永远是 0 了</p>
+<p>这个现象是一个非常严重的问题。他可能会出现：刚插入的数据竟然查不到的诡异现象。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>在互联网中，我们经常为了提高吞吐量、程序性能，会使用到异步的方式进行优化、削峰等。因此连接池、线程池得到了大量的应用。比如一个业务处理中，发短信、发微信通知、记录操作日志等这些非主干需求，我们一般都希望都交给线程池去处理而不要干扰主要业务流程，所以上面模拟的现象出现问题的可能性还是蛮高的</p>
+<p>上面出现的问题中，我们先给解决方案。我们的诉求是：<strong>我们的异步线程执行时，必须确保记录已经持久化到数据库了</strong>。因此可以这么处理：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Ojbect <span class="title">hello</span><span class="params">(Integer id)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 向数据库插入一条记录</span></span><br><span class="line">    String sql = <span class="string">"insert into user(id, name, age) values("</span> + id + <span class="string">", 'fsx', 21)"</span>;</span><br><span class="line">    jdbcTemplage.update(sql);</span><br><span class="line">    </span><br><span class="line">    TransactionSynchronizationManager.registerSynchronization(<span class="keyword">new</span> TransactionSynchronizationAdapter() &#123;</span><br><span class="line">        <span class="comment">// 在事务提交之后执行的代码块（方法），此处使用 TransactionSynchronizationAdapter</span></span><br><span class="line">        <span class="comment">// 其实在 Spring5 后直接使用接口也很方便</span></span><br><span class="line">        </span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterCommit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">   		 	String query = <span class="string">"select count(1) from user where id = "</span> + id;</span><br><span class="line">    		Integer count = jdbcTemplate.queryForObject(query, Integer.class);</span><br><span class="line">    		log.info(count.toString());     </span><br><span class="line">    		&#125;).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">   </span><br><span class="line">    <span class="comment">// 把问题放大</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="string">"service hello"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们使用 <code>TransactionSynchronizationManager</code> 注册一个 <code>TransactionSynchronization</code>，然后在 <code>afterCommit</code> 里执行我们的后续代码，这样就能 100% 确保我们的后续逻辑是在当前事务被 <code>commit</code> 后才执行的</p>
+<h3 id="TransactionSynchronizationManager"><a href="#TransactionSynchronizationManager" class="headerlink" title="TransactionSynchronizationManager"></a>TransactionSynchronizationManager</h3><p>TransactionSynchronizationManager 使用 <code>ThreadLocal</code> 记录事务的一些属性，用于应用扩展同步器的使用，在事务的开启、挂起、提交等各个点上回调应用的逻辑</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">TransactionSynchronizationManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// ======保存着一大堆的ThreadLocal 这里就是它的核心存储======</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//  应用代码随事务的声明周期绑定的对象  比如：DataSourceTransactionManager有这么做：</span></span><br><span class="line">	<span class="comment">//TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());</span></span><br><span class="line">	<span class="comment">// TransactionSynchronizationManager.bindResource(obtainDataSource(), suspendedResources);</span></span><br><span class="line">	<span class="comment">// 简单理解为当前线程的数据存储中心~~~~</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Map&lt;Object, Object&gt;&gt; resources = <span class="keyword">new</span> NamedThreadLocal&lt;&gt;(<span class="string">"Transactional resources"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 使用的同步器，用于应用扩展</span></span><br><span class="line">	<span class="comment">// TransactionSynchronization同步器是最为重要的一个扩展点~~~ 这里是个set 所以每个线程都可以注册N多个同步器</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt; synchronizations = <span class="keyword">new</span> NamedThreadLocal&lt;&gt;(<span class="string">"Transaction synchronizations"</span>);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 事务的名称  </span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;String&gt; currentTransactionName = <span class="keyword">new</span> NamedThreadLocal&lt;&gt;(<span class="string">"Current transaction name"</span>);</span><br><span class="line">	<span class="comment">// 事务是否是只读  </span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Boolean&gt; currentTransactionReadOnly = <span class="keyword">new</span> NamedThreadLocal&lt;&gt;(<span class="string">"Current transaction read-only status"</span>);</span><br><span class="line">	<span class="comment">// 事务的隔离级别</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Integer&gt; currentTransactionIsolationLevel = <span class="keyword">new</span> NamedThreadLocal&lt;&gt;(<span class="string">"Current transaction isolation level"</span>);</span><br><span class="line">	<span class="comment">// 事务是否开启   actual：真实的</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Boolean&gt; actualTransactionActive = <span class="keyword">new</span> NamedThreadLocal&lt;&gt;(<span class="string">"Actual transaction active"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 返回的是个只读视图</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Map&lt;Object, Object&gt; <span class="title">getResourceMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		Map&lt;Object, Object&gt; map = resources.get();</span><br><span class="line">		<span class="keyword">return</span> (map != <span class="keyword">null</span> ? Collections.unmodifiableMap(map) : Collections.emptyMap());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">hasResource</span><span class="params">(Object key)</span> </span>&#123; ... &#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">getResource</span><span class="params">(Object key)</span> </span>&#123; ... &#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// actualKey：确定的key  拆包后的</span></span><br><span class="line">	<span class="meta">@Nullable</span></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Object <span class="title">doGetResource</span><span class="params">(Object actualKey)</span> </span>&#123;</span><br><span class="line">		Map&lt;Object, Object&gt; map = resources.get();</span><br><span class="line">		<span class="keyword">if</span> (map == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		Object value = map.get(actualKey);</span><br><span class="line">		<span class="comment">// Transparently remove ResourceHolder that was marked as void...</span></span><br><span class="line">		<span class="comment">// 如果ResourceHolder 被标记为了void空白了。此处直接从map里移除掉对应的key </span></span><br><span class="line">		<span class="comment">// ~~~~~~~并且返回null~~~~~~~~~~~</span></span><br><span class="line">		<span class="keyword">if</span> (value <span class="keyword">instanceof</span> ResourceHolder &amp;&amp; ((ResourceHolder) value).isVoid()) &#123;</span><br><span class="line">			map.remove(actualKey);</span><br><span class="line">			<span class="comment">// Remove entire ThreadLocal if empty...</span></span><br><span class="line">			<span class="keyword">if</span> (map.isEmpty()) &#123;</span><br><span class="line">				resources.remove();</span><br><span class="line">			&#125;</span><br><span class="line">			value = <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> value;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 逻辑很简单，就是和当前线程绑定一个Map，并且处理ResourceHolder 如果isVoid就抛错</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">bindResource</span><span class="params">(Object key, Object value)</span> <span class="keyword">throws</span> IllegalStateException </span>&#123;</span><br><span class="line">		Object actualKey = TransactionSynchronizationUtils.unwrapResourceIfNecessary(key);</span><br><span class="line">		Assert.notNull(value, <span class="string">"Value must not be null"</span>);</span><br><span class="line">		Map&lt;Object, Object&gt; map = resources.get();</span><br><span class="line">		<span class="comment">// set ThreadLocal Map if none found</span></span><br><span class="line">		<span class="keyword">if</span> (map == <span class="keyword">null</span>) &#123;</span><br><span class="line">			map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">			resources.set(map);</span><br><span class="line">		&#125;</span><br><span class="line">		Object oldValue = map.put(actualKey, value);</span><br><span class="line">		<span class="comment">// Transparently suppress a ResourceHolder that was marked as void...</span></span><br><span class="line">		<span class="keyword">if</span> (oldValue <span class="keyword">instanceof</span> ResourceHolder &amp;&amp; ((ResourceHolder) oldValue).isVoid()) &#123;</span><br><span class="line">			oldValue = <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (oldValue != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Already value ["</span> + oldValue + <span class="string">"] for key ["</span> +</span><br><span class="line">					actualKey + <span class="string">"] bound to thread ["</span> + Thread.currentThread().getName() + <span class="string">"]"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">unbindResource</span><span class="params">(Object key)</span> <span class="keyword">throws</span> IllegalStateException </span>&#123; ... &#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">unbindResourceIfPossible</span><span class="params">(Object key)</span> </span>&#123; ... &#125;</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 同步器是否是激活状态~~~  若是激活状态就可以执行同步器里的相关回调方法了</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isSynchronizationActive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> (synchronizations.get() != <span class="keyword">null</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 如果事务已经开启了，就不能再初始化同步器了  而是直接注册</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">initSynchronization</span><span class="params">()</span> <span class="keyword">throws</span> IllegalStateException </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (isSynchronizationActive()) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Cannot activate transaction synchronization - already active"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		logger.trace(<span class="string">"Initializing transaction synchronization"</span>);</span><br><span class="line">		synchronizations.set(<span class="keyword">new</span> LinkedHashSet&lt;&gt;());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 注册同步器TransactionSynchronization   这个非常重要 下面有详细介绍这个接口</span></span><br><span class="line">	<span class="comment">// 注册的时候要求当前线程的事务已经是激活状态的  而不是随便就可以调用的哦~~~</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">registerSynchronization</span><span class="params">(TransactionSynchronization synchronization)</span> <span class="keyword">throws</span> IllegalStateException </span>&#123;</span><br><span class="line">		Assert.notNull(synchronization, <span class="string">"TransactionSynchronization must not be null"</span>);</span><br><span class="line">		<span class="keyword">if</span> (!isSynchronizationActive()) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Transaction synchronization is not active"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		synchronizations.get().add(synchronization);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 返回的是只读视图  并且，并且支持AnnotationAwareOrderComparator.sort(sortedSynchs); 这样排序~~</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;TransactionSynchronization&gt; <span class="title">getSynchronizations</span><span class="params">()</span> <span class="keyword">throws</span> IllegalStateException </span>&#123; ... &#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">clearSynchronization</span><span class="params">()</span> <span class="keyword">throws</span> IllegalStateException </span>&#123; ... &#125;</span><br><span class="line"></span><br><span class="line">	... <span class="comment">// 省略name等其余几个属性的get/set方法  因为没有任何逻辑</span></span><br><span class="line">	<span class="comment">// 这个方法列出来，应该下面会解释</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setActualTransactionActive</span><span class="params">(<span class="keyword">boolean</span> active)</span> </span>&#123;</span><br><span class="line">		actualTransactionActive.set(active ? Boolean.TRUE : <span class="keyword">null</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 清楚所有和当前线程相关的（注意：此处只是clear清除，和当前线程的绑定而已~~~）</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		synchronizations.remove();</span><br><span class="line">		currentTransactionName.remove();</span><br><span class="line">		currentTransactionReadOnly.remove();</span><br><span class="line">		currentTransactionIsolationLevel.remove();</span><br><span class="line">		actualTransactionActive.remove();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里把 <code>setActualTransactionActive</code> 单独拿出来看一下。在 <code>AbstractPlatformTransactionManager.getTransaction()</code> 的时候会调用此方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 相当于表示事务为开启了</span></span><br><span class="line">TransactionSynchronizationManager.setActualTransactionActive(status.hasTransacation());</span><br></pre></td></tr></table></figure>
+
+<p>而且该类的 <code>handleExistingTransaction</code>、<code>prepareTransactionStatus</code> 等方法都会调用上面的方法，也就是说它会参与到事务的声明周期里面去</p>
+<blockquote>
+<p>备注：以上方法他们统一的判断条件有：TransactionStatus.isNewTransaction() 是新事务的时候才会调用这个方法进行标记</p>
+</blockquote>
+<p>另外，AbstractPlatformTransactionManager 的 <code>suspend</code> 暂停的时候会直接这么调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">TransactionSynchronizationManager.setCurrentTransactionReadOnly(<span class="keyword">false</span>);</span><br><span class="line">TransactionSynchronizationManager.setActualTransactionActive(<span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>resume</code> 恢复的时候：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">TransactionSynchronizationManager.setCurrentTransactionReadOnly(resourcesHolder.readOnly);</span><br><span class="line">TransactionSynchronizationManager.setActualTransactionActive(resourcesHolder.wasActive);</span><br></pre></td></tr></table></figure>
+
+<p>大体可以得出这样的一个处理步骤：</p>
+<ul>
+<li><p>开启新的事务时初始化。第一次开启事务分为：real 首次或已存在事务但是 REQUIRES_NEW</p>
+</li>
+<li><p>在事务的嵌套过程中，TransactionSynchronizationManager 属性不断更新最终清除。即外层事务挂起、事务提交，这两个点需要更新 TransactionSynchronizationManager 属性</p>
+</li>
+<li><p>这里面有个内部类 ：AbstractPlatformTransactionManager.SuspendedResourcesHolder。它是负责事务挂起的时候，保存事务属性的对象，用于恢复外层事务。当恢复外层事务时，根据 <code>SuspendedResourcesHolder</code> 对象，调用底层事务框架恢复事务属性，并恢复 TransactionSynchronizationManager</p>
+</li>
+</ul>
+<h3 id="DefaultTransactionStatus"><a href="#DefaultTransactionStatus" class="headerlink" title="DefaultTransactionStatus"></a>DefaultTransactionStatus</h3><p>它实现了 <code>TransactionStatus</code> 接口，<strong>这个是整个事务框架最重要的状态对象，它贯穿于事务拦截器，Spring 抽象框架和底层具体事务实现框架之间</strong></p>
+<p>它的重要任务就是在新建、挂起、提交事务的过程中保存对应事务的属性，在 <code>AbstractPlatformTransactionManager</code> 中，每个事务流程都会 new 创建这个对象</p>
+<h3 id="TransactionSynchronizationUtils"><a href="#TransactionSynchronizationUtils" class="headerlink" title="TransactionSynchronizationUtils"></a>TransactionSynchronizationUtils</h3><p>这个工具类比较简单，主要是处理 <code>TransactionSynchronizationManager</code> 和执行 <code>TransactionSynchronization</code> 对应的方法们</p>
+<h3 id="TransactionSynchronization"><a href="#TransactionSynchronization" class="headerlink" title="TransactionSynchronization"></a>TransactionSynchronization</h3><p>这个类非常重要，它是我们对事务同步的扩展点，用于事务同步回调的接口，AbstractPlatformTransactionManager 支持它</p>
+<p>注意：自定义的同步器可以通过实现 <code>Ordered</code> 接口来自己定制化顺序，若没实现接口就按照添加的顺序执行</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Spring/" rel="tag"># Spring</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2021/03/29/I-0-多路复用/" rel="next" title="I/0 多路复用">
+                <i class="fa fa-chevron-left"></i> I/0 多路复用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/" rel="prev" title="Spring Ioc 容器初始化">
+                Spring Ioc 容器初始化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-事务极简介绍"><span class="nav-number">1.</span> <span class="nav-text">Spring 事务极简介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前提介绍"><span class="nav-number">2.</span> <span class="nav-text">前提介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DataSourceUtils"><span class="nav-number">2.1.</span> <span class="nav-text">DataSourceUtils</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题场景模拟"><span class="nav-number">3.</span> <span class="nav-text">问题场景模拟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">4.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TransactionSynchronizationManager"><span class="nav-number">4.1.</span> <span class="nav-text">TransactionSynchronizationManager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DefaultTransactionStatus"><span class="nav-number">4.2.</span> <span class="nav-text">DefaultTransactionStatus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TransactionSynchronizationUtils"><span class="nav-number">4.3.</span> <span class="nav-text">TransactionSynchronizationUtils</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TransactionSynchronization"><span class="nav-number">4.4.</span> <span class="nav-text">TransactionSynchronization</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

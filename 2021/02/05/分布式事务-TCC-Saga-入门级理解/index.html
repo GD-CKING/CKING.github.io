@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作 用电商场景来说就是以下几个步骤：  用户在订单平台操作下单  占库存  占钱款  生成一笔订单   如图所示：  分布式系统上图是">
+<meta name="keywords" content="分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式事务 -- TCC Saga 入门级理解">
+<meta property="og:url" content="https://github.com/2021/02/05/分布式事务-TCC-Saga-入门级理解/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作 用电商场景来说就是以下几个步骤：  用户在订单平台操作下单  占库存  占钱款  生成一笔订单   如图所示：  分布式系统上图是">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E8%AF%B7%E6%B1%82%E6%88%90%E5%8A%9F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF1.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF3.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/tcc%E6%AD%A3%E5%B8%B8%E9%80%BB%E8%BE%91.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/try%E5%A4%B1%E8%B4%A5.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/confirm%E5%A4%B1%E8%B4%A5.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/cancel%E5%A4%B1%E8%B4%A5.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E8%A1%A5%E5%81%BF%E8%B0%83%E7%94%A8.png">
+<meta property="og:updated_time" content="2021-10-15T00:16:22.002Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式事务 -- TCC Saga 入门级理解">
+<meta name="twitter:description" content="业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作 用电商场景来说就是以下几个步骤：  用户在订单平台操作下单  占库存  占钱款  生成一笔订单   如图所示：  分布式系统上图是">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2021/02/05/分布式事务-TCC-Saga-入门级理解/">
+
+
+
+
+
+  <title>分布式事务 -- TCC Saga 入门级理解 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式事务 -- TCC Saga 入门级理解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-05T14:51:46+08:00">
+                2021-02-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="业务理解"><a href="#业务理解" class="headerlink" title="业务理解"></a>业务理解</h2><p>简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作</p>
+<p>用电商场景来说就是以下几个步骤：</p>
+<ul>
+<li><p>用户在订单平台操作下单</p>
+</li>
+<li><p>占库存</p>
+</li>
+<li><p>占钱款</p>
+</li>
+<li><p>生成一笔订单</p>
+</li>
+</ul>
+<p>如图所示：</p>
+<p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF.png" alt="业务场景"></p>
+<h2 id="分布式系统"><a href="#分布式系统" class="headerlink" title="分布式系统"></a>分布式系统</h2><p>上图是一个分布式应用的简单呈现，将电商的业务拆分成了多个服务。在分布式应用的场景中，往往会遇到<strong>「网络通信异常」</strong>、<strong>「服务器节点异常」</strong>甚至<strong>「服务器宕机」</strong>等场景。其实，在分布式应用中遇到的各种异常场景一定会比想的还要多，发生也更频繁</p>
+<p>既然分布式应用需要考虑那么多的异常场景，为什么还要使用分布式的方式部署服务呢？以前，流量还没那么大的时候，一个网站靠单机是可以撑住的。但随着互联网业务的快速发展，我们开始追求网站的高可用、高性能、易扩展、伸缩性强且安全的系统。这也是分布式系统存在的意义</p>
+<p>分布式系统有一下特点：</p>
+<ul>
+<li><p><strong>高可用</strong>：在出现一台或多台服务器节点异常甚至宕机的情况下，系统仍然可用，采用分布式冗余部署多节点来保证高可用</p>
+</li>
+<li><p><strong>高性能</strong>：在单机的情况下一台机器的 CPU、内存等因素容易成为性能的瓶颈，在在分布式多机部署的情况下，通过拆分业务多机部署达到高性能</p>
+</li>
+<li><p><strong>伸缩性强</strong>：在访问量增大和存储需求提高的时候，一台或几台服务器就显得势单力薄，此时可以通过向服务器集群中添加服务器来应付</p>
+</li>
+<li><p><strong>扩展性强</strong>：需要将扩展性和伸缩性区分开来看待，伸缩性是基于底层硬件来说的，而扩展性则是针对业务来说的，也就是说便于新业务的扩展或者是业务的拆分。一般采用模块化，所以更便于扩展，也便于模块重用。业务被拆分，开发效率也会随之提升</p>
+</li>
+</ul>
+<p>另外，分布式需要重点考虑在服务调用「<strong>成功、失败、超时异常</strong>」三种场景下，如何保证「<strong>数据一致性</strong>」的问题</p>
+<h2 id="数据一致性"><a href="#数据一致性" class="headerlink" title="数据一致性"></a>数据一致性</h2><p>我们经常听到「<strong>一致性</strong>」这个名词。在使用数据库的时候提到的「<strong>ACID</strong>」里的 <code>C</code> 是一致性，分布式系统「<strong>CAP 理论</strong>」里面的 <code>C</code> 也是一致性，这两个有什么区别呢？</p>
+<h3 id="ACID"><a href="#ACID" class="headerlink" title="ACID"></a>ACID</h3><p><code>ACID</code> 指的是在数据库写入或更新时为了保证实物正确可靠而必须满足的四个特性，分别是「A（Atomicity 原子性）、C（Consistency 一致性）、I（Isolation 隔离性）、D（Durability 持久性）」。其它三个特性我们先不谈，这里的一致性指的是事务上的一致性。我理解的其它三个特性最终都是为了这个一致性而服务。这里的一致性指的是在事务发生的前后，系统从一个正确的状态，转移到另一个正确的状态</p>
+<p>什么叫「<strong>正确的状态</strong>」呢？举个例子，A B 账号各有 100 元，A 向 B 转账 50 元，转账后的 A 的账户变成 了 50 元，B 账户变成了 150 元，这是正确的状态。如果此时 A 又向 B 转账了 100元，之后 A 的账户变成了 -50 元，B 的账户变成了 250 元，那么这就是错误的状态。在这个例子里，如果变成了错误的状态，事务是需要回滚的，这就是事务上的一致性。一般来说这个一致性可以是数据库做约束去保证，但更多时候业务逻辑更为复杂，需要代码层面去约束保证</p>
+<h3 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h3><p>CAP 理论通常用于分布式系统中，CAP 分别指「<strong>C（Consistency 一致性）、A（Availability 可用性）、P（Partition tolerance 分区容错性）</strong>」，CAP 理论认为在分布式系统中这三个特性只能同时满足两个。而我们所说的数据一致性也是指的这个一致性，这个一致性和 ACID 中的事务一致性完全不是同一个东西，切记不要搞混了</p>
+<ul>
+<li><p><strong>一致性</strong>：在分布式系统中所有的数据副本，在同一个时刻有同样的值</p>
+</li>
+<li><p><strong>可用性</strong>：在分布式系统的集群中某个或多个节点故障了，客户端的读写请求仍然会有响应</p>
+</li>
+<li><p><strong>分区容错性</strong>：当集群中的节点与节点之间无法通信时，或者系统在一定时限内无法达到数据一致性，就意味着产生了分区，而分区产生后仍然可用，即分区容错性</p>
+</li>
+</ul>
+<p>为什么只能同时满足两个？首先考虑要满足分区容忍性的情况下，就要做多个副本，但是一旦副本多起来，一致性就会收到影响，数据同步需要花更多时间，数据同步花的时间多了，就会对可用性造成影响，有可能有段时间无法使用，同时分区容错性由于达到一致性的时间变长了，则无法很好地满足。归纳起来就是：</p>
+<ul>
+<li><p><strong>满足 C / A 不满足 P</strong>：即不要求分区，则节点受限，也就是放弃了系统的伸缩性，这跟分布式的特性是想违背的。通常采用这种方案的是传统的数据库，如 Oracle</p>
+</li>
+<li><p><strong>满足 C / P 不满足 A</strong>：则不要求可用性，要求一致性即所有副本的数据都要保持一致，而分区则有可能导致数据同步的时间大大地延长，这种场景下就牺牲了用户的体验，等数据全部一致了用户才可以用户。Zookeeper 就是采用了这种方式</p>
+</li>
+<li><p><strong>满足 A / P 不满足 C</strong>：则不要求一致性。一旦分区发生，又要保持可用，每个节点就会用本地缓存的数据来提供服务，这样用户就可能访问到过期的数据。服务发现组件 Eureka 就是采用了这种方式</p>
+</li>
+</ul>
+<p>前后的矛盾冲突导致无法同时满足三者，因此我们一般在实现中会采用一些折中的方案，这就要提到在一致性上根据实际需求而产生的集中不同的一致性：</p>
+<ul>
+<li><p><strong>强一致性</strong>：系统中某个数据被更新了，那么后续对于该数据的读取都将得到更新后的值，也就是说所有副本上数据都要保持严格的一致，副本是同步更新的</p>
+</li>
+<li><p><strong>弱一致性</strong>：相对强一致性而言，数据更新后，对该数据的读取并不能保证总是读取到更新后的值，也就是副本的数据无法保持一致，副本是异步更新的</p>
+</li>
+<li><p><strong>最终一致性</strong>：属于一种特殊的弱一致性，系统中多有的副本在经过一个短暂的数据不一致后通过同步最终达到一致</p>
+</li>
+</ul>
+<p>在我们这次的业务场景中，上游服务 A 对于服务 B、C、D 的调用都要保证数据最终一致性。对于服务 B、C 是同步调用，在服务调用过程中如果失败则事务直接进行回滚；对于服务 D 异步调用可以容忍较长时间的数据不一致，在最终一致性之前引入「软状态（中间状态）」作为临时状态，当异步调用结果还没有返回时，可以设置一个「订单生成中」的状态</p>
+<h2 id="容错机制"><a href="#容错机制" class="headerlink" title="容错机制"></a>容错机制</h2><p>对于跟钱打交道的业务，我们考虑的重点首先肯定是不能错（数据一致性），错了之后怎么解决或者系统如何自动处理是我们接下来考虑的（容错机制）</p>
+<p>容错的话需要考虑多种场景，流程顺利的话自不必说，失败的话就要考虑实现自动回滚系统，而像因为网络或服务器节点原因而导致的超时则是需要特殊考虑的异常场景</p>
+<h3 id="业务成功场景"><a href="#业务成功场景" class="headerlink" title="业务成功场景"></a>业务成功场景</h3><p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E8%AF%B7%E6%B1%82%E6%88%90%E5%8A%9F.png" alt="请求成功"></p>
+<p>成功场景表示同步调用成功以及异步发起请求这个动作成功，这个时候会返回给用户表示请求成功。但是有一点需要注意的是异步请求后不代表订单就生成成功了，此时返回给用户的只是给用户一个响应而不至于流程阻塞。所以此时我们会进入软状态，也就是中间状态类似于「<strong>订单生成中</strong>」的状态来表示。订单生成有可能成功也有可能失败，如果订单生成失败则同样要做回滚的处理</p>
+<h3 id="业务场景失败"><a href="#业务场景失败" class="headerlink" title="业务场景失败"></a>业务场景失败</h3><h4 id="业务失败场景-1"><a href="#业务失败场景-1" class="headerlink" title="业务失败场景 1"></a>业务失败场景 1</h4><p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF1.png" alt="失败场景1"></p>
+<h4 id="业务失败场景-2"><a href="#业务失败场景-2" class="headerlink" title="业务失败场景 2"></a>业务失败场景 2</h4><p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF2.png" alt="失败场景2"></p>
+<h4 id="业务失败场景-3"><a href="#业务失败场景-3" class="headerlink" title="业务失败场景 3"></a>业务失败场景 3</h4><p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E5%A4%B1%E8%B4%A5%E5%9C%BA%E6%99%AF3.png" alt="失败场景3"></p>
+<p>这里展示了三种失败的场景，对于前两种，失败了就需要做回滚处理：</p>
+<ul>
+<li><p>当调用服务 B 冻结库存失败则终止并回滚数据库</p>
+</li>
+<li><p>当调用服务 C 冻结钱款失败则终止并回滚服务 B 解除库存以及回滚数据库</p>
+</li>
+</ul>
+<p>对于第三种失败场景则多了几种选择：</p>
+<ul>
+<li><p>可以同前两种一样直接做回滚的处理</p>
+</li>
+<li><p>可以选择提供给用户「<strong>手动重试</strong>」的机会，因为一般成功冻结仓库和冻结钱款后，这笔订单已经大概率下达成功了，异步发起请求失败是极小概率的事情，通过提供重试机制来提升用户的体验</p>
+</li>
+<li><p>可以将异步请求写入数据库扩展消息队列，另起一个线程去处理异步请求以及后续的操作，包括可以设定「<strong>自动重试</strong>」以及受到异步返回结果后成功和失败的处理。这样的好处在于可以很好地将代码解耦开，业务流程较为清晰</p>
+</li>
+</ul>
+<h3 id="超时-异常处理"><a href="#超时-异常处理" class="headerlink" title="超时 / 异常处理"></a>超时 / 异常处理</h3><p>超时的原因多种多样，<strong>网络抖动、服务器节点不通、服务器节点崩溃</strong>，而且超时还有一个难点在于特别容易导致状态的不一致。当服务 A 调用服务 B 超时了，此时无法得知 B 是否有接收到请求，在这种情况下有两种解决方案：一种是要求 B 要实现「<strong>幂等</strong>」或者提供「<strong>状态查询接口</strong>」，服务 A 通过重试来处理超时情景；另外一种是采用「<strong>强制回滚</strong>」来处理超时，但是当这两种方法都再次超时的时候就不得不人工介入处理，此时则还需要预留好后续的提供给运维人员的人工处理手段</p>
+<h3 id="宕机处理"><a href="#宕机处理" class="headerlink" title="宕机处理"></a>宕机处理</h3><p>突然的停电、插头被人拔了或者有人恶意杀进程，一旦出现那么保存在内存中的状态和数据就全部没了。假如此时服务 A 已经成功调用服务 B 冻结库存成功了，还没有调用服务 C 就突然断电了，那么势必会造成各个服务上的数据不一致，库存都已经扣了，钱没有扣，订单也没有生成，这不就莫名多扣了库存吗。所以在调用服务前一定要将现场的数据保存下来，方便宕机重启后进行回滚状态</p>
+<p>在宕机重启系统后，会启动一个线程去读取保存的现场数据，基于现场数据去做回滚，因此现场数据应该包含有几个信息：<strong>被调用模块、传递参数、状态</strong>。判断该数据是否已经用于回滚处理，如果已经进行回滚则为已处理，否则为待处理</p>
+<h2 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h2><p>什么是 TCC 框架？TCC 其实是三个单词的首字母，分别是：<code>try</code>、<code>confirm</code>、<code>cancel</code>。try 就是尝试一下，confirm 就是确认，cancel 就是取消。例如你晚上约几个朋友去吃宵夜，然后就约了几个朋友预定了座位，这就是 try；朋友约到了座位预约到了，准时六点下班去吃饭，这就是 confirm；因为你要修 bug 不得不加班，或者朋友都在加班，或者没有预约到座位，那就没有宵夜了，这就是 cancel</p>
+<p>让我们结合业务场景来讲一下</p>
+<h3 id="正常逻辑"><a href="#正常逻辑" class="headerlink" title="正常逻辑"></a>正常逻辑</h3><p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/tcc%E6%AD%A3%E5%B8%B8%E9%80%BB%E8%BE%91.png" alt="tcc正常逻辑"></p>
+<h4 id="阶段一：try"><a href="#阶段一：try" class="headerlink" title="阶段一：try"></a>阶段一：try</h4><p>在 <code>try</code> 阶段，「<strong>调用方</strong>」会分别调用多个「<strong>被调用方</strong>」，只有当多个被调用方都返回成功的时候，才会进行 <code>confirm</code>，否则就会进行 <code>cancel</code>。也就是说 try 阶段是一个预备类的操作，锁定某个资源、冻结部分数据，是在真正的扣除之前进行一个预占、冻结的动作</p>
+<p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/try%E5%A4%B1%E8%B4%A5.png" alt="try失败"></p>
+<h4 id="阶段二：confirm"><a href="#阶段二：confirm" class="headerlink" title="阶段二：confirm"></a>阶段二：confirm</h4><p>在该阶段，confirm 就是对 try 成功了之后的一个后续处理，将冻结、预占的数据进行真正的扣除（该业务场景是扣除，当然其他场景也可能是增加），这里就要考虑两种场景：</p>
+<ol>
+<li>confirm 都成功了，那么对服务 B、C 的调用就此完成，在数据上服务也都是一致的</li>
+<li>个别或者全部的 confirm 失败了或者调用超时了，和 try 阶段不一样的是，这种场景不做 cancel 回滚处理，而是将所有的 confirm 进行重试。需要注意的是，被调用方一定要实现「<strong>幂等机制</strong>」，否则是无法进行重试的。另外，需要设定重试次数，如果重试还是失败或超时并且已经超过了重试次数，则必须告警通知人工进行处理</li>
+</ol>
+<p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/confirm%E5%A4%B1%E8%B4%A5.png" alt="confirm 失败"></p>
+<h4 id="阶段三：cancel"><a href="#阶段三：cancel" class="headerlink" title="阶段三：cancel"></a>阶段三：cancel</h4><p>只有在 <code>try</code> 阶段失败或异常超时的情况下才会进行 <code>cancel</code> 处理，并且 cancel 处理并不是对所有的调用方进行 cancel，而是对已经 try 成功的被调用方进行 cancel 处理。另外，和 confirm 阶段一样，cancel 阶段也需要提供重试机制和重试超过一定次数的情况下告警通知人工处理</p>
+<p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/cancel%E5%A4%B1%E8%B4%A5.png" alt="cancel失败"></p>
+<h3 id="进一步思考"><a href="#进一步思考" class="headerlink" title="进一步思考"></a>进一步思考</h3><p>到这，基本就能知道 TCC 框架大概是怎么回事。在具体实现中，可以选用开源的 TCC 框架：ByteTCC、Himly、TCC - transaction、Seata 等等。或者自己手写，不过手写这么个框架内部的实现细节还是很复杂的，各个阶段的执行情况怎么感知，如何推动到下一步阶段，如何实现重试机制、告警系统、人工菌介入、宕机回滚等等都要考虑清楚</p>
+<h2 id="Saga"><a href="#Saga" class="headerlink" title="Saga"></a>Saga</h2><p>Saga 框架，感觉是一个没有 <code>confirm</code> 的 TCC 框架，但这么说也不太准确，因为 Saga 的 try 不再是尝试一下，没有了预占和冻结数据，而是直接对数据进行了扣除 / 增加</p>
+<p>Saga 理论来自 Hector &amp; Kenneth 1987 发表的论文 Sagas，其中最主要的思想就是<strong>补偿协议</strong>：</p>
+<p><img src="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/%E8%A1%A5%E5%81%BF%E8%B0%83%E7%94%A8.png" alt="补偿调用"></p>
+<p><strong>补偿协议</strong>：在 Saga 模式下，分布式事务内有多个参与者，每个参与者都是正向补偿服务。上图中的 <code>T1 ~ Tn</code> 就是「<strong>正向调用</strong>」，<code>C1 ~ Cn</code> 是「<strong>补偿调用</strong>」，正向调用和补偿调用是一一对应的关系。假设有 n 个被调用方服务，<code>T1</code> 就是对服务方一的调用，<code>T2</code> 就是服务方二的调用，<code>T3</code> 就是服务方三的调用。如果这时候返回了失败，那么就需要进行回滚，此时就会调用 <code>T2</code> 的对应补偿 <code>C2</code>，调用 <code>T1</code> 的对应补偿 <code>C1</code>，使得分布式事务回到初始状态</p>
+<h3 id="Saga-适用场景"><a href="#Saga-适用场景" class="headerlink" title="Saga 适用场景"></a>Saga 适用场景</h3><ul>
+<li><p>Saga 是一种「<strong>长事务的解决方案</strong>」，更适合于<strong>业务流程长、业务流程多</strong>的场景</p>
+</li>
+<li><p>如果服务参与者包含其他公司或遗留系统服务，此时无法提供 TCC 模式下的三个接口，那么就需要采用 Saga</p>
+</li>
+<li><p>典型的业务系统：金融机构对接系统（需要对接外部系统）、渠道整合（流程长）、分布式架构服务</p>
+</li>
+<li><p>银行金融机构使用更为广泛</p>
+</li>
+</ul>
+<p>Saga 模式的优势是：</p>
+<ul>
+<li><p>一阶段提交本地数据库事务，无所，高性能；</p>
+</li>
+<li><p>参与者可以采用事务驱动异步执行，高吞吐</p>
+</li>
+<li><p>补偿服务即正向服务的「方向」，易于理解，易于实现</p>
+</li>
+</ul>
+<p>缺点：Saga 模式由于一阶段已经提交本地数据库事务，且没有进行「预留」动作，所以不能保证隔离性</p>
+<h2 id="Saga-和-TCC-的异同"><a href="#Saga-和-TCC-的异同" class="headerlink" title="Saga 和 TCC 的异同"></a>Saga 和 TCC 的异同</h2><p>TCC 和 Saga 的不同之处，主要体现在应用场景上的不同</p>
+<h3 id="数据隔离性"><a href="#数据隔离性" class="headerlink" title="数据隔离性"></a>数据隔离性</h3><p>回到我们的业务场景，服务 A 调用了服务 B、C，如果发生了以下的情况：</p>
+<ol>
+<li>对服务 B try 成功了，但是服务 C try 失败了</li>
+<li>此时有用户来读取服务 B 和服务 C 的数据</li>
+<li>A、B、C 进行回滚</li>
+</ol>
+<p>那么对于 TCC 和 Saga 来说，try 失败了都会进入 cancel阶段，但是刚好在还没有来得及进行 cancel 回滚处理的时候，有用户来读取 B、C 的数据。这种情况下 TCC 和 Saga 就会返回不一样的结果</p>
+<p>对于 TCC 来说，try 只是一个冻结的操作，所以它操作的也只是一个<strong>冻结字段</strong>，这并不会影响用户查询的实际数据，所以是可以返回正确的结果的</p>
+<p>对于 Saga 来说，try 则是对数据的一个直接操作，会更改用户想要访问的数据，那么这个时候就会返回给用户脏数据。会有脏读说明 Saga 框架下数据时有<strong>隔离性</strong>的问题的</p>
+<p>对于 Saga 来说，隔离问题本质上是要<strong>控制并发</strong>，因此还是要回到业务上来，从业务逻辑层去实现并发控制。可以是在应用层枷锁的机制去处理，也可以是 Session 层面保证串行化，但这些多多少少对性能和吞吐量有所影响</p>
+<h3 id="两阶段与一阶段"><a href="#两阶段与一阶段" class="headerlink" title="两阶段与一阶段"></a>两阶段与一阶段</h3><p>从上面的叙述中，Saga 相对于TCC主要在隔离性上的缺失，究其原因，是因为 TCC 是两阶段提交事务而 Saga 是一阶段提交事务。</p>
+<p>对于 TCC，<strong>一阶段</strong>会将资源进行预占，对资源进行锁定；<strong>二阶段</strong>才会使用资源或释放资源</p>
+<p>对于 Saga，则是<strong>一阶段</strong>直接进行事务提交。相比 TCC 二阶段的提交事务，一阶段提交事务「<strong>无锁</strong>」，且可以采用「<strong>事件驱动异步执行</strong>」，适合<strong>长流程</strong>的业务，另外异步执行也意味着更高的<strong>吞吐量</strong></p>
+<p>但是一阶段提交导致 Saga 有隔离性问题，那么在 cancel（补偿）失败的时候，TCC 可以采用重试机制去处理，而 Saga 需要提供额外的人工介入处理</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://weiyimu.vip/article?id=6857520180894351374" target="_blank" rel="noopener">分布式事务实践——TCC、Saga入门级理解</a></p>
+<p><a href="https://www.sofastack.tech/blog/sofa-meetup-3-seata-retrospect/" target="_blank" rel="noopener">分布式事务 Seata Saga 模式首秀以及三种模式详解</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/" rel="next" title="公司的分布式缓存架构">
+                <i class="fa fa-chevron-left"></i> 公司的分布式缓存架构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/" rel="prev" title="Hadoop 基本架构原理">
+                Hadoop 基本架构原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#业务理解"><span class="nav-number">1.</span> <span class="nav-text">业务理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式系统"><span class="nav-number">2.</span> <span class="nav-text">分布式系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据一致性"><span class="nav-number">3.</span> <span class="nav-text">数据一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ACID"><span class="nav-number">3.1.</span> <span class="nav-text">ACID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CAP"><span class="nav-number">3.2.</span> <span class="nav-text">CAP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容错机制"><span class="nav-number">4.</span> <span class="nav-text">容错机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#业务成功场景"><span class="nav-number">4.1.</span> <span class="nav-text">业务成功场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#业务场景失败"><span class="nav-number">4.2.</span> <span class="nav-text">业务场景失败</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#业务失败场景-1"><span class="nav-number">4.2.1.</span> <span class="nav-text">业务失败场景 1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#业务失败场景-2"><span class="nav-number">4.2.2.</span> <span class="nav-text">业务失败场景 2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#业务失败场景-3"><span class="nav-number">4.2.3.</span> <span class="nav-text">业务失败场景 3</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#超时-异常处理"><span class="nav-number">4.3.</span> <span class="nav-text">超时 / 异常处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#宕机处理"><span class="nav-number">4.4.</span> <span class="nav-text">宕机处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCC"><span class="nav-number">5.</span> <span class="nav-text">TCC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#正常逻辑"><span class="nav-number">5.1.</span> <span class="nav-text">正常逻辑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#阶段一：try"><span class="nav-number">5.1.1.</span> <span class="nav-text">阶段一：try</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#阶段二：confirm"><span class="nav-number">5.1.2.</span> <span class="nav-text">阶段二：confirm</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#阶段三：cancel"><span class="nav-number">5.1.3.</span> <span class="nav-text">阶段三：cancel</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进一步思考"><span class="nav-number">5.2.</span> <span class="nav-text">进一步思考</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Saga"><span class="nav-number">6.</span> <span class="nav-text">Saga</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Saga-适用场景"><span class="nav-number">6.1.</span> <span class="nav-text">Saga 适用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Saga-和-TCC-的异同"><span class="nav-number">7.</span> <span class="nav-text">Saga 和 TCC 的异同</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据隔离性"><span class="nav-number">7.1.</span> <span class="nav-text">数据隔离性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两阶段与一阶段"><span class="nav-number">7.2.</span> <span class="nav-text">两阶段与一阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

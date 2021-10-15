@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/15/MySQL-之执行计划的索引类型/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/15/MySQL-之执行计划的索引类型/" itemprop="url">MySQL 之执行计划的索引类型</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/" itemprop="url">Synchronized 锁升级优化的全流程</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-15T19:53:29+08:00">
-                2020-07-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-30T15:49:20+08:00">
+                2021-09-30
               </time>
             
 
@@ -328,8 +328,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
                   </a>
                 </span>
 
@@ -367,14 +367,13 @@
       
         
           
-          当我们用 EXPLAIN 查看执行计划的时候，一般如下图所示：
-
-现在我们就来看看执行计划中 type 代表什么意思
-假设你写一个 SELECT * FROM table WHERE id = x 或者 SELECT * FROM table WHERE name = x 的语句，直接就可以通过聚簇索引或者二级索引 + 聚簇索引回源，轻松查到你要的数据，这种根据索引可以快速查找数据的过程，在执行计
+          本文主要谈一下 Synchronized 锁的各种优化：包括偏向锁、轻量级锁、重量级锁，以及它们之间是如何获取和释放锁、锁之间是如何进行升级和膨胀的
+偏向锁从 JDK 1.6 开始，JVM 对比较重的 Synchronized 就引入了各种锁优化的机制，偏向锁算是最轻的一种锁，应用的场景也是最简单的，即偏向锁是专门为了优化线程多次获取同一把锁的场景量身打造的
+比如说方式 A 是被 Synchron
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/15/MySQL-之执行计划的索引类型/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -425,7 +424,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/10/MySQL-索引设计实战/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/26/Spring-事务失效情况/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -444,7 +443,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/10/MySQL-索引设计实战/" itemprop="url">MySQL 索引设计实战</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/26/Spring-事务失效情况/" itemprop="url">Spring 事务失效情况</a></h1>
         
 
         <div class="post-meta">
@@ -456,8 +455,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-10T17:51:25+08:00">
-                2020-07-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-26T19:16:19+08:00">
+                2021-09-26
               </time>
             
 
@@ -479,8 +478,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -518,12 +517,12 @@
       
         
           
-          这个实战我们以陌生人社交 APP 为例。社交 APP，它本身的核心主旨，就是你进入 APP 的时候，需要录入一系列你的个人信息。接着 APP 自己会通过一定的算法推荐一些可能适合你的人给你进行线上交友。当然自己也可以通过一定的条件去搜索和筛选，查找 APP 上符合你期望的人
-这里先忽略 APP 基于算法自动推荐潜在感兴趣的好友的部分，就看一下通过一系列的条件去筛选好友的过程。首先我们要有个用户表，
+          没有被 Spring 管理没有被 Spring 管理的 Bean，如果其中出现了方法需要进行事务处理的情况，此时的事务不会执行。如下，在 OrderServiceImpl 类中如果将 @Service 注释掉，那么此类对应的 bean 也就不会被 Spring IOC 容器管理。即使 updateOrder 上面注释了 @Transactional，这个方法也不会执行事务
+12345678//@S
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/10/MySQL-索引设计实战/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/26/Spring-事务失效情况/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -574,7 +573,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/10/MySQL-之索引设计/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/26/Spring-事务框架源码初探/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -593,7 +592,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/10/MySQL-之索引设计/" itemprop="url">MySQL 之索引设计</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/26/Spring-事务框架源码初探/" itemprop="url">Spring 事务框架源码初探</a></h1>
         
 
         <div class="post-meta">
@@ -605,8 +604,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-10T14:23:03+08:00">
-                2020-07-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-26T11:47:18+08:00">
+                2021-09-26
               </time>
             
 
@@ -628,8 +627,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -667,13 +666,13 @@
       
         
           
-          本文讲解索引设计的一般原则。
-原则一首先我们在针对业务需求建立一张表的结构之后，就知道这个表有哪些字段，每个字段是什么类型的，会包含哪些数据。设计好表结构之后，就是要设计表的索引。设计索引的时候，我们要考虑第一点，就是未来我们对表进行查询的时候，大概会如何来进行查询
-可能有人会说，你要我刚设计完表结构就知道未来会怎么查询表，我怎么知道？没关系，其实我们完全可以在表结构设计完毕之后，不用先急着设计索
+          事务开启分析Spring声明式事务是通过 AOP 增强实现的，所以现在分析 Spring 事务执行过程的时候离不开 AOP 拦截器执行链的描述，其中比较重要的拦截器就是 TransactionInterceptor 了
+
+如下，在 TransactionInterceptor 中有一个重要的方法 invoke，其中会获取带来对象的类型，同时会调用父类 TransactionAspectSuppor
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/10/MySQL-之索引设计/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/26/Spring-事务框架源码初探/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -724,7 +723,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/09/MySQL-索引的使用扩展/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -743,7 +742,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/09/MySQL-索引的使用扩展/" itemprop="url">MySQL 索引的使用扩展</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/" itemprop="url">Spring 同步和异步事件的使用场景</a></h1>
         
 
         <div class="post-meta">
@@ -755,8 +754,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-09T14:57:12+08:00">
-                2020-07-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-25T14:17:39+08:00">
+                2021-09-25
               </time>
             
 
@@ -778,8 +777,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -817,12 +816,12 @@
       
         
           
-          SQL 排序的时候如何使用索引假设你有一个 SELECT * FROM table WHERE xxx = xxx ORDER BY xxx 这样的一个 SQL 语句，似乎应该是基于 where 语句通过索引快速筛选出来一波数据，接着放到内存里，或者放到一个临时文件里，然后通过排序算法按照某个字段走一个排序，最后把排序好的数据返回
-但这么搞是有点慢的，尤其是你要排序的数据量比较大，还不能用内存来排
+          Spring 事件的监听机制可以理解为是一种观察者模式，有数据发布者（事件源）和数据接受者（监听器）。在 Java 中，事件对象都是继承 java.util.EventObject 对象，事件监听器都是 java.util.EventListener 实例
+其中，java.util.EventObject 是事件状态对象的基类，它封装了事件源对象以及和事件相关的信息。所有 java 的事件类都需要
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/09/MySQL-索引的使用扩展/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -873,7 +872,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -892,7 +891,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/" itemprop="url">MySQL-之索引讲解（下）</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/" itemprop="url">Spring AOP 源码分析 2</a></h1>
         
 
         <div class="post-meta">
@@ -904,8 +903,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-08T11:27:52+08:00">
-                2020-07-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-18T11:08:38+08:00">
+                2021-09-18
               </time>
             
 
@@ -927,8 +926,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -966,14 +965,16 @@
       
         
           
-          之前讲了 MySQL 数据库的索引结构，让大家清楚不同索引的结构，大致是如何建立的，搜索的时候是如何根据不同的索引去查找数据的。现在，我们说说在插入数据的时候，是如何维护不同索引的 B+ 树的
-首先，刚开始你一个表搞出来以后，它就一个数据页，这个数据页是属于聚簇索引的一部分，而且目前还是空的。此时如果你插入数据，就是直接在这个数据页里插入就可以了，没必要弄什么索引页
+          JDK 动态代理源码分析接着我们通过源码分析介绍 Spring AOP JDK 动态代理实现的原理。内容包括：
 
-这个初始的数据页其实就是一个
+invoke：实现 AOP 中具体的逻辑
+getProxy：获取产生的代理类
+
+invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lang.reflect 包中 Proxy 和 InvocationHandler 两个接口来实现的。对于 Invoca
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1024,7 +1025,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/17/Spring-AOP-源码分析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1043,7 +1044,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/" itemprop="url">MySQL-之索引讲解（中）</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/" itemprop="url">Spring AOP 源码分析</a></h1>
         
 
         <div class="post-meta">
@@ -1055,8 +1056,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-07T10:12:54+08:00">
-                2020-07-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-17T10:38:19+08:00">
+                2021-09-17
               </time>
             
 
@@ -1078,8 +1079,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1117,14 +1118,12 @@
       
         
           
-          上篇我们讲了数据页分裂的过程，在你不停地往表里插入数据的时候，会出来一个一个的数据页，如果你的主键不是自增的，它可能会有一个数据行的挪动过程，保证你下一个数据页的主键值都大于上一个数据页的主键值
-现在是这样，假设我们有很多数据页，然后我们想要根据主键来查询数据，那么直接查询是不行的，因为我们也不知道主键在哪里。如下：
-
-假设你要搜 id = 4 的数据，但你怎么知道在哪个数据页里？没有任何证据可以
+          AOP 框架有很多种，Spring 中的 AOP 是通过动态代理实现的。JDK 动态代理只在运行期，目标类加载后，为借口动态生成代理类，将切面织入代理类中
+这里通过一个例子来讲解 JDK 动态代理的原理。如下，定义一个 Service 接口，其中有一个 help 方法。用 ServiceImpl 去实现 Service 借口，在 help 方法中实现「打印买书」的输出。这个 ServiceImpl
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1175,7 +1174,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1194,7 +1193,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/" itemprop="url">MySQL 之索引讲解（上）</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/" itemprop="url">Spring 动态代理时是如何解决依赖循环的</a></h1>
         
 
         <div class="post-meta">
@@ -1206,8 +1205,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-03T11:13:20+08:00">
-                2020-07-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-10T15:22:17+08:00">
+                2021-09-10
               </time>
             
 
@@ -1229,8 +1228,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1268,14 +1267,15 @@
       
         
           
-          磁盘数据页的存储结构在深入研究索引之前，我们需要先来看磁盘上的数据文件中的数据页的物理存储结构。之前说过，数据库最终所有的数据（包括我们建的各种表以及表里的数据）都是要存放在磁盘上的文件里的，然后文件里存放的物理格式就是数据页，那么大量的数据页在磁盘文件里是怎么存储的呢？
-首先，大量的数据页是按顺序一页一页存放的，然后两两相邻的数据页之间会采用双向链表的格式互相引用，大概如下：
+          什么是依赖循环我们先回顾一下 Bean 的创建过程，在此之前，先看一下三级缓存的概念：
 
-上面画的这个图在
+singletonObjects：一级缓存。存储单例对象，Bean 已经实例化，初始化完成
+earlySingletonObjects：二级缓存。存储 singletonObject，这个 Bean 已经实例化，还没有初始化
+singletonFactories：三级缓存。存储 singletonFactor
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1326,7 +1326,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/09/Spring-依赖循环/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1345,7 +1345,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/" itemprop="url">MySQL 不确定性的性能抖动优化实践</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/09/Spring-依赖循环/" itemprop="url">Spring 依赖循环</a></h1>
         
 
         <div class="post-meta">
@@ -1357,8 +1357,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-29T17:22:49+08:00">
-                2020-06-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-09T15:37:37+08:00">
+                2021-09-09
               </time>
             
 
@@ -1380,8 +1380,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1419,14 +1419,14 @@
       
         
           
-          今天我们说说，线上数据库时不时莫名地来一次性能抖动的问题，而且造成性能抖动的还不是之前我们说过的数据库锂电池充放电问题，而是另一个新的问题，跟我们之前讲解的原理是息息相关的
-我们平时在数据库里执行的更新语句，实际上都是从磁盘上加载数据页到数据库内存的缓存页里来，接着就直接更新内存里的缓存页吗，同时还更新对应的 redo log 写入一个 buffer 中
+          什么是依赖循环
+Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，并抛出 BeanCurrentlyInCreationException。所有要避免构造函数注入，可以使用 setter 注入替代
 
-既然我们更新了 Buffer Pool 
+根据官方文档说明，Spring 会自动解决基于 setter 注入的依赖循环，当然我们工作中现在都使用 @Autowired 注解来注入属性。@Autowired 是通过反射进行赋值
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/09/Spring-依赖循环/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1477,7 +1477,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/28/MySQL-锁详解/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1496,7 +1496,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/28/MySQL-锁详解/" itemprop="url">MySQL 锁详解</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/" itemprop="url">Spring 单例 Bean 创建</a></h1>
         
 
         <div class="post-meta">
@@ -1508,8 +1508,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-28T14:00:17+08:00">
-                2020-06-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T16:17:32+08:00">
+                2021-09-08
               </time>
             
 
@@ -1531,8 +1531,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1570,13 +1570,18 @@
       
         
           
-          之前说过，脏写是绝对不允许的，那么这个脏写是靠什么防止的呢？其实就是靠锁机制，依靠锁机制让多个事务更新一行数据的时候串行化，避免同时更新一行数据。
-在 MySQL 里，假设有一行数据摆在那不动，此时有一个事务来了要更新这行数据，这个时候它会先看看这行数据此时有没有人加锁？如果没有，此时这个事务就会创建一个锁，里面包含了自己的 trx_id 和等待状态，然后把锁跟这行数据关联在一起。
-因为更新一行数
+          本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：
+
+getSingleton
+createBean
+getObjectForBeanInstance
+
+getSingleton我们先看一下 getSingleton的源码
+1234567891011121314151617181920212223242526272829303132333435363738394041
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/28/MySQL-锁详解/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1627,7 +1632,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/前缀和技巧/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1646,7 +1651,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/" itemprop="url">详解 MVCC -- 多版本并发控制Ⅱ</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/前缀和技巧/" itemprop="url">前缀和技巧</a></h1>
         
 
         <div class="post-meta">
@@ -1658,8 +1663,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-24T13:42:54+08:00">
-                2020-06-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
+                2021-09-08
               </time>
             
 
@@ -1681,8 +1686,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -1720,12 +1725,15 @@
       
         
           
-          Read Committed（读已提交）隔离级别现在我们讲讲基于 ReadView 机制是如何实现 Read Committed 隔离级别的。所谓的Read Committed 隔离级别，简称为 RC，是说你事务运行期间，只要别的事务修改数据还提交了，你就是可以读到人家修改的数据的，所以是会发生不可重复读的问题，包括幻读的问题，都会有的。
-而 ReadView 机制，它是基于 undo log 版
+          前缀和技巧适用于快速计算一个索引区间内的元素之和
+这道题 303.区域和检索 - 数组不可变 就是前缀和的基本使用场景：
+
+题目要求你实现这样一个类：
+12345678910class NumArray &#123;    public NumArray(int[] nums) &#123;    &#125;        public int sumRange(int left, int ri
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/前缀和技巧/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1767,7 +1775,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/CKING.github.io/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/13/">13</a><a class="extend next" rel="next" href="/CKING.github.io/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/CKING.github.io/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1815,7 +1823,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">124</span>
+                  <span class="site-state-item-count">161</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1826,7 +1834,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1837,7 +1845,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

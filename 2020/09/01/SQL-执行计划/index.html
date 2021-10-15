@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="所谓执行计划，无非就是先访问哪个表，用哪个索引还是全表扫描，拿到数据之后如何去聚簇索引回表，是否要基于临时磁盘文件做分组聚合或者排序。 在 MySQL 中，只要使用 Explain 命令，就可以拿到这个 SQL 语句的执行计划，例如：explain select * from table。拿到的执行计划可能是类似下面的东西：  如上图，我们可以看到 id、select_type、table、par">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL 执行计划">
+<meta property="og:url" content="https://github.com/2020/09/01/SQL-执行计划/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="所谓执行计划，无非就是先访问哪个表，用哪个索引还是全表扫描，拿到数据之后如何去聚簇索引回表，是否要基于临时磁盘文件做分组聚合或者排序。 在 MySQL 中，只要使用 Explain 命令，就可以拿到这个 SQL 语句的执行计划，例如：explain select * from table。拿到的执行计划可能是类似下面的东西：  如上图，我们可以看到 id、select_type、table、par">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/%E7%AE%80%E5%8D%95%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/%E8%BF%9E%E8%A1%A8%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/%E5%AD%90%E6%9F%A5%E8%AF%A2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/SQL-%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%5Cunion.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/%E5%A4%8D%E6%9D%82%E6%9F%A5%E8%AF%A2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/%E5%88%86%E7%BB%84%E7%BB%9F%E8%AE%A1.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/innerjoin.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/ref.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/ref2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/ref3.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/extra.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/extra2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/extra3.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/extra4.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/extra5.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/extra6.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/extra7.png">
+<meta property="og:updated_time" content="2021-10-15T00:16:21.850Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SQL 执行计划">
+<meta name="twitter:description" content="所谓执行计划，无非就是先访问哪个表，用哪个索引还是全表扫描，拿到数据之后如何去聚簇索引回表，是否要基于临时磁盘文件做分组聚合或者排序。 在 MySQL 中，只要使用 Explain 命令，就可以拿到这个 SQL 语句的执行计划，例如：explain select * from table。拿到的执行计划可能是类似下面的东西：  如上图，我们可以看到 id、select_type、table、par">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2020/09/01/SQL-执行计划/">
+
+
+
+
+
+  <title>SQL 执行计划 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/09/01/SQL-执行计划/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SQL 执行计划</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-01T16:39:55+08:00">
+                2020-09-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>所谓执行计划，无非就是先访问哪个表，用哪个索引还是全表扫描，拿到数据之后如何去聚簇索引回表，是否要基于临时磁盘文件做分组聚合或者排序。</p>
+<p>在 MySQL 中，只要使用 <code>Explain</code> 命令，就可以拿到这个 SQL 语句的执行计划，例如：<code>explain select * from table</code>。拿到的执行计划可能是类似下面的东西：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="执行计划"></p>
+<p>如上图，我们可以看到 <code>id</code>、<code>select_type</code>、<code>table</code>、<code>partitions</code>、<code>type</code> 之类的数据。</p>
+<p>如果是一个简单的单表查询，可能这里就只有一条数据，也就是代表了它是打算如何访问这一个表而已。但是如果你的 SQL 语句极为复杂，可能这里会有很多条数据，因为一个复杂的 SQL 语句的执行是要拆分为很多步骤的，比如先访问表 A，接着弄一个排序，再来一个分组聚合，再访问表 B，接着搞一个连接，类似这样</p>
+<p>接着，我们来看看执行计划里包含的各个字段都是什么意思。</p>
+<p>首先是 <code>id</code>，每个 SELECT 都会对应一个 id，说穿了，就是一个复杂的 SQL 里可能会有很多个 SELECT，也可能包含多条执行计划，每一条执行计划都会有一个唯一的 id</p>
+<p><code>select_type</code>，说的是一条执行计划对应的查询是个什么类型。<code>table</code> 就是表名，意思是要查询哪个表，<code>partitions</code> 是表分区的概念。而 <code>type</code> 就比较关键了，针对当前这个表的访问方法，这个我们之前都讲过很多，比如 const、ref、range、index、all 之类的，分别代表了使用聚簇索引、二级索引、全表扫描之类的访问方式</p>
+<p><code>possible_keys</code> 也很关键，它是跟 <code>type</code> 结合起来的，意思是说你 type 确定使用方式了，那么有哪些索引是可供选择，可以使用的呢？这都会放这里。<code>key</code> 就是在 <code>possible_keys</code> 里实际选择的那个索引，而 <code>key_len</code> 就是索引的长度。</p>
+<p><code>ref</code> 就是使用某个字段的索引进行等值匹配搜索的时候，跟索引列进行等值匹配的那个目标值的一些信息。<code>rows</code> 是预估通过索引或者别的方式访问这个表的时候，大概可能会读取多少条数据。<code>filtered</code>，就是经过搜索条件过滤之后的剩余数据的百分比</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>首先我们先看这么一条简单的 SQL：<code>EXPLAIN SELECT * FROM t1</code>，此时它的执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/%E7%AE%80%E5%8D%95%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="简单执行计划"></p>
+<p>我们来分析上面的执行计划。首先是 id，它的值为 1，我们先不管。select_type 是 SIMPLE，顾名思义，这个表的查询类型是很普通的。table 是 t1，即表名是 t1。type 是 all，这就是我们之前提到的多种访问方式之一，all 就是全表扫描。你完全没加任何 where 条件，就只能是全表扫描了。这里直接会扫描表的聚簇索引的叶子结点，按顺序扫描过去拿到表里全部数据</p>
+<p>rows 是 8191，说明全表扫描会扫描这个表的 8191 条数据，说明这个表里有 8191 条数据，此时你全表扫描会全部扫描出来。filtered 是 100%，你没有任何 where 过滤条件，所以直接筛选出来的数据就是表里数据的 100% 占比</p>
+<p>接着看另一个 SQL 语句的执行计划：`EXPLAIN SELECT * FROM t1 JOIN t2。这是一个典型的多表关联语句，这种关联语句，实际上会选择一个表先查询出来数据，接着遍历每一条数据去另外一个表里查询可以关联在一起的数据，然后关联起来，它的执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/%E8%BF%9E%E8%A1%A8%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="连表执行计划"></p>
+<p>这是一个多表关联的执行计划。它的执行分为了两条，也就是会访问两个表。它先用全表扫描方位表 t1，接着用全表扫描访问表 t2，因为它这种多表关联方式，基本上是笛卡尔积的效果。t1 表的每条数据都会去 t2 表全部扫描所有的 34110 条数据，跟 t2 表的每一条数据都会做关联，而且 extra 里说了是 <code>Nested Loop</code>，也就是嵌套循环的访问方式</p>
+<p>另外上面两条执行计划的 id 都是 1，是一样的，实际上一般来说，在执行计划里，一个 SELECT 会对应一个 id，因为这两条计划对应的是一个 SELECT 语句，所以它们两的 id 都是 1，是一样的。如果你要是有一个子查询，有另外一个 SELECT，那么另外一个 SELECT 子查询对应的执行计划的 id 就可能是 2 了</p>
+<p>接着我们看一个包含子查询的 SQL 语句执行计划：<code>EXPLAIN SELECT * FROM t1 WHERE x1 IN ( SELECT x1 FROM t1 ) OR x3 = &#39;xxx&#39;</code>。这个 SQL 就稍微有一点复杂了，因为主 SELECT 语句的 WHERE 条件是依赖于一个子查询的，而且除此之外还有一个自己的 WHERE 筛选条件。它的执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/%E5%AD%90%E6%9F%A5%E8%AF%A2.png" alt="子查询"></p>
+<p>我们分析一下上面的执行计划。首先，第一条执行计划的 id 是 1，第二条执行计划的 id 是 2。因为这个 SQL 里又两个 SELECT，主查询的 SELECT 的执行计划的 id 就是 1，子查询 SELECT 的执行计划的 id 就是 2</p>
+<p>另外，第一条执行计划里，<code>select_type</code> 是 <code>PRIMARY</code>，不是 SIMPLE 了，说明第一个执行计划的查询类型是主查询的意思。对主查询而言，它有一个条件是 <code>x3 = &#39;xxx&#39;</code>，所以它的 possible_keys 里包含了 index_x3，就是 x3 字段的索引，但是它的 key 实际是 NULL，而且 type 是 ALL，所以说它最后没选择用 x3 字段的索引，而是选择了全表扫描</p>
+<p>为什么？可能它通过成本分析发现，使用 x3 字段的索引扫描 xxx 这个值，几乎就跟全表扫描差不多，所以最后就选择还不如直接全表扫描呢</p>
+<p>接着第二条执行计划，它的 <code>select_type</code> 是 <code>SUBQUERY</code>，即子查询。子查询针对的是 t2 这个表，当然子查询本身就是一个全表查询，但是相对主查询而言，会使用 x1 in 这个筛选条件，它这里 type 是 index，说明使用了扫描 index_x1 这个 x1 字段的二级索引的方式，直接扫描 x1 字段的二级索引，来跟子查询的结果集作对比</p>
+<p>接着看另外一个 <code>union</code> 的 SQL 语句：EXPLAIN SELECT * FROM t1 UNION SELECT * FROM t2</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/SQL-%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%5Cunion.png" alt="union"></p>
+<p>两个 SELECT 对应两个 id，就是分别从 t1 表和 t2 表里进行全表扫描。接着第三条执行计划，其实 <code>union</code> 字句默认的作用是把两个结果集合并起来还会进行去重，所以第三条执行计划干的是去重的活儿。</p>
+<p>所以上面它的 table 是 <code>&lt;union 1, 2&gt;</code>，就是一个临时表的表名，而且它的 extra 里，有一个 using temporary，也就是使用临时表的意思，它就是把结果集放到临时表里进行去重的。当然，如果你使用 <code>union all</code>，那么就不会进行去重了。</p>
+<h2 id="执行计划中的-id、select-type"><a href="#执行计划中的-id、select-type" class="headerlink" title="执行计划中的 id、select_type"></a>执行计划中的 id、select_type</h2><p>SQL 执行计划里有一个 id 的概念，这个 id 是什么意思？简单说，有一个 SELECT 子句就会对应一个 id，如果有多个 SELECT 就会对应多个 id，但是往往有时候一个 SELECT 子句涉及到了多个表，所以会对应多条执行计划，此时可能多条执行计划的 id 是一样的。</p>
+<p>接着是 select_type，select_type 之前我们已经看过几种，有 SIMPLE 的，还有 primary 和 subquery 的，那么这些 select_type 是什么意思？还有哪几种 select_type？</p>
+<p>一般如果单表查询或者是多表连接查询，它们的 select_type 都是 SIMPLE，这个大家也都看到过了，意思就是简单的查询。如果是 union 语句的话，就类似于 <code>select * from t1 union select * from t2</code>，那么会对应两条执行计划，第一条执行计划是针对 t1 表的，select_type 是 PRIMARY，第二条执行计划是针对 t2 表的，select_type 是 UNION，这就是出现 UNION 语句的时候，它们就不一样了。</p>
+<p>在使用 UNION 语句的时候，会有第三条执行计划。这个第三条执行计划意思是针对两个查询的结果依托一个临时表进行去重，这个第三条执行计划的 select_type 就是 <code>union_result</code></p>
+<p>另外，如果 SQL 里有子查询，类似于 <code>SELECT * FROM t1 WHERE x1 IN (SELECT x1 FROM t2) OR x3 = &#39;xxx&#39;</code>，此时也会有两条执行计划，第一条执行计划的 select_type 是 PRIMARY，第二条执行计划的 select_type 是 SUBQUERY。</p>
+<h2 id="复杂的示例"><a href="#复杂的示例" class="headerlink" title="复杂的示例"></a>复杂的示例</h2><p>接着我们看一下复杂的 SQL 语句：<code>EXPLAIN SELECT * FROM t1 WHERE x1 IN (SELECT x1 FROM t2 WHERE x1 = &#39;xxx&#39; UNION SELECT x1 FROM t1 WHERE x1 = &#39;xxx&#39;)</code>。它有一个外层查询，还有一个内存子查询，子查询里还有两个 SELECT 语句进行 UNION 操作，它的执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/%E5%A4%8D%E6%9D%82%E6%9F%A5%E8%AF%A2.png" alt="复杂查询"></p>
+<p>第一个执行计划是针对 t1 表查询的外层循环，select_type 就是 PRIMARY，因为这里涉及到了子查询，所以外层查询的 select_type 就是 PRIMARY</p>
+<p>第二个查询计划是子查询里针对 t2 表的那个查询语句，它的 select_type 是 <code>DEPENDENT SUBQUERY</code>，第三个执行计划是子查询里针对 t1 表的另一个查询语句，select_type 就是 <code>DEPENDENT_UNION</code>，因为第三个执行计划是在执行 union 后的查询，第四个执行计划的 select_type 就是 <code>UNION RESULT</code>，因为在执行子查询里两个结果集的合并以及去重</p>
+<p>接着看另一个复杂的 SQL 语句：<code>EXPLAIN SELECT * FROM (SELECT x1, count(*) as cnt FROM t1 GROUP BY X1) AS _t1 WHERE cnt &gt; 10</code>。它是 FROM 自己后跟了一个子查询，在子查询里是根据 x1 字段进行分组然后进行 count 聚合操作，也就是统计出来 x1 这个字段的每个值的个数，然后在外层则是针对这个内层查询的结果集进行查询通过 where 条件来进行过滤。执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/%E5%88%86%E7%BB%84%E7%BB%9F%E8%AE%A1.png" alt="分组统计"></p>
+<p>上面的执行计划中，我们主要看第二条。它的 select_type 是 <code>derived</code>，意思是，针对子查询执行后的结果集会物化为一个内部临时表，然后外层查询是针对这个临时的物化表执行的。它这里执行分组聚合的时候，是使用 <code>index_x1</code> 这个索引进行的，type 是 index，意思是扫描了 index_x1 这个索引树的所有叶子节点，把 x1 相同值的个数都统计出来</p>
+<p>然后外层的第一个执行计划，select_type 是 PRIMARY，针对的 table 是 <code>&lt;derived2&gt;</code>，就是针对一个子查询结果集物化形成的临时表，它是直接针对这个物化临时表进行全表扫描根据 where 条件进行筛选的</p>
+<h2 id="执行计划之-select-type-和-type"><a href="#执行计划之-select-type-和-type" class="headerlink" title="执行计划之 select_type 和 type"></a>执行计划之 select_type 和 type</h2><p>首先是 select_type，它不是很关键，它主要是代表了大 SQL 里的不同的 SELECT 代表了一个什么角色，比如有的 SELECT 是 PRIMARY 查询，有的是 UNION，有的是 SUBQUERY</p>
+<p>但这个 type 就比较关键了，因为它直接决定了对某个表是如何从里面查询数据的，包括了 const、ref、range、index、all 这几种方式，分别是根据主键/唯一索引查询，根据二级索引查询，对二级索引进行全索引扫描，对聚簇索引进行全表扫描</p>
+<p>首先，假设是这样的一个语句：<code>SELECT * FROM t1 WHERE id = 110</code> 这样的 SQL，直接根据主键进行等值匹配查询，那执行计划里的 type 就会是 <code>const</code>，意思是极为快速的。因为主键是不会重复的，这个值一匹配，在一个索引树里跳转查询，基本上几次磁盘 IO 就可以定位到了</p>
+<p>接着这样一个 SQL：<code>SELECT * FROM t1 INNER JOIN t2 ON t1.id = t2.id</code>，这里是通过两个表的 id 进行关联查询的，此时它的执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/innerjoin.png" alt="innerjoin"></p>
+<p>这个执行计划里，它针对 t1 表是一个全表扫描，这是必然的，因为关联的时候会先查询一个驱动表，这里就是 t1，它没什么 where 筛选条件，自然只能是全表扫描查出来所有的数据了</p>
+<p>接着针对 t2 表的查询 type 是 eq_ref，而且使用了 PRIMARY 主键。即，针对 t1 表全表扫描获取到的每条数据，都会去 t2 表里基于主键进行等值匹配，此时会在 t2 表里的聚簇索引里根据主键值进行快速查找，所以在连接查询时，针对被驱动表如果基于主键进行等值匹配，那么它的查询方式就是 <code>eq_ref</code></p>
+<p>而如果是正常基于某个二级索引进行等值匹配的时候，type 就会是 <code>ref</code>，而如果基于二级索引查询的时候允许值为 null，那么查询方式就会是 <code>ref_or_null</code>。另外，有一些特殊场景下对单表查询可能会基于多个索引提取数据后进行合并，此时查询方式会是 <code>index_merge</code> 这种</p>
+<p>而查询方式时 <code>range</code> 的话就是基于二级索引进行范围查询，查询方式是 <code>index</code> 的时候是直接扫描二级索引的叶子节点，也就是扫描索引里的每条数据，最后如果是 all 的话就是全表扫描，也就是对聚簇索引的叶子节点扫描每条数据</p>
+<h2 id="执行计划之其他字段"><a href="#执行计划之其他字段" class="headerlink" title="执行计划之其他字段"></a>执行计划之其他字段</h2><p>接着我们看 <code>possible_keys</code>，顾名思义，其实就是针对一个表进行查询的时候有哪些潜在可以使用的索引。比如你有两个索引，一个是 KEY(x1, x2, x3)，一个是 KEY(x1, x2, x4)，此时在 where 条件里要根据 x1 和 x2 两个字段进行查询，此时上面两个索引都可以使用的，那要使用哪个呢？</p>
+<p>此时就需要通过成本优化方法，有估算两个索引进行查询的成本，看使用哪个索引的成本更低，那么久选择用那个索引。最终选择的索引，就是执行计划里的 <code>key</code> 这个字段的值了。</p>
+<p>而 <code>key_len</code>，其实就是当你在 key 里选择使用某个索引之后，那个索引里的最大值的长度是多少，这个就是给你一个参考，大概知道那个索引里的值最大值能有多长，就这么个意思。</p>
+<p>而执行计划里的 <code>ref</code> 也相对会关键一些。当你的查询方式是索引等值匹配的时候，比如 const、ref、eq_ref、ref_or_null 这些方式的时候这些方式的时候，此时执行计划的 ref 字段告诉你的就是：你跟索引列等值匹配的是什么？是等值匹配一个常量值，还是等值匹配另外一个字段的值？</p>
+<p>例如这样的一个 SQL 语句：EXPLAIN SELECT * FROM t1 WHERE x1 = ‘xxx’。执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/ref.png" alt="ref"></p>
+<p>如上图，针对 t1 表的查询，type 是 ref 方式，也就是说基于普通的二级索引进行等值匹配，然后 possible_key 只有一个，就是 index_x1，针对 x1 字段建立的一个索引，而实际使用的索引也是 index_x1</p>
+<p>然后 key_len 是 5，意思是 index_x1 这个索引里的 x1 字段最大值的长度就是 5 个字节。而比较关键的是 ref 字段，它的意思是，既然你是针对某个二级索引进行等值匹配的，那么跟 index_x1 进行等值匹配的是什么？是一个常量或者是别的字段？这里的 ref 的值是 const，是使用一个常量值跟 index_x1 索引里的值进行等值匹配的</p>
+<p>如果是这样的 SQL 语句：EXPLAIN SELECT * FROM t1 INNER JOIN t2 ON t1.id = t2.id 此时执行计划里的 ref 肯定不是 const，因为你跟 t1 表的 id 字段等值匹配的是另一个表的 id 字段，此时 ref 的值就是那个字段的名称了，如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/ref2.png" alt="ref2"></p>
+<p>如图，针对 t1 表作为驱动表执行一个全表扫描，接着针对 t1 表里每条数据都会去 t2 表根据 t2 表的主键执行等值匹配，所以第二个执行计划的 type 是 eq_ref，意思是被驱动表基于主键进行等值匹配，而且使用的是 PRIMARY，就是使用了 t2 表的主键</p>
+<p>至于 ref，意思是，谁跟 t2 表的聚簇索引里的主键值进行等值匹配？是 test 这个库的 t1 表的 id 字段，这里跟 t2 表的主键进行等值匹配的是 t1 表的主键 id 字段，所以 ref 这里显示的很清楚了</p>
+<p>最后简单说下 <code>rows</code> 和 <code>filtered</code>。这个 rows，就是说你使用指定的查询方式，会查出多少条数据，而 filtered 意思是，在查询方式查出来的这波数据里再用上其他的不在索引范围里的查询条件，又会过滤出百分之几的数据</p>
+<p>比如 SQL 语句：EXPLAIN SELECT * FROM t1 WHERE x1 &gt; ‘xxx’ AND x2 = ‘xxx’ 它只有一个 x1 字段建了索引，x2 字段是没有索引的，执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/ref3.png" alt="ref3"></p>
+<p>如上图，针对 t1 表的查询方式是 range，也就是基于索引进行范围查询，用的索引是 index_x1，也就是 x1 字段的索引，然后基于 x1 &gt; ‘xxx’ 这个条件通过 index_x1 索引查询出来的数据大概是 479 条，接着会针对 479 条数据再基于 where 条件里的其他条件，即 x2 = ‘xxx’ 进行过滤</p>
+<p>这个 filtered 是 10，意思是估算基于 x2 = ‘xxx’ 条件过滤的数据大概是 10%，即最终查出来的数据大概是 479 * 10% = 48 条左右</p>
+<h2 id="执行计划之-extra"><a href="#执行计划之-extra" class="headerlink" title="执行计划之 extra"></a>执行计划之 extra</h2><p>接着我们看 extra 字段代表什么。其实，除了 extra 字段以外的其他内容，最多就是告诉你 SQL 里的每个表是如何查询的，用了哪个索引，查出来了多少数据，但是很多时候，往往针对一个表可不是那么简单的。因为除了基于索引查询数据，可能同时还得基于 where 条件里的其他过滤条件去筛选数据，此时还会筛选出来一些数据</p>
+<p>这个 extra 里的信息可能会非常多，我们不可能都讲一遍。主要将一些平时常见的，比较有用的 extra 信息。例如 SQL ：EXPLAIN SELECT x1 FROM t1 WHERE x1 = ‘xxx’ 它的执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/extra.png" alt="extra"></p>
+<p>我们看一下这个执行计划。首先它是访问了 t1 表，使用的是 ref 访问方法，也就是基于二级索引去找，找的是 index_x1 这个索引，这个索引的最大长度是 5 个字节，查找的目标是一个 const 代表的常量值，通过索引可以查出来 1 条数据，经过其他条件筛选，最终剩下数据是 100%</p>
+<p>接着看 extra 的信息，是 Using index。就是说这次查询，仅仅涉及到了一个二级索引，不需要回表，因为它仅仅是查出来了 x1 这个字段，直接从 index_x1 索引里查就行了。如果没有回表操作，仅仅在二级索引里执行，那么 extra 会告诉你是 <code>Using index</code></p>
+<p>如果 SQL 语句是：SELECT * FROM t1 WHERE x1 &gt; ‘xxx’ AND x1 LIKE ‘%xxx’。此时它会先在二级索引 index_x1 里查找，查找出来的结构还会额外地跟 x1 LIKE ‘%xxx’ 条件做对比，如果满足条件的才会被筛选出来。这种情况下，extra 显示的是 <code>Using index condition</code></p>
+<p>接着讲一个最常见的 extra 信息：<strong>Using where</strong>。这个一般是见于你直接针对一个表扫描，没用到索引，然后 where 里好几个条件，就会告诉你 Using where。或者是你用了索引去查找，但是除了索引之外，还需要其他的字段进行筛选，也会告诉你 Using where</p>
+<p>比如 SQL 语句：EXPLAIN SELECT * FROM t1 WHERE x2 = ‘xxx’。这里的 x2 是没有建立索引的，此时它的执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/extra2.png" alt="extra2"></p>
+<p>这里针对 t1 表进行查询，用的是全表扫描方式，没有使用任何索引。然后全表扫描，扫出来的是 5 条数据，这个时候 extra 是 Using where，意思是，它对每条数据都用了 WHERE x2 = ‘xxx’ 进行筛选。最终 filtered 告诉你，你过滤出了 20% 的数据</p>
+<p>如果你的 where 条件里有一个条件是针对索引列查询的，有一个列是普通列的筛选，类似这样的 SQL 语句：EXPLAIN SELECT * FROM t1 WHERE x1 = ‘xxx’ AND X2 = ‘xxx’。执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/extra3.png" alt="extra3"></p>
+<p>这里针对 t1 表去查询，先通过 ref 方式直接在 index_x1 索引里查找，是跟 const 代表的常量值去查找，然后查出来了 1 条数据，接着再用 Using where 代表的方式，去使用 AND x2 = ‘xxx’ 条件进行筛选，筛选后的数据比例是 20%</p>
+<p>另外，在多表关联的时候，有的时候你的关联条件并不是索引，此时就会用一种叫做 <strong>join buffer</strong> 的内存技术来提升关联的性能，例如：EXPLAIN SELECT * FROM t1 INNER JOIN t2 ON t1.x2 = t2.x2。它们的连接条件 x2 是没有索引的，执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/extra4.png" alt="extra4"></p>
+<p>因为要执行 join，那么肯定先得查询 t1 表的数据，此时是对 t1 表直接全表查询，查出来 5 条数据。接着就是对每条数据的 x2 字段的值，跑到 t2 表里去对应的数据，进行关联。但是此时因为 t2 表也没法根据索引来查，也是属于全表扫描，所以每次都得对 t2 表全表扫描一下。根据 extra 提示的 Using where，就是根据 t1 表每条数据的 x2 字段去 t2 表查找对应的数据了，然后此时会用 join buffer 技术，在内存里做一些特殊优化，减少 t2 表的全表扫描次数</p>
+<p>接着看 <code>Using fileSort</code>。一般，我们在 SQL 语句里进行排序的时候，如果排序字段是有索引的，那么其实是直接可以从索引里按照顺序去查找数据的。例如：EXPLAIN SELECT * FROM t1 ORDER BY x1 LIMIT 10 这就是一个排序后再分页的语句，执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/extra5.png" alt="extra5"></p>
+<p>这个 SQL 语句，它是用了 index 方式访问的，意思是直接扫描了二级索引，而且实际使用的索引也是 index_x1，本质上来说，它就是在 index_x1 索引里，按照顺序找你 LIMIT 10 要求的 10 条数据而已。所以大家看到返回的数据是 10 条，也没别的过滤条件，所以 filtered 是 100%，也就是 10 条数据都返回了</p>
+<p>但是如果我们排序的时候没有用到索引，此时就会基于内存或者磁盘文件来排序。大部分时候都得基于磁盘文件来排序，比如 EXPLAIN SELECT * FROM t1 ORDER BY x2 LIMT 10。x2 是没有索引的，执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/extra6.png" alt="extra6"></p>
+<p>SQL 很明确，它基于 x2 字段来排序，是没法直接根据有序的索引去找数据的，只能把所有数据写入一个临时的磁盘文件，基于排序算法在磁盘文件里按照 x2 字段的值完成排序，然后在按照 LIMIT 10 的要求取出来头 10 条数据。这种把表全数据放磁盘文件排序的做法是相当糟糕的，性能会极差</p>
+<p>最后，我们用 group by、union、distinct 之类的语法的时候，你要是没法直接利用索引来进行分组聚合，那么它直接会基于临时表来完成，也会有大量的磁盘操作，性能也是极地的。比如这个 SQL ：EXPLAIN SELECT x2, COUNT(*) AS amount FROM t1 GROUP BY x2 这里的 x2 是没有索引的，它的执行计划如下：</p>
+<p><img src="/CKING.github.io/2020/09/01/SQL-执行计划/extra7.png" alt="extra7"></p>
+<p>这个 SQL 里只能去全表数据放到临时表里做大量的磁盘文件操作，然后才能完成对 x2 字段的不同的值去分组，分组完了以后对不同 x2 的值的分组做聚合操作，这个过程也是相当耗时的</p>
+<p><strong>所有，未来在 SQL 调优的时候，核心就是分析执行计划里哪些地方出现了全表扫描，或者扫描数据过大，尽可能通过合理优化索引保证执行计划每个步骤都可以基于索引执行，避免扫描过多的数据</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/MySQL/" rel="tag"># MySQL</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2020/08/25/组合模式/" rel="next" title="组合模式">
+                <i class="fa fa-chevron-left"></i> 组合模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2020/09/24/SQL-调优案例一/" rel="prev" title="SQL 调优案例一">
+                SQL 调优案例一 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#示例"><span class="nav-number">1.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行计划中的-id、select-type"><span class="nav-number">2.</span> <span class="nav-text">执行计划中的 id、select_type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复杂的示例"><span class="nav-number">3.</span> <span class="nav-text">复杂的示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行计划之-select-type-和-type"><span class="nav-number">4.</span> <span class="nav-text">执行计划之 select_type 和 type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行计划之其他字段"><span class="nav-number">5.</span> <span class="nav-text">执行计划之其他字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行计划之-extra"><span class="nav-number">6.</span> <span class="nav-text">执行计划之 extra</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

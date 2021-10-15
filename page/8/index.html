@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/12/23/Java并发编程杂记/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/09/RocketMQ-事务消息机制的底层原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/12/23/Java并发编程杂记/" itemprop="url">Java并发编程杂记</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/04/09/RocketMQ-事务消息机制的底层原理/" itemprop="url">RocketMQ - 事务消息机制的底层原理</a></h1>
         
 
         <div class="post-meta">
@@ -305,464 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T21:18:34+08:00">
-                2019-12-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          synchronized关键字的底层原理​        synchronized底层的原理，是跟jvm指令和monitor有关系的。你如果用到了synchronized关键字，在底层编译后的jvm指令中，会有monitorenter和monitorexit两个指令。
-123monitorenter	// 代码对应的指令monitorexit
-
-​        那么monitorenter指令执
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/12/23/Java并发编程杂记/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/" itemprop="url">捋一遍MySQL索引结构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-18T14:21:17+08:00">
-                2019-12-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          从一个简单的表开始​        首先我们先建一个表，语句如下：
-1234567create table user(    id int primary key,    age int,    height int,    weight int,    name varchar(32))engine = innoDb;
-
-​        然后往这个表中插入一些数据：
-12345INSERT I
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/" itemprop="url">浅谈Netty底层架构原理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-13T09:49:35+08:00">
-                2019-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/网络编程/" itemprop="url" rel="index">
-                    <span itemprop="name">网络编程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          
-本节思维导图
-
-
-​        对于高性能的RPC框架，Netty作为异步通信框架，几乎成了必需品。例如Dubbo框架中通信组件，还有RocketMQ中生产者和消费者的通信，都是用了Netty。现在让我们开简单看一下Netty的基本架构和原理。
-Netty的特点与NIO​        Netty是一个异步的、基于事件驱动的网络应用框架，它可以用来开发高性能服务端和客户端。以前编写网络调用程
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/12/13/浅谈Netty底层架构原理/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/12/10/RocketMQ详解/" itemprop="url">RocketMQ详解</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-10T09:37:44+08:00">
-                2019-12-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-09T17:16:28+08:00">
+                2020-04-09
               </time>
             
 
@@ -823,13 +367,12 @@ Netty的特点与NIO​        Netty是一个异步的、基于事件驱动的�
       
         
           
-          MQ 集群化部署以支撑高并发访问假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。
-
-MQ 存
+          half 消息的实现我们之前已经说过了 RocketMQ 事务消息的全流程。在这个流程中，第一步就是要由订单系统去支付一个 half 消息给 MQ。当时我们说过，对于这个 half 消息，红包系统这个时候是看不到它的，没法消费这条消息去处理，那这个 half 消息是如何做到的？
+其实 RocketMQ 底层采取了一个巧妙的设计。举个例子，订单系统发送了一个 half 状态的订单支付消息到 “Ord
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/12/10/RocketMQ详解/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/04/09/RocketMQ-事务消息机制的底层原理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -880,7 +423,7 @@ MQ 存
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/12/09/JVM工具使用-使用jmap和jhat弄清楚线上系统的对象分布/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/08/RocketMQ-的事务消息/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -899,7 +442,7 @@ MQ 存
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/12/09/JVM工具使用-使用jmap和jhat弄清楚线上系统的对象分布/" itemprop="url">JVM工具使用-使用jmap和jhat弄清楚线上系统的对象分布</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/" itemprop="url">RocketMQ 的事务消息</a></h1>
         
 
         <div class="post-meta">
@@ -911,8 +454,8 @@ MQ 存
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-09T21:12:19+08:00">
-                2019-12-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-08T14:46:45+08:00">
+                2020-04-08
               </time>
             
 
@@ -934,8 +477,8 @@ MQ 存
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
                   </a>
                 </span>
 
@@ -973,12 +516,14 @@ MQ 存
       
         
           
-          ​        JVM中有两个非常实用的工具：jmap和jhat。这两个工具可以帮助我们观察线上JVM中的对象分布，了解到你的系统运行过程中，哪些对象占据了主角位置，占据了多少内存空间，让你对你的系统有更加细致的了解。
-使用jmap了解系统运行时的内存区域​        如果只是要了解JVM的运行状况，然后去进行JVM GC优化，一般情况下jstat就够用了。但是有时候我们会发现JVM新增对象
+          示例背景在一个电商系统中，按照规则在支付之后可以拿到一个现金红包的，但是在支付了一个订单之后，却没有收到这个现金红包。这是怎么回事？
+经过一通排查，找了系统中打印的很多日志之后，发现了一个奇怪的现象。按理来说，订单系统在完成支付之后，会推送一条消息到 RocketMQ 里去，然后红包系统会从 RocketMQ 里接收那条消息去给用户发现金红包：如图：
+
+但是从订单系统和红包系统当天那个时间段的日志
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/12/09/JVM工具使用-使用jmap和jhat弄清楚线上系统的对象分布/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/04/08/RocketMQ-的事务消息/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1029,7 +574,7 @@ MQ 存
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/12/02/JVM工具使用-使用jstat了解线上系统的JVM运行状况/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1048,7 +593,7 @@ MQ 存
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/12/02/JVM工具使用-使用jstat了解线上系统的JVM运行状况/" itemprop="url">JVM工具使用-使用jstat了解线上系统的JVM运行状况</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/" itemprop="url">硬件层面聊聊可见性和有序性</a></h1>
         
 
         <div class="post-meta">
@@ -1060,8 +605,8 @@ MQ 存
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-02T20:54:21+08:00">
-                2019-12-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-06T11:41:36+08:00">
+                2020-04-06
               </time>
             
 
@@ -1083,8 +628,8 @@ MQ 存
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
                   </a>
                 </span>
 
@@ -1122,12 +667,11 @@ MQ 存
       
         
           
-          ​        平时我们对运行中的系统，如果要检查他的JVM的整体运行情况，比较实用的工具是jstat。它可以让你看到当前运行中的系统，它的JVM内的Eden、Survivor、老年代的内存使用情况，还有Young GC和Full GC的执行次数以及耗时。通过这些指标，我们可以分析出当前系统的运行情况，判断当前系统的内存使用压力以及GC压力，还有就是内存分配是否合理。
-jstat的使用jstat
+          高速缓存的数据结构处理器高速缓存的底层数据结构实际上一个拉链散列表的结构，就是有很多个 bucket，每个 bucket 挂了很多的 cache entry，每个 cache entry 由三个部分组成：tag、cache line 和 flag，其中的 cache line 就是缓存的数据；tag 指向了这个缓存数据在主内存中的数据地址，flag 标识了缓存行的状态。另外需要注意的一点是，cac
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/12/02/JVM工具使用-使用jstat了解线上系统的JVM运行状况/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/04/06/硬件层面聊聊可见性和有序性/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1178,7 +722,7 @@ jstat的使用jstat
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/02/RocketMQ-杂记之消费者/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1197,7 +741,7 @@ jstat的使用jstat
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/" itemprop="url">JVM之看懂垃圾回收的日志</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/04/02/RocketMQ-杂记之消费者/" itemprop="url">RocketMQ 杂记之消费者</a></h1>
         
 
         <div class="post-meta">
@@ -1209,8 +753,8 @@ jstat的使用jstat
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-29T15:04:01+08:00">
-                2019-11-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-02T16:21:51+08:00">
+                2020-04-02
               </time>
             
 
@@ -1232,8 +776,8 @@ jstat的使用jstat
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
                   </a>
                 </span>
 
@@ -1271,14 +815,11 @@ jstat的使用jstat
       
         
           
-          打印JVM的GC日志​        如果想打印GC日志，需要在系统的JVM参数中加入GC日志的打印选型，如下：
-123-XX:+PrintGCDetail #打印详细的gc日志-XX:+PrintGCTimeStamps #打印出每次GC发生的时间-Xloggc:log	#设置将gc日志写入一个磁盘文件
-
-示例示例程序代码12345678910111213public class Demo1 &
+          消费者如何获取消息处理以及进行 ACK消费者组首先，我们需要了解一个概念，就是消费者组。消费者组的意思，就是你给一组消费者起一个名字。比如我们有一个 Topic 叫 “TopicOrderPaySuccess”，然后假设有库存系统、积分系统、营销系统、仓储系统他们都要去消费这个 Topic 中的数据。此时我们应该给那四个系统分别起一个消费组的名字，比如： stock_consumer_group，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/11/29/JVM之看懂垃圾回收的日志/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/04/02/RocketMQ-杂记之消费者/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1329,7 +870,7 @@ jstat的使用jstat
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/11/05/JVM垃圾回收器之G1回收器/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/02/Rocket-基于-DLedger-技术的-Broker-主从同步班原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1348,7 +889,7 @@ jstat的使用jstat
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/11/05/JVM垃圾回收器之G1回收器/" itemprop="url">JVM垃圾回收器之G1回收器</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/04/02/Rocket-基于-DLedger-技术的-Broker-主从同步班原理/" itemprop="url">RocketMQ - 基于 DLedger 技术的 Broker 主从同步班原理</a></h1>
         
 
         <div class="post-meta">
@@ -1360,8 +901,8 @@ jstat的使用jstat
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-05T11:10:26+08:00">
-                2019-11-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-02T11:40:02+08:00">
+                2020-04-02
               </time>
             
 
@@ -1383,8 +924,8 @@ jstat的使用jstat
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
                   </a>
                 </span>
 
@@ -1422,11 +963,12 @@ jstat的使用jstat
       
         
           
-          ParNew + CMS组合的痛点​        传统的JVM垃圾回收器ParNew + CMS组合有一个很大的痛点，就是Stop the World。无论是新生代垃圾回收，还是老年代垃圾回收，都会或多或少产生“Stop the World”现象，对系统的运行有一定的影响。所以后面对垃圾回收器的优化，都是朝着减少“Stop the World”的目标去做的。在这个基础上，G1垃圾回收器就应运而生
+          之前有跟大家说过 Broker 的数据存储原理，接下来我们就说说 Broker 接收到数据写入之后，是如何同步给其他的 Broker 做多副本冗余的。这里就会牵扯到 DLedger 是个什么东西，因为我们是基于 DLedger 实现 Broker 多副本高可用的。
+首先，我们回顾一下，producer 写入消息到 broker 之后，broker 会将消息写入本地 CommitLog 磁盘文件中，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/11/05/JVM垃圾回收器之G1回收器/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/04/02/Rocket-基于-DLedger-技术的-Broker-主从同步班原理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1477,7 +1019,7 @@ jstat的使用jstat
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/10/29/Spring-Cloud-Stream入门/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/01/ThreadLocal/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1496,7 +1038,7 @@ jstat的使用jstat
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/10/29/Spring-Cloud-Stream入门/" itemprop="url">Spring Cloud Stream入门</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/04/01/ThreadLocal/" itemprop="url">ThreadLocal</a></h1>
         
 
         <div class="post-meta">
@@ -1508,8 +1050,8 @@ jstat的使用jstat
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-29T15:35:36+08:00">
-                2019-10-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-01T11:01:52+08:00">
+                2020-04-01
               </time>
             
 
@@ -1531,8 +1073,8 @@ jstat的使用jstat
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/SpringCloud/" itemprop="url" rel="index">
-                    <span itemprop="name">SpringCloud</span>
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
                   </a>
                 </span>
 
@@ -1570,11 +1112,19 @@ jstat的使用jstat
       
         
           
-          Spring Cloud Stream​        官方定义Spring Cloud Stream是一个构建消息驱动微服务的框架。应用程序通过inputs或者outputs来与Spring Cloud Stream中binder交互，通过我们来配置binding，而Spring Cloud Stream的binder负责与消息中间件交互。所以，我们只需要搞清楚如何与Spring Cloud S
+          ThreadLocal 用在什么地方讨论 ThreadLocal 用在什么地方之前，我们先明确下，如果仅仅只有一个线程，都不用谈 ThreadLocal 了，因为 ThreadLocal 是用在多线程的场景的！！
+ThreadLocal 归纳下来就 2 类用途：
+
+保存线程上下文信息，在任意需要的地方可以获取
+
+线程安全的，避免某些情况需要考虑线程安全必须同步带来的性能损失
+
+
+保存线程上下文信息
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/10/29/Spring-Cloud-Stream入门/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/04/01/ThreadLocal/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1625,7 +1175,7 @@ jstat的使用jstat
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/03/30/Synchronized-和-volatile/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1644,7 +1194,7 @@ jstat的使用jstat
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/10/23/JVM之垃圾回收器/" itemprop="url">JVM之垃圾回收器</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/03/30/Synchronized-和-volatile/" itemprop="url">Synchronized 和 volatile</a></h1>
         
 
         <div class="post-meta">
@@ -1656,8 +1206,8 @@ jstat的使用jstat
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-23T16:42:32+08:00">
-                2019-10-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-30T20:51:11+08:00">
+                2020-03-30
               </time>
             
 
@@ -1679,8 +1229,8 @@ jstat的使用jstat
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
                   </a>
                 </span>
 
@@ -1718,14 +1268,466 @@ jstat的使用jstat
       
         
           
-          ​        在新生代和老年代进行垃圾回收的时候，都是要用垃圾回收器进行回收的，不同的区域用不同的垃圾回收器。常用的垃圾回收机有一下几种：
-
-Serial和Serial Old垃圾回收器：分别用来回收新生代和老年代的垃圾对象。工作原理就是单线程运行，垃圾回收的时候会停止我们自己写的系统的其他工作线程，让我们系统直接卡死不动，然后让他们垃圾回收，这个现在一般写后台Java系统几乎不用。
-ParN
+          Synchronized 关键字Synchronized 关键字，可以同时保证原子性、可见性以及有序性
+原子性层面而言，它加了 synchronized 之后，就有一个加锁和释放锁的机制。加锁之后，同一段代码就只有它可以执行了
+可见性，它会通过加入一些内存屏障，使得它在同步代码块中对变量做的写操作，都会在释放锁的时候，全部强制执行 flush 操作；在进入同步代码块的时候，对变量的读操作，全部会强
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/10/23/JVM之垃圾回收器/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/03/30/Synchronized-和-volatile/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/" itemprop="url">再谈原子性、可见性和有序性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-26T20:48:26+08:00">
+                2020-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          
+思维导图
+
+
+原子性Java 语言规范里，int i = 0、resource = loadResources、flag = true，各种变量的简单赋值操作，规定都是原子的，包括引用类型的变量的赋值操作，也是原子的。
+但是很多复杂的操作，例如 i++，先读取 i 的值，再更新 i 的值。还有 i = y + 2，先读取 y 的值，再更新 i 的值，这种复杂操作，不是简单赋值写，它是有计算的过程
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2020/03/26/再谈原子性、可见性和有序性/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/03/26/MySQL-锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2020/03/26/MySQL-锁/" itemprop="url">MySQL 锁</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-26T11:47:34+08:00">
+                2020-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          MySQL 的锁类型，一般就是表锁、行锁和页锁。
+MyIsam一般 MyIsam 会加表锁。就是在 MyIsam 引擎下，执行查询的时候，会默认加个表共享锁，也就是表读锁，这个时候别人只能来查，不能写数据。当 MyIsam 写的时候，也会加个表独占锁，也就是写表锁，别人不能读也不能写。
+InnoDBInnoDB 引擎一般用行锁，但是也有表锁。
+InnoDB 的行锁有共享锁（S）和排它锁（X）。共享
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2020/03/26/MySQL-锁/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/03/13/RocketMQ-杂记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2020/03/13/RocketMQ-杂记/" itemprop="url">RocketMQ 杂记</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-13T19:57:12+08:00">
+                2020-03-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          RocketMQ 生产者工作原理MessageQueue要清楚生产者的工作原理，就需要明白一个概念：MessageQueue。而要明白 MessageQueue 是什么，就必须把它跟 Topic 以及 Broker 综合起来看。
+如果我们要使用 RocketMQ，要先部署一套 RocketMQ集群，在有了集群之后，就要根据你的业务去创建一些 Topic。比如说创建一个 “TopicOrderPay
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2020/03/13/RocketMQ-杂记/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1767,7 +1769,7 @@ ParN
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/CKING.github.io/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/13/">13</a><a class="extend next" rel="next" href="/CKING.github.io/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/CKING.github.io/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1815,7 +1817,7 @@ ParN
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">124</span>
+                  <span class="site-state-item-count">161</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1826,7 +1828,7 @@ ParN
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1837,7 +1839,7 @@ ParN
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

@@ -93,7 +93,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/23/Java并发编程杂记/AQS.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/23/Java并发编程杂记/%E9%9D%9E%E5%85%AC%E5%B9%B3%E9%94%81.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/23/Java并发编程杂记/%E5%85%AC%E5%B9%B3%E9%94%81.png">
-<meta property="og:updated_time" content="2020-01-22T01:08:35.173Z">
+<meta property="og:updated_time" content="2021-10-15T00:16:21.837Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java并发编程杂记">
 <meta name="twitter:description" content="synchronized关键字的底层原理​        synchronized底层的原理，是跟jvm指令和monitor有关系的。你如果用到了synchronized关键字，在底层编译后的jvm指令中，会有monitorenter和monitorexit两个指令。 123monitorenter	// 代码对应的指令monitorexit  ​        那么monitorenter指令执">
@@ -408,7 +408,7 @@
 <p>​        同一时间，只有一个线程能成功执行这个CAS。就是说，它刚开始先获取一下数组[5]这个位置的值，为null，然后执行CAS，然后线程1比较当前还是null，就可以put进去我的这条数据。同时间，其他线程执行CAS，都会失败。</p>
 <p>​        这其实也可以算是分段加锁，通过对数组每个元素执行CAS的策略。如果是很多线程对数组里不同的元素执行put，大家互不干扰，没有关系。如果其他线程失败了，发现数组[5]这个位置，已经别人放进去值了，就需要在这个位置基于链表+红黑树进行处理。就是synchronized(数组[5])进行加锁，然后基于链表或者红黑树在这个位置插进去自己的数据。所以说，如果你是对数组里同一个位置的元素进行操作，才会加锁进行串行化处理；如果是对数组不同位置的元素操作，那么此时大家可以并发执行。</p>
 <p>​        总的来说，在JDK1.8之前，多个数组，分段加锁，一个数组一个锁。在JDK1.8之后，优化细粒度，一个数组，每个元素进行CAS，如果失败说明有人了，此时synchronized对数组元素进行加锁，基于链表+红黑树处理，对数组每个元素加锁。</p>
-<h2 id="简单说一下AQS"><a href="#简单说一下AQS" class="headerlink" title="简单说一下AQS"></a>简单说一下AQS</h2><p>​        AQS，全称<code>Abstract Queue Synchronizer</code>，中文名叫抽象队列同步器。java并发包中的Semahore和部分Lock底层的实现原理都是利用AQS，例如可重入锁<code>ReentrantLock</code>。现在简单说一下AQS的原理。</p>
+<h2 id="简单说一下AQS"><a href="#简单说一下AQS" class="headerlink" title="简单说一下AQS"></a>简单说一下AQS</h2><p>​        AQS，全称 <code>Abstract Queue Synchronizer</code>，中文名叫抽象队列同步器。java 并发包中的 Semahore 和部分Lock底层的实现原理都是利用AQS，例如可重入锁<code>ReentrantLock</code>。现在简单说一下AQS的原理。</p>
 <p>​        AQS内部主要包含<code>state</code>变量，一个存储当前加锁线程的变量和一个等待队列。当多个线程访问时，先通过CAS尝试更新state的变量，如果成功了，将加锁线程的变量更改为自己，并进行后续操作。如果失败了，进入队列等待，等待拥有锁的线程释放锁后唤醒。大概如下图：</p>
 <p><img src="/CKING.github.io/2019/12/23/Java并发编程杂记/AQS.png" alt="AQS"></p>
 <p>​        接下来会涉及到公平锁和非公平锁。像ReentractLock，默认就是非公平锁。只有<code>ReentrantLock lock = new ReentrantLock(true)</code>时，才是公平锁。那什么是公平锁，什么是非公平锁。例如上面那个图，非公平锁就是，此时线程1释放了资源，唤醒线程2，但此时刚好线程3来进行CAS加锁等操作，并且成功了，那是此时就是线程3获取这个锁，而线程2继续回到等待队列。这就是非公平锁。</p>
@@ -554,7 +554,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">124</span>
+                  <span class="site-state-item-count">161</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -565,7 +565,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -576,7 +576,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
