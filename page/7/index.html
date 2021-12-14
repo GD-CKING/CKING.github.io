@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/05/04/回溯算法/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/05/04/回溯算法/" itemprop="url">回溯算法</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/" itemprop="url">MySQL-之索引讲解（下）</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-04T21:38:56+08:00">
-                2020-05-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-08T11:27:52+08:00">
+                2020-07-08
               </time>
             
 
@@ -328,8 +328,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -367,22 +367,14 @@
       
         
           
-          解决一个回溯问题，实际上就是一个决策树的遍历过程，你只需要思考三个问题：
+          之前讲了 MySQL 数据库的索引结构，让大家清楚不同索引的结构，大致是如何建立的，搜索的时候是如何根据不同的索引去查找数据的。现在，我们说说在插入数据的时候，是如何维护不同索引的 B+ 树的
+首先，刚开始你一个表搞出来以后，它就一个数据页，这个数据页是属于聚簇索引的一部分，而且目前还是空的。此时如果你插入数据，就是直接在这个数据页里插入就可以了，没必要弄什么索引页
 
-路径：也就是已经做出的选择
-
-选择列表：也就是你当前可以做的选择
-
-结束条件：也就是到达决策树底层，无法再做选择的条件
-
-
-如果你不理解这三个词语的解释，没关系，我们后面会用几个经典的回溯算法问题来帮你理解这些词语是什么意思。现在你先留着隐形。
-代码方面，回溯算的的框架：
-12345678910111213result =
+这个初始的数据页其实就是一个
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/05/04/回溯算法/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -433,7 +425,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -452,7 +444,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/" itemprop="url">Jetty 服务器的 NIO 机制导致堆外内存溢出</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/" itemprop="url">MySQL-之索引讲解（中）</a></h1>
         
 
         <div class="post-meta">
@@ -464,8 +456,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-26T11:01:36+08:00">
-                2020-04-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-07T10:12:54+08:00">
+                2020-07-07
               </time>
             
 
@@ -487,8 +479,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -526,13 +518,14 @@
       
         
           
-          背景引入这是一个使用 Jetty 作为 Web 服务器的时候在某个非常罕见的场景下发生的一次堆外内存溢出的场景。这种场景其实并不多见，只是给大家介绍一下这种场景的排查方法
-案例发生有一天收到线上的一个报警：某台机器部署的一个服务突然之间就不可以访问了。此时第一反应就是登陆机器去看日志，这个时候在机器的日志中发现了如下的一些信息：
-1234nio handle failed java.lang.Ou
+          上篇我们讲了数据页分裂的过程，在你不停地往表里插入数据的时候，会出来一个一个的数据页，如果你的主键不是自增的，它可能会有一个数据行的挪动过程，保证你下一个数据页的主键值都大于上一个数据页的主键值
+现在是这样，假设我们有很多数据页，然后我们想要根据主键来查询数据，那么直接查询是不行的，因为我们也不知道主键在哪里。如下：
+
+假设你要搜 id = 4 的数据，但你怎么知道在哪个数据页里？没有任何证据可以
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -583,7 +576,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/24/RocketMQ-的一些特殊场景解决方案/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -602,7 +595,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/24/RocketMQ-的一些特殊场景解决方案/" itemprop="url">RocketMQ 的一些特殊场景解决方案</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/" itemprop="url">MySQL 之索引讲解（上）</a></h1>
         
 
         <div class="post-meta">
@@ -614,8 +607,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-24T14:41:50+08:00">
-                2020-04-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-03T11:13:20+08:00">
+                2020-07-03
               </time>
             
 
@@ -637,8 +630,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -676,11 +669,14 @@
       
         
           
-          RocketMQ 百万消息积压问题有一个系统，它是由生产者系统和消费者系统两个环节组成的，生产者系统会负责不停地把消息写入 RocketMQ 里去，然后消费者系统就是负责从 RocketMQ 里消费消息。这个系统是有高峰和低谷的，在晚上几个小时的高峰期内，大概会有 100 多万条消息进入 RocketMQ，然后消费者系统从 RocketMQ 里获取到消息之后，会依赖一些 NoSQL 数据库去进行一
+          磁盘数据页的存储结构在深入研究索引之前，我们需要先来看磁盘上的数据文件中的数据页的物理存储结构。之前说过，数据库最终所有的数据（包括我们建的各种表以及表里的数据）都是要存放在磁盘上的文件里的，然后文件里存放的物理格式就是数据页，那么大量的数据页在磁盘文件里是怎么存储的呢？
+首先，大量的数据页是按顺序一页一页存放的，然后两两相邻的数据页之间会采用双向链表的格式互相引用，大概如下：
+
+上面画的这个图在
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/24/RocketMQ-的一些特殊场景解决方案/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -731,7 +727,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/22/RocketMQ-实践经验/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -750,7 +746,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/22/RocketMQ-实践经验/" itemprop="url">RocketMQ 实践经验</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/" itemprop="url">MySQL 不确定性的性能抖动优化实践</a></h1>
         
 
         <div class="post-meta">
@@ -762,8 +758,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-22T17:44:26+08:00">
-                2020-04-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-29T17:22:49+08:00">
+                2020-06-29
               </time>
             
 
@@ -785,8 +781,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -824,12 +820,14 @@
       
         
           
-          灵活地运用 tags 来过滤数据之前我们讲解过基于 tags 来过滤数据的功能，其实在真正的生产项目中，建议大家合理地规划 Topic 和里面的 tags。一个 Topic 代表了一类业务消息数据，然后对于这类业务消息数据，如果你希望继续划分一些类别的话，可以在发送消息的时候设置 tags
-例如，我们知道现在常见的外卖平台有美团外卖。饿了么和其他一些外卖，假设你现在一个系统要发送外卖订单数据到 M
+          今天我们说说，线上数据库时不时莫名地来一次性能抖动的问题，而且造成性能抖动的还不是之前我们说过的数据库锂电池充放电问题，而是另一个新的问题，跟我们之前讲解的原理是息息相关的
+我们平时在数据库里执行的更新语句，实际上都是从磁盘上加载数据页到数据库内存的缓存页里来，接着就直接更新内存里的缓存页吗，同时还更新对应的 redo log 写入一个 buffer 中
+
+既然我们更新了 Buffer Pool 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/22/RocketMQ-实践经验/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -880,7 +878,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/21/记一次系统-OOM/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/28/MySQL-锁详解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -899,7 +897,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/21/记一次系统-OOM/" itemprop="url">记一次系统 OOM</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/28/MySQL-锁详解/" itemprop="url">MySQL 锁详解</a></h1>
         
 
         <div class="post-meta">
@@ -911,8 +909,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-21T14:17:28+08:00">
-                2020-04-21
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-28T14:00:17+08:00">
+                2020-06-28
               </time>
             
 
@@ -934,8 +932,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -973,14 +971,13 @@
       
         
           
-          由此系统因为 OOM 问题而挂掉了，当时我们就登录到线上系统去下载日志，并在日志中发现类似这么一句话：
-1Exception in thread "http-nio-8080-exec-1089" java.lang.OutOfMemoryError: Java heap space
-
-日志中，http-nio-8080-exec 1089 说的其实是 Tomcat 的工作线程，而后面的 java
+          之前说过，脏写是绝对不允许的，那么这个脏写是靠什么防止的呢？其实就是靠锁机制，依靠锁机制让多个事务更新一行数据的时候串行化，避免同时更新一行数据。
+在 MySQL 里，假设有一行数据摆在那不动，此时有一个事务来了要更新这行数据，这个时候它会先看看这行数据此时有没有人加锁？如果没有，此时这个事务就会创建一个锁，里面包含了自己的 trx_id 和等待状态，然后把锁跟这行数据关联在一起。
+因为更新一行数
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/21/记一次系统-OOM/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/28/MySQL-锁详解/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1031,7 +1028,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/20/JVM-内存溢出的解决方案/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1050,7 +1047,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/20/JVM-内存溢出的解决方案/" itemprop="url">JVM 内存溢出的解决方案</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/" itemprop="url">详解 MVCC -- 多版本并发控制Ⅱ</a></h1>
         
 
         <div class="post-meta">
@@ -1062,8 +1059,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-20T16:45:06+08:00">
-                2020-04-20
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-24T13:42:54+08:00">
+                2020-06-24
               </time>
             
 
@@ -1085,8 +1082,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1124,13 +1121,12 @@
       
         
           
-          对于内存溢出，我们需要生成并分析一下 GC 日志，然后再让 JVM 自动 dump 出来内存快照，最后用 MAT 来分析一下这份内存快照，从内存快照里去找到内存溢出的原因。
-Metaspace 内存区域溢出首先我们先看下面的代码：
-12345678910111213141516171819202122232425262728293031323334353637383940414243public 
+          Read Committed（读已提交）隔离级别现在我们讲讲基于 ReadView 机制是如何实现 Read Committed 隔离级别的。所谓的Read Committed 隔离级别，简称为 RC，是说你事务运行期间，只要别的事务修改数据还提交了，你就是可以读到人家修改的数据的，所以是会发生不可重复读的问题，包括幻读的问题，都会有的。
+而 ReadView 机制，它是基于 undo log 版
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/20/JVM-内存溢出的解决方案/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1181,7 +1177,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/18/RocketMQ-基于延迟消息机制的大量订单的定时退款扫描/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1200,7 +1196,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/18/RocketMQ-基于延迟消息机制的大量订单的定时退款扫描/" itemprop="url">RocketMQ - 基于延迟消息机制的大量订单的定时退款扫描</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/" itemprop="url">详解 MVCC -- 多版本并发控制</a></h1>
         
 
         <div class="post-meta">
@@ -1212,8 +1208,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-18T11:47:26+08:00">
-                2020-04-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-23T16:56:57+08:00">
+                2020-06-23
               </time>
             
 
@@ -1235,8 +1231,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1274,13 +1270,12 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
       
         
           
-          我们来看一个订单退款扫描的问题。一个正常的电商购物流程，一般来说我们现在作为用户在一个电商 APP 上都会选择一些商品加入购物车，然后对购物车里选择的一些商品统一下一个订单，此时后台的订单系统会在订单数据库中创建一个订单。
-但是我们下了一个订单之后，虽然订单数据库里会有一个订单，订单的状态却是 “待支付” 状态，因此此时你还没有支付这个订单，我们的订单系统其实也在等待用户完成这个订单的支付
-这里就
+          MySQL 默认的事务隔离级别是 RR（Read Repeatable 可重复读），即脏写、脏读、不可重复读、幻读都不会发生，这是怎么做到的？这就是由经典的 MVCC 多版本并发控制机制实现的。在讲解 MVCC 机制之前，我们得先讲讲 undo log 版本连。
+理解 MVCC 机制的前奏：undo log 版本链简单来说，我们每条数据其实都有两个子段，一个是 trx_id，一个是 roll_po
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/18/RocketMQ-基于延迟消息机制的大量订单的定时退款扫描/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1331,7 +1326,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/16/RocketMQ-消息乱序/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/22/适配器模式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1350,7 +1345,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/16/RocketMQ-消息乱序/" itemprop="url">RocketMQ - 消息乱序</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/22/适配器模式/" itemprop="url">适配器模式</a></h1>
         
 
         <div class="post-meta">
@@ -1362,8 +1357,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-16T22:21:36+08:00">
-                2020-04-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-22T16:53:18+08:00">
+                2020-06-22
               </time>
             
 
@@ -1385,8 +1380,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -1424,12 +1419,12 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
       
         
           
-          案例分析大数据团队需要获取订单数据库中的全部数据，然后将订单数据保存一份在自己的大数据存储系统中，比如 HDFS、Hive、HBASE 等。接着基于大数据技术对这些数据进行计算。
-如果让大数据系统自己跑负责的大 SQL 在订单系统的数据库上来出一些数据报表，是会严重影响订单系统的性能的，所有采用了基于 canal 这样的中间件去监听订单数据库的 binlog，就是一些增删改查的日志，然后把这些 b
+          有的笔记本电脑的工作电压是 20V，而我国的家庭用电是 220V，如何让 20V 的笔记本电脑能够在 220V 的电压下工作？答案是引入一个电源适配器（AC Adapter），俗称充电器或者变压器。有了这个电源适配器，生活用电和笔记本电脑即可兼容。
+在软件开发中，有时也存在这种不兼容的情况，也可以像引入一个电源适配器一样引入一个称之为适配器的角色来协调这些不兼容的结构，这种设计方案即为适配器模式。
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/16/RocketMQ-消息乱序/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/22/适配器模式/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1480,7 +1475,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/22/MySQL-多事务运行场景/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1499,7 +1494,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/15/RocketMQ-重发机制/" itemprop="url">RocketMQ-重发机制</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/22/MySQL-多事务运行场景/" itemprop="url">MySQL 多事务运行场景</a></h1>
         
 
         <div class="post-meta">
@@ -1511,8 +1506,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-15T16:02:14+08:00">
-                2020-04-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-22T10:53:35+08:00">
+                2020-06-22
               </time>
             
 
@@ -1534,8 +1529,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1573,13 +1568,12 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
       
         
           
-          背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券
-优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。
-通过查看日志
+          平时我们执行增删改的时候，无非就是从磁盘加载数据到 buffer pool 的缓存页里去，对缓存页进行更新，同时记录下来 undo log 回滚日志和 redo log 重做日志，应对的是事务提交之后 MySQL 挂了恢复数据的场景，以及事务回滚的场景
+接下来我们就要理解到「事务」这个层面了。平时我们一般都是写一个业务系统，然后业务系统对去对数据库执行增删改查，然后通常而言，我们都是在业务系统里开
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/15/RocketMQ-重发机制/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/22/MySQL-多事务运行场景/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1630,7 +1624,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/12/常见的网络攻击/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/18/MySQL-之-undo-日志/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1649,7 +1643,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/12/常见的网络攻击/" itemprop="url">常见的网络攻击</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/18/MySQL-之-undo-日志/" itemprop="url">MySQL 之 undo 日志</a></h1>
         
 
         <div class="post-meta">
@@ -1661,8 +1655,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-12T17:50:36+08:00">
-                2020-04-12
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-18T19:37:58+08:00">
+                2020-06-18
               </time>
             
 
@@ -1684,8 +1678,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/计算机网络/" itemprop="url" rel="index">
-                    <span itemprop="name">计算机网络</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1723,12 +1717,11 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
       
         
           
-          XSS 攻击XSS 的全称是 Cross Site Script，就是跨站点脚本攻击，意思就是，黑客恶意篡改你的网页的前端代码，在里面注入一些它自己的 html + JavaScript 的脚本和代码，然后在你访问那个网站的网页的时候，他注入的那些恶意脚本就会运行。恶意脚本运行的时候就会控制你的浏览器，这个时候它的脚本就可以做很多的事情了。
-XSS 反射性攻击第一种 XSS 攻击是反射性攻击，它主
+          之前我们已经讲了在执行增删改操作时候的 redo log 的重做日志原理，说白了就是你对 buffer pool 里的缓存页执行增删改操作的时候，必须要写对应的 redo log 记录下来你做了哪些修改。而 redo log 都是先进入 redo log buffer 中的一个 block，然后事务提交的时候就会刷入磁盘文件里去。这样万一你提交事务了，结果事务修改的缓存页还没来得及刷入磁盘上的数据
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/12/常见的网络攻击/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/18/MySQL-之-undo-日志/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1770,7 +1763,7 @@ XSS 反射性攻击第一种 XSS 攻击是反射性攻击，它主
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/CKING.github.io/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/8/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/CKING.github.io/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/8/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1818,7 +1811,7 @@ XSS 反射性攻击第一种 XSS 攻击是反射性攻击，它主
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-count">183</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1829,7 +1822,7 @@ XSS 反射性攻击第一种 XSS 攻击是反射性攻击，它主
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1840,7 +1833,7 @@ XSS 反射性攻击第一种 XSS 攻击是反射性攻击，它主
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

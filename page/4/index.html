@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/08/25/组合模式/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/08/25/组合模式/" itemprop="url">组合模式</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/" itemprop="url">Spring 单例 Bean 创建</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-25T16:47:12+08:00">
-                2020-08-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T16:17:32+08:00">
+                2021-09-08
               </time>
             
 
@@ -328,8 +328,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -367,13 +367,18 @@
       
         
           
-          树形结构在软件中随处可见，例如操作系统中的目录结构，应用软件的菜单和办公系统中的公司组织结构等。如何运用面向对象的方式来处理这种树形结构是组合模式需要解决的问题。组合模式使用户可以一致性地处理整个树形结构或者树形结构的一部分，也可以一致性处理树形结构中的叶子节点和容器节点（包含子节点的节点）
-示例
-Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文件夹（Folder）杀毒，也可以对某个指
+          本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：
+
+getSingleton
+createBean
+getObjectForBeanInstance
+
+getSingleton我们先看一下 getSingleton的源码
+1234567891011121314151617181920212223242526272829303132333435363738394041
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/08/25/组合模式/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -424,7 +429,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/08/05/双指针技巧总结/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/前缀和技巧/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -443,7 +448,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/08/05/双指针技巧总结/" itemprop="url">双指针技巧总结</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/前缀和技巧/" itemprop="url">前缀和技巧</a></h1>
         
 
         <div class="post-meta">
@@ -455,8 +460,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-05T10:14:29+08:00">
-                2020-08-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
+                2021-09-08
               </time>
             
 
@@ -517,13 +522,15 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          双指针技巧可以分为两类：一类是「快慢指针」，一类是「左右指针」。前者主要解决链表中的问题，比如典型的判定链表中是否包含环；后者主要解决数组（或者字符串）的问题，比如二分查找
-快慢指针的常见算法快慢指针一般都初始化指向链表的头结点 head，前进时快指针 fast 在前，慢指针 slow 在后，巧妙解决一些链表中的问题
-判定链表中是否含有环单链表的特点就是每个节点只知道下一个节点，所以一个指针的话无
+          前缀和技巧适用于快速计算一个索引区间内的元素之和
+这道题 303.区域和检索 - 数组不可变 就是前缀和的基本使用场景：
+
+题目要求你实现这样一个类：
+12345678910class NumArray &#123;    public NumArray(int[] nums) &#123;    &#125;        public int sumRange(int left, int ri
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/08/05/双指针技巧总结/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/前缀和技巧/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -574,7 +581,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/08/04/BFS-算法/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/差分数组技巧/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -593,7 +600,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/08/04/BFS-算法/" itemprop="url">BFS 算法</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/差分数组技巧/" itemprop="url">差分数组技巧</a></h1>
         
 
         <div class="post-meta">
@@ -605,8 +612,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-04T11:02:57+08:00">
-                2020-08-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
+                2021-09-08
               </time>
             
 
@@ -667,12 +674,13 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          BFS 广度优先搜索的核心思想，就是把一些问题抽象成图，从一个点开始，向四周开始扩散。一般来说，我们写 BFS 算法都是用「队列」这种数据结构，每次将一个节点周围的所有节点都加入队列。BFS 与 DFS 的最主要区别是：BFS 找到的路径一定是最短的，但代价就是空间复杂度比 DFS 大很多。
-算法框架我们先说一下 BFS 出现的常见场景，本质就是让你在一幅「图」中找到从起点 start 到终点 t
+          本文将一个和前缀和思想非常类似的算法技巧：差分数组。前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和；而差分数组主要适用场景是频繁对原始数组的某个区间的元素进行增减
+比如，我给你输入一个数组 nums，然后要求给区间 nums[2..6] 全部加 1，再给 nums[3..9] 全部减 3，再给 nums[0..4] 全部加 2，再给..
+一通操作之后，然后问你，最后 n
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/08/04/BFS-算法/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/差分数组技巧/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -723,7 +731,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/31/MySQL-根据成本优化选择执行计划/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -742,7 +750,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/31/MySQL-根据成本优化选择执行计划/" itemprop="url">MySQL 根据成本优化选择执行计划</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/" itemprop="url">Spring Ioc 容器初始化</a></h1>
         
 
         <div class="post-meta">
@@ -754,8 +762,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-31T15:57:17+08:00">
-                2020-07-31
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-11T17:29:18+08:00">
+                2021-08-11
               </time>
             
 
@@ -777,8 +785,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -816,13 +824,12 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          我们在执行单表查询也好，还是多表查询也好，都有多种执行计划可以选择。比如有的表可以全表扫描，有的可以用索引 A，有的用索引 B，那用哪种执行计划呢？
-我们先了解 MySQL 里的成本是什么意思。一般跑一个 SQL 语句，一般成本是两块。首先那些数据在磁盘里，是不是要从磁盘里把数据读出来？这个从磁盘读取数据到内存就是 IO 成本，而且 MySQL 里都是一页一页读的，读一页的成本约定为 1.0
-接着
+          思维导图![Spring Ioc 容器初始化](Spring-Ioc-容器初始化/Spring Ioc 容器初始化.png)
+Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spring 容器，该容器会读取配置文件 /beans.xml，并统一管理由该文件中定义好的 bean 实例对象，如果要获取某个 bean 实例，使用 getBean 方法就行。假设将 Us
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/31/MySQL-根据成本优化选择执行计划/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -873,7 +880,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/15/MySQL-之执行计划的索引类型/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/04/08/Spring-事务同步机制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -892,7 +899,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/15/MySQL-之执行计划的索引类型/" itemprop="url">MySQL 之执行计划的索引类型</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/" itemprop="url">Spring 事务同步机制</a></h1>
         
 
         <div class="post-meta">
@@ -904,8 +911,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-15T19:53:29+08:00">
-                2020-07-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-08T11:00:09+08:00">
+                2021-04-08
               </time>
             
 
@@ -927,8 +934,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -966,14 +973,15 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          当我们用 EXPLAIN 查看执行计划的时候，一般如下图所示：
+          Spring 事务极简介绍Spring 有「声明式事务」和「编程式事务」：
 
-现在我们就来看看执行计划中 type 代表什么意思
-假设你写一个 SELECT * FROM table WHERE id = x 或者 SELECT * FROM table WHERE name = x 的语句，直接就可以通过聚簇索引或者二级索引 + 聚簇索引回源，轻松查到你要的数据，这种根据索引可以快速查找数据的过程，在执行计
+声明式事务只需要提供 Transactional 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可
+
+编程式事务则需要使用 Spring 提供的模板，如 TransactionTemplate，或者直接使用底层的 PlatformTransactionManage
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/15/MySQL-之执行计划的索引类型/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1024,7 +1032,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/10/MySQL-索引设计实战/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/03/29/I-0-多路复用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1043,7 +1051,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/10/MySQL-索引设计实战/" itemprop="url">MySQL 索引设计实战</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/03/29/I-0-多路复用/" itemprop="url">I/0 多路复用</a></h1>
         
 
         <div class="post-meta">
@@ -1055,8 +1063,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-10T17:51:25+08:00">
-                2020-07-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-29T15:12:56+08:00">
+                2021-03-29
               </time>
             
 
@@ -1078,8 +1086,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
                   </a>
                 </span>
 
@@ -1117,12 +1125,12 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          这个实战我们以陌生人社交 APP 为例。社交 APP，它本身的核心主旨，就是你进入 APP 的时候，需要录入一系列你的个人信息。接着 APP 自己会通过一定的算法推荐一些可能适合你的人给你进行线上交友。当然自己也可以通过一定的条件去搜索和筛选，查找 APP 上符合你期望的人
-这里先忽略 APP 基于算法自动推荐潜在感兴趣的好友的部分，就看一下通过一系列的条件去筛选好友的过程。首先我们要有个用户表，
+          最基本的 Socket 模型要想客户端和服务器能在网络中通信，必须要使用 Socket 编程，它是进程间通信里比较特别的方式，特别之处在于它是可以跨主机间通信
+Socket 的中文名叫「插口」。事实上，双方要进行网络通信前，各自得创建一个 Socket，这相当于客户端和服务器都开了一个「口子」，双方读取和发送数据的时候，都通过这个口子。这样，是不是觉得很像弄了一根网线，一头插在客户端，一头插在服务
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/10/MySQL-索引设计实战/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/03/29/I-0-多路复用/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1173,7 +1181,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/10/MySQL-之索引设计/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1192,7 +1200,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/10/MySQL-之索引设计/" itemprop="url">MySQL 之索引设计</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/" itemprop="url">大规模集群下 Hadoop NameNode 如何承受每秒上千万的高并发访问</a></h1>
         
 
         <div class="post-meta">
@@ -1204,8 +1212,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-10T14:23:03+08:00">
-                2020-07-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-10T14:23:12+08:00">
+                2021-02-10
               </time>
             
 
@@ -1227,8 +1235,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -1266,13 +1274,21 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          本文讲解索引设计的一般原则。
-原则一首先我们在针对业务需求建立一张表的结构之后，就知道这个表有哪些字段，每个字段是什么类型的，会包含哪些数据。设计好表结构之后，就是要设计表的索引。设计索引的时候，我们要考虑第一点，就是未来我们对表进行查询的时候，大概会如何来进行查询
-可能有人会说，你要我刚设计完表结构就知道未来会怎么查询表，我怎么知道？没关系，其实我们完全可以在表结构设计完毕之后，不用先急着设计索
+          我们分析一下，高并发请求 NameNode 会遇到什么问题
+我们知道，每次请求 NameNode 修改一条元数据（比如说申请上传一个文件，那么就需要在内存目录树种加入一个文件），都要写一条 edits log，包括两个步骤：
+
+写入本地磁盘
+
+通过网络传输给 JournalNodes 集群
+
+
+但是这存在多线程并发安全问题。NameNode 在写 edits log 时的第一条原则：
+
+必须保证每
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/10/MySQL-之索引设计/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1323,7 +1339,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/09/MySQL-索引的使用扩展/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/09/Hadoop-基本架构原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1342,7 +1358,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/09/MySQL-索引的使用扩展/" itemprop="url">MySQL 索引的使用扩展</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/" itemprop="url">Hadoop 基本架构原理</a></h1>
         
 
         <div class="post-meta">
@@ -1354,8 +1370,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-09T14:57:12+08:00">
-                2020-07-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-09T16:37:37+08:00">
+                2021-02-09
               </time>
             
 
@@ -1377,8 +1393,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -1416,12 +1432,14 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          SQL 排序的时候如何使用索引假设你有一个 SELECT * FROM table WHERE xxx = xxx ORDER BY xxx 这样的一个 SQL 语句，似乎应该是基于 where 语句通过索引快速筛选出来一波数据，接着放到内存里，或者放到一个临时文件里，然后通过排序算法按照某个字段走一个排序，最后把排序好的数据返回
-但这么搞是有点慢的，尤其是你要排序的数据量比较大，还不能用内存来排
+          Hadoop 是目前大数据领域最主流的一套技术体系，包含了多种技术。包括 HDFS（分布式文件系统）、YARN（分布式资源调度系统）、MapReduce（分布式计算系统）等等
+我们用一个简单的场景来阐述一下 Hadoop。假如你现在公司里的数据都是放在 MySQL 里的，并且全部放在一台数据库服务器上，假设这台服务器的磁盘空间有 2T ，如下：
+
+如果你不停地往这台服务器的 MySQL 里放数据，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/09/MySQL-索引的使用扩展/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1472,7 +1490,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1491,7 +1509,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/" itemprop="url">MySQL-之索引讲解（下）</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/" itemprop="url">分布式事务 -- TCC Saga 入门级理解</a></h1>
         
 
         <div class="post-meta">
@@ -1503,8 +1521,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-08T11:27:52+08:00">
-                2020-07-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-05T14:51:46+08:00">
+                2021-02-05
               </time>
             
 
@@ -1526,8 +1544,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
                   </a>
                 </span>
 
@@ -1565,14 +1583,25 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          之前讲了 MySQL 数据库的索引结构，让大家清楚不同索引的结构，大致是如何建立的，搜索的时候是如何根据不同的索引去查找数据的。现在，我们说说在插入数据的时候，是如何维护不同索引的 B+ 树的
-首先，刚开始你一个表搞出来以后，它就一个数据页，这个数据页是属于聚簇索引的一部分，而且目前还是空的。此时如果你插入数据，就是直接在这个数据页里插入就可以了，没必要弄什么索引页
+          业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作
+用电商场景来说就是以下几个步骤：
 
-这个初始的数据页其实就是一个
+用户在订单平台操作下单
+
+占库存
+
+占钱款
+
+生成一笔订单
+
+
+如图所示：
+
+分布式系统上图是
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/08/MySQL-之索引讲解（下）/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1623,7 +1652,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/03/公司的分布式缓存架构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1642,7 +1671,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/" itemprop="url">MySQL-之索引讲解（中）</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/" itemprop="url">公司的分布式缓存架构</a></h1>
         
 
         <div class="post-meta">
@@ -1654,8 +1683,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-07T10:12:54+08:00">
-                2020-07-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-03T15:11:32+08:00">
+                2021-02-03
               </time>
             
 
@@ -1677,8 +1706,8 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/杂记/" itemprop="url" rel="index">
+                    <span itemprop="name">杂记</span>
                   </a>
                 </span>
 
@@ -1716,14 +1745,21 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
       
         
           
-          上篇我们讲了数据页分裂的过程，在你不停地往表里插入数据的时候，会出来一个一个的数据页，如果你的主键不是自增的，它可能会有一个数据行的挪动过程，保证你下一个数据页的主键值都大于上一个数据页的主键值
-现在是这样，假设我们有很多数据页，然后我们想要根据主键来查询数据，那么直接查询是不行的，因为我们也不知道主键在哪里。如下：
+          Spring Cache在讨论公司的分布式缓存架构之前，我们先拿 Spring Cache 缓存作为一个参考系。简单来说，Spring Cache 有两个优点：
 
-假设你要搜 id = 4 的数据，但你怎么知道在哪个数据页里？没有任何证据可以
+基于 Spring AOP 注解
+上手简单
+对业务侵入性低
+
+
+提供标准的 Cache 抽象（JSR 107），具体的 Cache、CacheManager 依赖各自实现
+
+
+SpaceStation 实践在 Spring Cache 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/07/MySQL-之索引讲解（中）/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1765,7 +1801,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/CKING.github.io/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/CKING.github.io/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1813,7 +1849,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-count">183</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1824,7 +1860,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1835,7 +1871,7 @@ Sunny 软件公司欲开发一个杀毒软件，该软件既可以对某个文�
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

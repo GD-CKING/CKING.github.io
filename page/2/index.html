@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/差分数组技巧/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/30/生产者压缩算法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/08/差分数组技巧/" itemprop="url">差分数组技巧</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/30/生产者压缩算法/" itemprop="url">生产者压缩算法</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
-                2021-09-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-30T15:28:15+08:00">
+                2021-11-30
               </time>
             
 
@@ -328,8 +328,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
                   </a>
                 </span>
 
@@ -367,13 +367,13 @@
       
         
           
-          本文将一个和前缀和思想非常类似的算法技巧：差分数组。前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和；而差分数组主要适用场景是频繁对原始数组的某个区间的元素进行增减
-比如，我给你输入一个数组 nums，然后要求给区间 nums[2..6] 全部加 1，再给 nums[3..9] 全部减 3，再给 nums[0..4] 全部加 2，再给..
-一通操作之后，然后问你，最后 n
+          
+Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社区分别称之为 V1 版本和 V2 版本。V2 版本是 Kafka 0.11.0.0 中正式引入的
+无论是哪个版本，Kafka 的消息层次都分为两层：消息集合（message set）和消息（message）。一个消息集合中包含若干条日志项，而日志项才是真正封装消息的地方。Kafka 底层的消息日志由一系列消息集合日志项组成。K
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/08/差分数组技巧/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/30/生产者压缩算法/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -424,7 +424,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/30/生产者消息分区机制原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -443,7 +443,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/" itemprop="url">Spring Ioc 容器初始化</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/30/生产者消息分区机制原理/" itemprop="url">生产者消息分区机制原理</a></h1>
         
 
         <div class="post-meta">
@@ -455,8 +455,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-11T17:29:18+08:00">
-                2021-08-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-30T10:28:14+08:00">
+                2021-11-30
               </time>
             
 
@@ -478,8 +478,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
                   </a>
                 </span>
 
@@ -517,12 +517,15 @@
       
         
           
-          思维导图![Spring Ioc 容器初始化](Spring-Ioc-容器初始化/Spring Ioc 容器初始化.png)
-Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spring 容器，该容器会读取配置文件 /beans.xml，并统一管理由该文件中定义好的 bean 实例对象，如果要获取某个 bean 实例，使用 getBean 方法就行。假设将 Us
+          ![Kafka 分区机制](生产者消息分区机制原理/Kafka 分区机制.png)
+为什么分区kafka 有主题（Topic）的概念，它是承载真实数据的逻辑容器，而在主题之下还分为若干个分区，也就是说 Kafka 的消息组织方式实际上是三级结构：主题 - 分区 - 消息。主题下的每条消息只会保存在某一个分区中，而不会在多个分区中被保存多份。如图：
+
+为什么使用分区的概念而不是直接使用多个主题呢？
+
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/30/生产者消息分区机制原理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -573,7 +576,7 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/04/08/Spring-事务同步机制/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -592,7 +595,7 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/" itemprop="url">Spring 事务同步机制</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/" itemprop="url">MySQL 之说说 join 连接</a></h1>
         
 
         <div class="post-meta">
@@ -604,8 +607,8 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-08T11:00:09+08:00">
-                2021-04-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-25T16:51:31+08:00">
+                2021-11-25
               </time>
             
 
@@ -627,8 +630,8 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -666,15 +669,12 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
       
         
           
-          Spring 事务极简介绍Spring 有「声明式事务」和「编程式事务」：
-
-声明式事务只需要提供 Transactional 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可
-
-编程式事务则需要使用 Spring 提供的模板，如 TransactionTemplate，或者直接使用底层的 PlatformTransactionManage
+          今天我们说说 join 语句是怎么执行的。为了方便分析，我们先创建两个表 t1 和 t2
+1234567891011121314151617181920212223CREATE TABLE `t2` (  `id` int(11) NOT NULL,  `a` int(11) DEFAULT NULL,  `b` int(11) DEFAULT NULL,  PRIMARY KEY (`id`),
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -725,7 +725,7 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/03/29/I-0-多路复用/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -744,7 +744,7 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/03/29/I-0-多路复用/" itemprop="url">I/0 多路复用</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/" itemprop="url">MySQL 之怎么保证高可用</a></h1>
         
 
         <div class="post-meta">
@@ -756,8 +756,8 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-29T15:12:56+08:00">
-                2021-03-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-23T16:08:48+08:00">
+                2021-11-23
               </time>
             
 
@@ -779,8 +779,8 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/网络编程/" itemprop="url" rel="index">
-                    <span itemprop="name">网络编程</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -818,12 +818,17 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
       
         
           
-          最基本的 Socket 模型要想客户端和服务器能在网络中通信，必须要使用 Socket 编程，它是进程间通信里比较特别的方式，特别之处在于它是可以跨主机间通信
-Socket 的中文名叫「插口」。事实上，双方要进行网络通信前，各自得创建一个 Socket，这相当于客户端和服务器都开了一个「口子」，双方读取和发送数据的时候，都通过这个口子。这样，是不是觉得很像弄了一根网线，一头插在客户端，一头插在服务
+          
+主备延迟主备延迟可能是一个主动运维动作，比如软件升级、主库所在机器按计划下线等，也可能是被动操作，比如主库所在机器掉电
+在介绍主动切换流程的详细步骤之前，要先跟你说明一个概念，即「同步延迟」。与数据同步有关的时间点主要包括以下三个：
+
+主库 A 执行完成一个事务，写入 binlog，我们把这个时刻记为 T1
+之后传给备库 B，我们把备库 B 接收完这个 binlog 的时刻记为 T2
+备库 B 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/03/29/I-0-多路复用/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -874,7 +879,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -893,7 +898,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/" itemprop="url">大规模集群下 Hadoop NameNode 如何承受每秒上千万的高并发访问</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/" itemprop="url">MySQL 之主备如何保证一致</a></h1>
         
 
         <div class="post-meta">
@@ -905,8 +910,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-10T14:23:12+08:00">
-                2021-02-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-22T16:58:14+08:00">
+                2021-11-22
               </time>
             
 
@@ -928,8 +933,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
-                    <span itemprop="name">大数据</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -967,21 +972,16 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
       
         
           
-          我们分析一下，高并发请求 NameNode 会遇到什么问题
-我们知道，每次请求 NameNode 修改一条元数据（比如说申请上传一个文件，那么就需要在内存目录树种加入一个文件），都要写一条 edits log，包括两个步骤：
+          
+MySQL 主备的基本原理下图是基本的主备切换流程
 
-写入本地磁盘
-
-通过网络传输给 JournalNodes 集群
-
-
-但是这存在多线程并发安全问题。NameNode 在写 edits log 时的第一条原则：
-
-必须保证每
+在状态 1 中，客户端的读写都直接访问节点 A，而节点 B 是 A 的备库，只是将 A 的更新都同步过来，到本地执行。这样可以保持节点 B 和 A 的数据都是相同的
+当需要切换的时候，就切成状态 2。这时候客户端读写访问的都是节点 B，而节点 A 是 B 的备库
+在状态 1 中，虽然节点 B 没有被直接访问，但是依然建议把节点 B（也就是备库
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1032,7 +1032,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/09/Hadoop-基本架构原理/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1051,7 +1051,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/" itemprop="url">Hadoop 基本架构原理</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/" itemprop="url">MySQL 之怎么保证数据不丢</a></h1>
         
 
         <div class="post-meta">
@@ -1063,8 +1063,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-09T16:37:37+08:00">
-                2021-02-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-15T14:03:46+08:00">
+                2021-11-15
               </time>
             
 
@@ -1086,8 +1086,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
-                    <span itemprop="name">大数据</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1125,14 +1125,12 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
       
         
           
-          Hadoop 是目前大数据领域最主流的一套技术体系，包含了多种技术。包括 HDFS（分布式文件系统）、YARN（分布式资源调度系统）、MapReduce（分布式计算系统）等等
-我们用一个简单的场景来阐述一下 Hadoop。假如你现在公司里的数据都是放在 MySQL 里的，并且全部放在一台数据库服务器上，假设这台服务器的磁盘空间有 2T ，如下：
-
-如果你不停地往这台服务器的 MySQL 里放数据，
+          
+MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指的是 MySQL 的写操作并不是立刻更新到磁盘上，而是先记录在日志上，然后在合适的时间更新到磁盘上。日志主要分为 undo log、redo log 和 binlog，作用分别是「完成 MVCC 从而实现 MySQL 的隔离级别」「降低随机写的性能消耗（转成顺序写），同时防止写操作因为宕机而丢失」「写操
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1183,7 +1181,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1202,7 +1200,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/" itemprop="url">分布式事务 -- TCC Saga 入门级理解</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/" itemprop="url">MySQL 之全局锁和表锁</a></h1>
         
 
         <div class="post-meta">
@@ -1214,8 +1212,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-05T14:51:46+08:00">
-                2021-02-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-12T13:51:45+08:00">
+                2021-11-12
               </time>
             
 
@@ -1237,8 +1235,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1276,25 +1274,12 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
       
         
           
-          业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作
-用电商场景来说就是以下几个步骤：
-
-用户在订单平台操作下单
-
-占库存
-
-占钱款
-
-生成一笔订单
-
-
-如图所示：
-
-分布式系统上图是
+          数据库锁设计的初衷是处理并发问题。作为多用户共享的资源，当出现并发访问的时候，数据库需要合理地控制资源的访问规则，而锁就是用来实现这些访问规则的重要数据结构。而根据加锁的范围，MySQL 里面的锁大致可以分成全局锁、表级锁和行锁三类
+全局锁全局锁就是对整个数据库实例加锁。MySQL 提供了一个加全局读锁的方法，命令是 Flush tables with read lock (FTWRL)。当需要让
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1345,7 +1330,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/03/公司的分布式缓存架构/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1364,7 +1349,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/" itemprop="url">公司的分布式缓存架构</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/" itemprop="url">MySQL 之 order by 是怎么工作的</a></h1>
         
 
         <div class="post-meta">
@@ -1376,8 +1361,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-03T15:11:32+08:00">
-                2021-02-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-08T10:52:32+08:00">
+                2021-11-08
               </time>
             
 
@@ -1399,8 +1384,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/杂记/" itemprop="url" rel="index">
-                    <span itemprop="name">杂记</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1438,21 +1423,13 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
       
         
           
-          Spring Cache在讨论公司的分布式缓存架构之前，我们先拿 Spring Cache 缓存作为一个参考系。简单来说，Spring Cache 有两个优点：
-
-基于 Spring AOP 注解
-上手简单
-对业务侵入性低
-
-
-提供标准的 Cache 抽象（JSR 107），具体的 Cache、CacheManager 依赖各自实现
-
-
-SpaceStation 实践在 Spring Cache 
+          
+开发应用的时候，会遇到需要根据指定的字段排序来显示结果的需求。举个例子，假设有个表的定义是这样子的
+123456789CREATE TABLE `t` (  `id` int(11) NOT NULL,  `city` varchar(16) NOT NULL,  `name` varchar(16) NOT NULL,  `age` int(11) NOT NULL,  `addr` varc
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1503,7 +1480,7 @@ SpaceStation 实践在 Spring Cache
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/01/Spring-Cache/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/05/SQL-变慢的一些场景/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1522,7 +1499,7 @@ SpaceStation 实践在 Spring Cache
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/01/Spring-Cache/" itemprop="url">Spring Cache</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/05/SQL-变慢的一些场景/" itemprop="url">SQL 变慢的一些场景</a></h1>
         
 
         <div class="post-meta">
@@ -1534,8 +1511,8 @@ SpaceStation 实践在 Spring Cache
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-01T15:55:27+08:00">
-                2021-02-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-05T10:41:09+08:00">
+                2021-11-05
               </time>
             
 
@@ -1557,8 +1534,8 @@ SpaceStation 实践在 Spring Cache
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1596,11 +1573,14 @@ SpaceStation 实践在 Spring Cache
       
         
           
-          Spring Cache 简介在 Spring 3.1 中引入了多 Cache 的支持，在 spring - context 包中定义了 org.springframework.cache.Cache 和 org.springframework.cache.CacheManager 两个接口来统一不同的缓存技术。Cache 接口包含缓存的常用操作：增加、删除、读取等。CacheManager 是 
+          
+在 MySQL 中，有很多看上去逻辑相同，但性能确差异巨大的 SQL 语句。对这些语句使用不当的话，就会导致这个数据库的压力变大
+条件字段函数操作假设你维护了一个交易系统，其中交易记录表 tradelog 包含交易流水号（tradeid）、交易员 id（opeartor）、交易时间（t_modified）等字段。为了方便描述，我们先忽略其他字段
+123456789CREATE TABLE `tr
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/01/Spring-Cache/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/05/SQL-变慢的一些场景/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1651,7 +1631,7 @@ SpaceStation 实践在 Spring Cache
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/12/25/Java-内部类/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/04/MySQL-之-count/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1670,7 +1650,7 @@ SpaceStation 实践在 Spring Cache
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/12/25/Java-内部类/" itemprop="url">Java 内部类</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/04/MySQL-之-count/" itemprop="url">MySQL 之 count(*)</a></h1>
         
 
         <div class="post-meta">
@@ -1682,8 +1662,8 @@ SpaceStation 实践在 Spring Cache
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-25T18:20:52+08:00">
-                2020-12-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-04T19:47:28+08:00">
+                2021-11-04
               </time>
             
 
@@ -1705,8 +1685,8 @@ SpaceStation 实践在 Spring Cache
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1744,26 +1724,16 @@ SpaceStation 实践在 Spring Cache
       
         
           
-          内部类的作用首先我们要知道什么事内部类
+          Count(*) 的实现方式首先，在不同的 MySQL 引擎中，count(*) 有不同的实现方式
 
-内部类（inner class）：定义在另一个类中的类
+MyISAM 引擎把一个表的总行数存在了磁盘上，因此执行 count(*) 的时候会直接返回这个数，效率很高
+而 InnoDB 引擎，它执行 count(*) 的时候，需要把数据一行一行地从引擎里面读出来，然后累积计数
 
-内部类有什么作用：
-
-内部类方法可以访问该类定义所在作用域中的数据，包括 private 修饰的私有数据
-
-
-内部类可以对同一包中的其他类隐藏起来
-
-
-内部类可以实现 Java 单继承的缺陷
-
-内部类方法可以访问该类定义所在作用域中的数据我们看下面的代码
-1234567891011121314151
+注意，我们讨论的是没有过滤条件的 count(*)，如果加了 where 条
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/12/25/Java-内部类/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/04/MySQL-之-count/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1805,7 +1775,7 @@ SpaceStation 实践在 Spring Cache
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="page-number current">2</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="page-number current">2</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1853,7 +1823,7 @@ SpaceStation 实践在 Spring Cache
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-count">183</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1864,7 +1834,7 @@ SpaceStation 实践在 Spring Cache
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1875,7 +1845,7 @@ SpaceStation 实践在 Spring Cache
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

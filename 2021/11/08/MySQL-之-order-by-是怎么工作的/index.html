@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="开发应用的时候，会遇到需要根据指定的字段排序来显示结果的需求。举个例子，假设有个表的定义是这样子的 123456789CREATE TABLE `t` (  `id` int(11) NOT NULL,  `city` varchar(16) NOT NULL,  `name` varchar(16) NOT NULL,  `age` int(11) NOT NULL,  `addr` varc">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 之 order by 是怎么工作的">
+<meta property="og:url" content="https://github.com/2021/11/08/MySQL-之-order-by-是怎么工作的/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="开发应用的时候，会遇到需要根据指定的字段排序来显示结果的需求。举个例子，假设有个表的定义是这样子的 123456789CREATE TABLE `t` (  `id` int(11) NOT NULL,  `city` varchar(16) NOT NULL,  `name` varchar(16) NOT NULL,  `age` int(11) NOT NULL,  `addr` varc">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/city%E7%B4%A2%E5%BC%95.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E5%85%A8%E5%AD%97%E6%AE%B5%E6%8E%92%E5%BA%8F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/optimizer_trace.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/rowid%E6%8E%92%E5%BA%8F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/optimizer_trace2.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/city_user%E7%B4%A2%E5%BC%95.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E7%B4%A2%E5%BC%95%E6%8E%92%E5%BA%8F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/explain%E7%BB%93%E6%9E%9C.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95%E6%8E%92%E5%BA%8F.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png">
+<meta property="og:updated_time" content="2021-12-14T00:45:31.285Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL 之 order by 是怎么工作的">
+<meta name="twitter:description" content="开发应用的时候，会遇到需要根据指定的字段排序来显示结果的需求。举个例子，假设有个表的定义是这样子的 123456789CREATE TABLE `t` (  `id` int(11) NOT NULL,  `city` varchar(16) NOT NULL,  `name` varchar(16) NOT NULL,  `age` int(11) NOT NULL,  `addr` varc">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2021/11/08/MySQL-之-order-by-是怎么工作的/">
+
+
+
+
+
+  <title>MySQL 之 order by 是怎么工作的 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MySQL 之 order by 是怎么工作的</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-08T10:52:32+08:00">
+                2021-11-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png" alt="思维导图"></p>
+<p>开发应用的时候，会遇到需要根据指定的字段排序来显示结果的需求。举个例子，假设有个表的定义是这样子的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `t` (</span><br><span class="line">  `id` int(11) NOT NULL,</span><br><span class="line">  `city` varchar(16) NOT NULL,</span><br><span class="line">  `name` varchar(16) NOT NULL,</span><br><span class="line">  `age` int(11) NOT NULL,</span><br><span class="line">  `addr` varchar(128) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (`id`),</span><br><span class="line">  KEY `city` (`city`)</span><br><span class="line">) ENGINE=InnoDB;</span><br></pre></td></tr></table></figure>
+
+<p>这时候你的 SQL 可以这么写：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT city, name, age FROM t where city = &apos;杭州&apos; ORDER BY name LIMIT 1000</span><br></pre></td></tr></table></figure>
+
+<p>这个语句很简单，但是你了解它的执行流程吗？</p>
+<h3 id="全字段排序"><a href="#全字段排序" class="headerlink" title="全字段排序"></a>全字段排序</h3><p>上面的 SQL 语句中，我们为了避免全表扫描，需要在 city 字段加上索引。在 city 字段上创建索引后，我们用 explain 命令看看看这个语句的执行情况</p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="执行计划"></p>
+<p>Extra 这个字段中的 <code>Using filesort</code> 表示的就是需要排序，MySQL 会给每个线程分配一块内存用于排序，成为 <code>sort_buffer</code></p>
+<p>为了说明这个 SQL 查询语句的执行过程，我们先来看一下 city 这个索引的示意图</p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/city%E7%B4%A2%E5%BC%95.png" alt="city索引"></p>
+<p>从图中可以看到，满足 city = ‘杭州’ 条件的行，是从 ID_X 到 ID_(X + N) 的这些记录</p>
+<p>通常情况下，这个过程执行流程如下：</p>
+<ol>
+<li>初始化 sort_buffer，确定放入 name、city、age 这三个字段</li>
+<li>从索引 city 找到第一个满足 city = ‘杭州’ 条件的主键 id，也就是图中的 ID_X</li>
+<li>到主键 id 索引取出整行，取 name、city、age 三个字段的值，存入 sort_buffer 中</li>
+<li>从索引 city 去下一个记录的主键 id</li>
+<li>重复步骤 3、4 直到 city 的值不满足查询条件为止，对应的主键 id 也就是图中的 ID_Y</li>
+<li>对 sort_buffer 中的数据按照字段name 做快速排序</li>
+<li>按照排序结果取前 1000 行返回给客户端</li>
+</ol>
+<p>我们暂且把这个排序过程，成为<strong>全字段排序</strong>，执行流程的示意图如下：</p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E5%85%A8%E5%AD%97%E6%AE%B5%E6%8E%92%E5%BA%8F.png" alt="全字段排序"></p>
+<p>图中 「按 name 排序」这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数 <code>sort_buffer_size</code></p>
+<p><code>sort_buffer_size</code>，就是 MySQL 为排序开辟的内存（sort_buffer）的大小。如果要排序的数据量小于 sort_buffer_size，排序就在内存中完成。但如果排序数据量太大，内存放不下，则不得不利用磁盘临时文件辅助排序</p>
+<p>你可以用下面介绍的方法，来确定一个排序语句是否使用了临时文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">/* 打开 optimizer_trace，只对本线程有效 */</span><br><span class="line">SET optimizer_trace=&apos;enabled=on&apos;;</span><br><span class="line"></span><br><span class="line">/* @a保存Innodb_rows_read的初始值 */</span><br><span class="line">select VARIABLE_VALUE into @a from  performance_schema.session_status where variable_name = &apos;Innodb_rows_read&apos;;</span><br><span class="line"></span><br><span class="line">/* 执行语句 */</span><br><span class="line">select city, name,age from t where city=&apos;杭州&apos; order by name limit 1000; </span><br><span class="line"></span><br><span class="line">/* 查看 OPTIMIZER_TRACE 输出 */</span><br><span class="line">SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G</span><br><span class="line"></span><br><span class="line">/* @b保存Innodb_rows_read的当前值 */</span><br><span class="line">select VARIABLE_VALUE into @b from performance_schema.session_status where variable_name = &apos;Innodb_rows_read&apos;;</span><br><span class="line"></span><br><span class="line">/* 计算Innodb_rows_read差值 */</span><br><span class="line">select @b-@a;</span><br></pre></td></tr></table></figure>
+
+<p>这个方法是通过 <code>OPTIMIZER_TRACE</code> 的结果来确认的，可以从 <code>number_of_tmp_files</code> 中看到是否使用了临时文件</p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/optimizer_trace.png" alt="optimizer_trace"></p>
+<p><code>number_of_tmp_files</code> 表示的是，排序过程中使用的临时文件数。为什么需要 12 个文件？内存放不下时，就需要使用外部排序，外部排序一般使用归并排序算法。可以这么简单理解，<strong>MySQL 将需要排序的数据分成 12 份，每一份单独排序后存在这些临时文件中。然后把这 12 个有序文件再合并成一个有序的大文件</strong></p>
+<p>如果 <code>sort_buffer_size</code> 超过了需要排序的数据量的大小，number_of_tmp_files 就是 0，表示排序可以直接在内存中完成。否则就需要放在临时文件中排序，sort_buffer_size  越小，需要分成的份数越多，number_of_tmp_files 的值就越大</p>
+<p>我们示例表中有 4000 条满足 city = ‘杭州’ 的记录，所以你可以看到 examined_rows = 4000，表示参与排序的行数是 4000 行</p>
+<p><code>sort_mode</code> 里面的 <code>packed_additional_fields</code> 的意思是，排序过程对字符串做了「紧凑」处理。即使 name 字段的含义是 varcahr(16)，在排序过程中还是要按照实际长度来分配空间的</p>
+<p>同时，最后一个查询语句 <code>select @b - @a</code> 的返回结果是 4000，表示整个执行过程只扫描了 4000 行</p>
+<p>这里需要注意的是，为了避免对结论造成干扰，把 <code>internal_tmp_disk_storage_engine</code> 设置成 MyISAM，否则，<code>select @b - @a</code> 的结果会显示为 4001</p>
+<p>这是因为查询 OPTIMIZER_TRACE 这个表时，需要用到临时表，而 interanl_tmp_disk_storage_engine 的默认值是 InnoDB。如果使用的是 InnoDB 引擎的话，把数据从临时表取出来的时候，会让 InnoDB_rows_read 的值加 1</p>
+<h3 id="rowid-排序"><a href="#rowid-排序" class="headerlink" title="rowid 排序"></a>rowid 排序</h3><p>上面这个算法过程里面，只对原表的数据读了一遍，剩下的操作都是在 <code>sort_buffer</code> 和临时文件中执行的。但这个算法有一个问题，就是如果查询要返回的字段很多的话，那么 sort_buffer 里面要放的字段数太多，这样内存里能够同时放下的行数很少，要分成很多个临时文件，排序的性能会很差</p>
+<p>所以如果单行很大，这个方法效率不够好</p>
+<p>那么，如果 MySQL 认为排序的单行长度太大会怎么做呢？我们修改一个参数，让 MySQL 采用另外一种算法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET max_length_for_sort_data = 16</span><br></pre></td></tr></table></figure>
+
+<p><code>max_length_for_sort_data</code> 是 MySQL 中专门控制用于排序的行数据的长度的一个参数。它的意思是，如果单行的长度超过这个值，MySQL 就认为单行太大，要换一个算法</p>
+<p>city、name、age 这三个字段的定义总长度是 36，我把 max_length_for_sort_data 设置为 16，我们在看看计算过程有什么改变</p>
+<p>新的算法放入 sort_buffer 的字段，只有要排序的列（即 name 字段）和主键 id</p>
+<p>但这时，排序的结果就因为少了 city 和 age 字段的值，不能直接返回了，整个执行流程就变成如下：</p>
+<ol>
+<li>初始化 sort_buffer，确定放入两个字段，即 name 和 id</li>
+<li>从索引 city 找到另一个满足 city = ‘杭州’ 条件的主键 id，也就是图中的 ID_X</li>
+<li>到主键 id 索引取出整行，取 name、id 这两个字段，存入 sort_buffer 中</li>
+<li>从索引 city 去下一个记录的主键 id</li>
+<li>重复步骤 3、4 直到不满足 city = ‘杭州’ 条件为止，也就是图中的 ID_Y</li>
+<li>对 sort_buffer 中数据按照字段 name 进行排序</li>
+<li>遍历排序结果，取前 1000 行，并按照 id 的值回到原表中取出 city、name 和 age 三个字段返回给客户端</li>
+</ol>
+<p>这个执行流程的示意图如下，我们称为 <strong>rowid 排序</strong></p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/rowid%E6%8E%92%E5%BA%8F.png" alt="rowid排序"></p>
+<p>对比全字段排序流程图你会发现，rowid 排序多访问了一次表 t 的主键索引</p>
+<p>需要说明的是，最后的「结果集」是一个逻辑概念，实际上 MySQL 服务端从排序后的 sort_buffer 中依次取出 id，然后到原表查到 city、name 和 age 这三个字段的结果，不需要再服务端再耗费内存存储结果，是直接返回给客户端的</p>
+<p>根据这个说明过程和图示，你可以想一下，这个时候执行 select @b - @a，结果会是多少？</p>
+<p>首先，图中的 examined_rows 的值还是 4000，表示用于排序的数据是 4000 行。但是 select @b - @a 这个语句的值变成 5000 了</p>
+<p>因为这时候除了排序过程外，在排序完成后，还要根据 id 去原表取值。由于语句是 limit 1000，因此会多读 1000 行</p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/optimizer_trace2.png" alt="optimizer_trace2"></p>
+<p>从 OPTIMIZER_TRACE 的结果中，你还能看到另外两个信息也变了</p>
+<ul>
+<li>sort_mode 变成了 &lt;sort_key, rowid&gt;，表示参与排序的只有 name 和 id 这两个字段</li>
+<li>number_of_tmp_files 变成 10 了，是因为这时候参与排序的行数虽然仍为 4000 行，但是每一行都变小了，因此需要排序的总数据量就变小了，需要的临时文件也相应地变小了</li>
+</ul>
+<h3 id="全字段排序-VS-rowid-排序"><a href="#全字段排序-VS-rowid-排序" class="headerlink" title="全字段排序 VS rowid 排序"></a>全字段排序 VS rowid 排序</h3><p>我们来分析一下，从这两个执行流程，还能得出什么结论</p>
+<p>如果 MySQL 实在是担心排序内存太小，会影响排序效率，才会采用 rowid 排序算法，这样排序过程中一次可以排序更多行，但是需要再回到原表去取数据</p>
+<p>如果 MySQL 认为内存足够大，会优先选择全字段排序，把需要的字段都放到 sort_buffer 中，这样排序后就会直接从内存里面返回查询结果了，不用再回到原表去取数据</p>
+<p>这也就体现了 MySQL 的一个设计思想：<strong>如果内存够，就要多利用内存，尽量减少磁盘访问</strong></p>
+<p>对于 InnoDB 表来说，rowid 排序会要求回表造成磁盘读，因此不会被优先选择</p>
+<p>看到这，你就了解了，MySQL 做排序时一个成本比较高的操作。那么，是不是所有的 order by 都需要排序操作呢？如果不排序就能得到正确的结果，那对系统的消耗会小很多，语句的执行时间也会变得更短</p>
+<p>其实，并不是所有的 order by 语句，都需要排序操作的。从上面分析的执行过程，我们可以看到，<strong>MySQL 之所以需要生成临时表，并且在临时表上做排序操作，其原因是原来的数据都是无序的</strong></p>
+<p>所以，如果能够保证从 city 这个索引上取出来的行，天然就是按照 name 递增排序的话，是不是就可以不用再排序了呢？</p>
+<p>确实是这样。所以，我们可以在这个市民表上创建一个 city 和 name 的联合索引，对应的 SQL 语句是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter table t add index ciyt_user(city, name)</span><br></pre></td></tr></table></figure>
+
+<p>作为与索引 city 索引的对比，我们看看这个索引的示意图</p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/city_user%E7%B4%A2%E5%BC%95.png" alt="city_user索引"></p>
+<p>在这个索引里，我们依然可以用树搜索的方式定位到第一个满足 city = ‘杭州’ 的记录，并且额外确保了，接下来按顺序取「下一条记录」的遍历过程中，只要 city 的值是杭州，name 的值就一定是有序的</p>
+<p>这样整个查询过程的流程就变成了：</p>
+<ol>
+<li>从索引 (city, name) 找打第一个满足 city = ‘杭州’ 条件的主键 id</li>
+<li>到主键 id 索引取出整行，取 name、city、age 三个字段的值，作为结果集的一部分直接返回</li>
+<li>从索引 (city, name) 取下一个记录主键 id</li>
+<li>重复步骤 2、3，直到查到第 1000 条记录，或者是不满足 city = ‘杭州’ 条件时循环结束</li>
+</ol>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E7%B4%A2%E5%BC%95%E6%8E%92%E5%BA%8F.png" alt="索引排序"></p>
+<p>可以看到，这个查询过程不需要临时表，也不需要排序。explain 的结果如下：</p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/explain%E7%BB%93%E6%9E%9C.png" alt="explain结果"></p>
+<p>从图中可以看到，Extra 字段中没有 Using filesort 了，也就是不需要排序了。而且由于 (city, name) 这个联合索引本身有序，所以这个查询也不用把 4000 行全都读一遍，只要找到满足条件的前 1000 条记录就可以退出了。即，在我们这个例子里，只需要扫描 1000 次</p>
+<p>到这里，这个语句的执行流程有没有可能进一步简化呢？我们可以利用覆盖索引。覆盖索引是指，索引上的信息足够满足查询请求，不需要再回到主键索引上去取数据</p>
+<p>按照覆盖索引的概念，我们可以在优化一下这个查询语句的执行流程。我们可以创建一个 city、name 和 age 的联合索引，对应的 SQL 语句就是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter table t add index city_user_age(city, name, age)</span><br></pre></td></tr></table></figure>
+
+<p>此时，对于 city 字段的值相同的行来说，还是按照 name 字段的值递增排序的，此时的查询语句也就不再需要排序了。这样整个查询语句的执行流程就变成了：</p>
+<ol>
+<li>从索引 (city, name, age) 找到第一个满足 city = ‘杭州’ 条件的记录，取出其中的 city、name 和 age 这三个字段的值，作为结果集的一部分直接返回</li>
+<li>从索引 (city, name, age) 去下一个解读那，同样取出这三个字段的值，作为结果集一部分直接返回</li>
+<li>重复执行步骤 2，知道查到第 1000 条记录，或者是不满足 city = ‘杭州’ 条件时循环结束</li>
+</ol>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95%E6%8E%92%E5%BA%8F.png" alt="覆盖索引排序"></p>
+<p>然后，我们来看看 explain 的结果</p>
+<p><img src="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="覆盖索引执行计划"></p>
+<p>可以看到，Extra 字段里面多了「Using index」，表示的就是使用了覆盖索引，性能上会快很多</p>
+<p>当然，这里并不是说要为了么个查询能用上覆盖索引，就要把语句中涉及的字段都建上联合索引，毕竟索引还是有维护代价的。这是一个需要权衡的决定</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/MySQL/" rel="tag"># MySQL</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2021/11/05/SQL-变慢的一些场景/" rel="next" title="SQL 变慢的一些场景">
+                <i class="fa fa-chevron-left"></i> SQL 变慢的一些场景
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/" rel="prev" title="MySQL 之全局锁和表锁">
+                MySQL 之全局锁和表锁 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#全字段排序"><span class="nav-number">1.</span> <span class="nav-text">全字段排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rowid-排序"><span class="nav-number">2.</span> <span class="nav-text">rowid 排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全字段排序-VS-rowid-排序"><span class="nav-number">3.</span> <span class="nav-text">全字段排序 VS rowid 排序</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

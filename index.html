@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/12/Kafka-之位移主题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/" itemprop="url">Synchronized 锁升级优化的全流程</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/12/Kafka-之位移主题/" itemprop="url">Kafka 之位移主题</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-30T15:49:20+08:00">
-                2021-09-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-12T16:25:24+08:00">
+                2021-12-12
               </time>
             
 
@@ -328,8 +328,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
                   </a>
                 </span>
 
@@ -367,13 +367,14 @@
       
         
           
-          本文主要谈一下 Synchronized 锁的各种优化：包括偏向锁、轻量级锁、重量级锁，以及它们之间是如何获取和释放锁、锁之间是如何进行升级和膨胀的
-偏向锁从 JDK 1.6 开始，JVM 对比较重的 Synchronized 就引入了各种锁优化的机制，偏向锁算是最轻的一种锁，应用的场景也是最简单的，即偏向锁是专门为了优化线程多次获取同一把锁的场景量身打造的
-比如说方式 A 是被 Synchron
+          
+Kafka 内部有一个位移主题：__consumer_offsets，它的主要作用就是用来保存 Kafka 消费者的位移信息
+位移主题可以看做是一个普通的 Kafka 主题，但它的消息格式却是 Kafka 自己定义的，用户不能修改，即你不能随意地向这个主题写消息，因为一旦你写入的消息不满足 Kafka 规定的格式，那么 Kafka 内部就无法解析成功
+那这个主题存的到底是什么格式的消息呢？你可以
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/12/Kafka-之位移主题/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -424,7 +425,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/26/Spring-事务失效情况/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/12/Kafka-之消费者组/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -443,7 +444,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/26/Spring-事务失效情况/" itemprop="url">Spring 事务失效情况</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/12/Kafka-之消费者组/" itemprop="url">Kafka 之消费者组</a></h1>
         
 
         <div class="post-meta">
@@ -455,8 +456,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-26T19:16:19+08:00">
-                2021-09-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-12T14:49:31+08:00">
+                2021-12-12
               </time>
             
 
@@ -478,8 +479,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
                   </a>
                 </span>
 
@@ -517,12 +518,13 @@
       
         
           
-          没有被 Spring 管理没有被 Spring 管理的 Bean，如果其中出现了方法需要进行事务处理的情况，此时的事务不会执行。如下，在 OrderServiceImpl 类中如果将 @Service 注释掉，那么此类对应的 bean 也就不会被 Spring IOC 容器管理。即使 updateOrder 上面注释了 @Transactional，这个方法也不会执行事务
-12345678//@S
+          
+Consumer Group 是 Kafka 提供的可扩展且具有容错性的消费者实例。组内有多个消费者或消费者实例，他们共享一个公共的 ID，这个 ID 被称为 Group ID。组内的所有消费者协调在一起来消费订阅主题（Subscribed Topics）的所有分区（Partition）。当然，每个分区只能由同一个消费组内的一个 Consumer 实例来消费
+理解 Consumer Group，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/26/Spring-事务失效情况/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/12/Kafka-之消费者组/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -573,7 +575,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/26/Spring-事务框架源码初探/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/11/Redis-之-String/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -592,7 +594,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/26/Spring-事务框架源码初探/" itemprop="url">Spring 事务框架源码初探</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/11/Redis-之-String/" itemprop="url">Redis 之 String</a></h1>
         
 
         <div class="post-meta">
@@ -604,8 +606,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-26T11:47:18+08:00">
-                2021-09-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-11T17:33:55+08:00">
+                2021-12-11
               </time>
             
 
@@ -627,8 +629,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -666,13 +668,14 @@
       
         
           
-          事务开启分析Spring声明式事务是通过 AOP 增强实现的，所以现在分析 Spring 事务执行过程的时候离不开 AOP 拦截器执行链的描述，其中比较重要的拦截器就是 TransactionInterceptor 了
-
-如下，在 TransactionInterceptor 中有一个重要的方法 invoke，其中会获取带来对象的类型，同时会调用父类 TransactionAspectSuppor
+          
+我们要开发一个图片存储系统，要求这个系统能快速地记录图片 ID 和图片再存储系统中保存的 ID。同时，还要能够根据图片 ID 快速查找到图片存储对象 ID
+因为图片数量巨大，所以我们用 10 位数来表示图片 ID 和图片存储对象 ID。例如，图片 ID 为 1101000051，它在存储系统中对应的 ID 号是 3301000051
+12photo_id: 1101000051photo_obj
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/26/Spring-事务框架源码初探/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/11/Redis-之-String/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -723,7 +726,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/11/Redis-之切片集群/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -742,7 +745,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/" itemprop="url">Spring 同步和异步事件的使用场景</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/11/Redis-之切片集群/" itemprop="url">Redis 之切片集群</a></h1>
         
 
         <div class="post-meta">
@@ -754,8 +757,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-25T14:17:39+08:00">
-                2021-09-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-11T12:29:42+08:00">
+                2021-12-11
               </time>
             
 
@@ -777,8 +780,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -816,12 +819,13 @@
       
         
           
-          Spring 事件的监听机制可以理解为是一种观察者模式，有数据发布者（事件源）和数据接受者（监听器）。在 Java 中，事件对象都是继承 java.util.EventObject 对象，事件监听器都是 java.util.EventListener 实例
-其中，java.util.EventObject 是事件状态对象的基类，它封装了事件源对象以及和事件相关的信息。所有 java 的事件类都需要
+          
+切片集群，也叫分片集群，就是指启动多个 Redis 实例组成一个集群，然后按照一定的规则，把收到的数据分成多份，每一份用一个实例来保存。在实际应用 Redis 时，随着用户或业务规模的扩展，保存大量数据的情况通常是无法避免的。而切片集群，就是一个非常好的解决方案
+数据切片和实例的对应分布关系在切片集群中，数据需要分布在不同实例上，那么，数据和实例之间如何对应呢？这就和 Redis Cluster
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/11/Redis-之切片集群/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -872,7 +876,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/09/Redis-之-RDB-快照/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -891,7 +895,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/" itemprop="url">Spring AOP 源码分析 2</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/09/Redis-之-RDB-快照/" itemprop="url">Redis 之 RDB 快照</a></h1>
         
 
         <div class="post-meta">
@@ -903,8 +907,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-18T11:08:38+08:00">
-                2021-09-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-09T17:11:07+08:00">
+                2021-12-09
               </time>
             
 
@@ -926,8 +930,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -965,16 +969,12 @@
       
         
           
-          JDK 动态代理源码分析接着我们通过源码分析介绍 Spring AOP JDK 动态代理实现的原理。内容包括：
-
-invoke：实现 AOP 中具体的逻辑
-getProxy：获取产生的代理类
-
-invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lang.reflect 包中 Proxy 和 InvocationHandler 两个接口来实现的。对于 Invoca
+          Redis 持久化除了 AOF 之外，还有另外一种方式：内存快照。对 Redis 来说，它实现类似于照片记录效果的方式，就是把某一时刻的状态以文件的形式写到磁盘上，也就是快照。这样一来，即使宕机，快照文件也不会丢失，数据的可靠性也就得到了保证。这个快照文件被称为 RDB 文件。其中，RDB 就是 Redis DataBase  的缩写
+和 AOF 相比，RDB 记录的是某一时刻的记录，并不是操作，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/09/Redis-之-RDB-快照/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1025,7 +1025,7 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/17/Spring-AOP-源码分析/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/06/Kafka-之幂等生产者和事务生产者/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1044,7 +1044,7 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/" itemprop="url">Spring AOP 源码分析</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/06/Kafka-之幂等生产者和事务生产者/" itemprop="url">Kafka 之幂等生产者和事务生产者</a></h1>
         
 
         <div class="post-meta">
@@ -1056,8 +1056,8 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-17T10:38:19+08:00">
-                2021-09-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-06T18:18:45+08:00">
+                2021-12-06
               </time>
             
 
@@ -1079,8 +1079,8 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
                   </a>
                 </span>
 
@@ -1118,12 +1118,11 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
       
         
           
-          AOP 框架有很多种，Spring 中的 AOP 是通过动态代理实现的。JDK 动态代理只在运行期，目标类加载后，为借口动态生成代理类，将切面织入代理类中
-这里通过一个例子来讲解 JDK 动态代理的原理。如下，定义一个 Service 接口，其中有一个 help 方法。用 ServiceImpl 去实现 Service 借口，在 help 方法中实现「打印买书」的输出。这个 ServiceImpl
+          幂等性 Producer在 Kafka 中，Producer 默认不是幂等的，但我们可以创建幂等性 Producer。它是 0.11.0.0 版本引入的新功能。指定 Producer 幂等性的方法很简单，仅需要设置一个参数即可，即 props.put(“enable.idempotence”, true) 或 props.put(ProducerConfig.ENABLE_IDEMPOTENCE_
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/06/Kafka-之幂等生产者和事务生产者/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1174,7 +1173,7 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/05/kafka-之无消息丢失配置/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1193,7 +1192,7 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/" itemprop="url">Spring 动态代理时是如何解决依赖循环的</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/05/kafka-之无消息丢失配置/" itemprop="url">kafka 之无消息丢失配置</a></h1>
         
 
         <div class="post-meta">
@@ -1205,8 +1204,8 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-10T15:22:17+08:00">
-                2021-09-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-05T19:54:37+08:00">
+                2021-12-05
               </time>
             
 
@@ -1228,8 +1227,8 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
                   </a>
                 </span>
 
@@ -1267,15 +1266,15 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
       
         
           
-          什么是依赖循环我们先回顾一下 Bean 的创建过程，在此之前，先看一下三级缓存的概念：
-
-singletonObjects：一级缓存。存储单例对象，Bean 已经实例化，初始化完成
-earlySingletonObjects：二级缓存。存储 singletonObject，这个 Bean 已经实例化，还没有初始化
-singletonFactories：三级缓存。存储 singletonFactor
+          
+Kafka 什么情况下能保证消息不丢失呢？
+一句话概括，Kafka 只对「已提交」的消息做有限度的持久化保证
+第一个核心要素是「已提交的消息」。什么是已提交的消息？当 Kafka 的若干个 Broker 成功地接收到一条消息并写入到日志文件后，它们会告诉生产者程序这条消息已成功提交。此时，这条消息在 Kafka 看来就正式变成了「已提交」消息了
+那为什么是若干个 Broker 呢？这取决于你对「
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/05/kafka-之无消息丢失配置/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1326,7 +1325,7 @@ singletonFactories：三级缓存。存储 singletonFactor
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/09/Spring-依赖循环/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/05/Redis-之-AOF-日志/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1345,7 +1344,7 @@ singletonFactories：三级缓存。存储 singletonFactor
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/09/Spring-依赖循环/" itemprop="url">Spring 依赖循环</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/05/Redis-之-AOF-日志/" itemprop="url">Redis 之 AOF 日志</a></h1>
         
 
         <div class="post-meta">
@@ -1357,8 +1356,8 @@ singletonFactories：三级缓存。存储 singletonFactor
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-09T15:37:37+08:00">
-                2021-09-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-05T17:34:38+08:00">
+                2021-12-05
               </time>
             
 
@@ -1380,8 +1379,8 @@ singletonFactories：三级缓存。存储 singletonFactor
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -1419,14 +1418,13 @@ singletonFactories：三级缓存。存储 singletonFactor
       
         
           
-          什么是依赖循环
-Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，并抛出 BeanCurrentlyInCreationException。所有要避免构造函数注入，可以使用 setter 注入替代
-
-根据官方文档说明，Spring 会自动解决基于 setter 注入的依赖循环，当然我们工作中现在都使用 @Autowired 注解来注入属性。@Autowired 是通过反射进行赋值
+          
+目前，Redis 的持久化主要有两大机制：AOF 日志和 RDB 快照。我们先看一下 AOF 日志
+AOF 日志是怎么实现的说到日志，我们比较熟悉的是数据库的写前日志（Write Ahead Log，WAL），即，在实际写日志前，先把修改的数据记到日志文件中，以便故障时进行恢复。不过，AOF 日志正好相反，它是写后日志。「写后」的意思是 Redis 先执行命令，把数据写入内存，然后才记录日志。如
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/09/Spring-依赖循环/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/05/Redis-之-AOF-日志/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1477,7 +1475,7 @@ Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/05/Redis-单线程为什么这么快/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1496,7 +1494,7 @@ Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/" itemprop="url">Spring 单例 Bean 创建</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/05/Redis-单线程为什么这么快/" itemprop="url">Redis 单线程为什么这么快</a></h1>
         
 
         <div class="post-meta">
@@ -1508,8 +1506,8 @@ Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T16:17:32+08:00">
-                2021-09-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-05T14:53:02+08:00">
+                2021-12-05
               </time>
             
 
@@ -1531,8 +1529,8 @@ Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -1570,18 +1568,13 @@ Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，
       
         
           
-          本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：
-
-getSingleton
-createBean
-getObjectForBeanInstance
-
-getSingleton我们先看一下 getSingleton的源码
-1234567891011121314151617181920212223242526272829303132333435363738394041
+          
+我们通常说，Redis 是单线程，主要是值 Redis 的网络 IO 和键值对读写是由一个线程来完成的，这也是 Redis 对外提供键值存储服务的主要流程。但 Redis 的其他功能，比如持久化、异步删除、集群数据同步等，是由额外的线程执行的
+多线程的开销在我们平时使用的系统中，会存在被多线程同时访问的共享资源，比如一个共享的数据结构。当有多个线程要修改这个共享资源时，为了保证共享资源的正确性，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/05/Redis-单线程为什么这么快/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1632,7 +1625,7 @@ getSingleton我们先看一下 getSingleton的源码
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/前缀和技巧/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/30/Redis-数据结构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1651,7 +1644,7 @@ getSingleton我们先看一下 getSingleton的源码
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/08/前缀和技巧/" itemprop="url">前缀和技巧</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/30/Redis-数据结构/" itemprop="url">Redis 数据结构</a></h1>
         
 
         <div class="post-meta">
@@ -1663,8 +1656,8 @@ getSingleton我们先看一下 getSingleton的源码
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
-                2021-09-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-30T17:55:04+08:00">
+                2021-11-30
               </time>
             
 
@@ -1686,8 +1679,8 @@ getSingleton我们先看一下 getSingleton的源码
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -1725,15 +1718,12 @@ getSingleton我们先看一下 getSingleton的源码
       
         
           
-          前缀和技巧适用于快速计算一个索引区间内的元素之和
-这道题 303.区域和检索 - 数组不可变 就是前缀和的基本使用场景：
-
-题目要求你实现这样一个类：
-12345678910class NumArray &#123;    public NumArray(int[] nums) &#123;    &#125;        public int sumRange(int left, int ri
+          Redis 为什么能那么快？一方面是因为它是内存数据库，所有操作都在内存上完成，内存的访问速度本身就很快。另一方面，这要归功于它的数据结构。这是因为，键值对是按一定的数据结构来组织的，操作键值对最终就是对数据结构进行增删改查操作，所以高效的数据结构是 Redis 快速处理数据的基础
+Redis 的数据结构有哪些呢？你可能会说，是 String、List、Hash、Set 和 Sorted Set 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/08/前缀和技巧/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/30/Redis-数据结构/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1775,7 +1765,7 @@ getSingleton我们先看一下 getSingleton的源码
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/CKING.github.io/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/CKING.github.io/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1823,7 +1813,7 @@ getSingleton我们先看一下 getSingleton的源码
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-count">183</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1834,7 +1824,7 @@ getSingleton我们先看一下 getSingleton的源码
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1845,7 +1835,7 @@ getSingleton我们先看一下 getSingleton的源码
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

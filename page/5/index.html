@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/01/Spring-Cache/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/" itemprop="url">MySQL 之索引讲解（上）</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/01/Spring-Cache/" itemprop="url">Spring Cache</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,624 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-03T11:13:20+08:00">
-                2020-07-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-01T15:55:27+08:00">
+                2021-02-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          Spring Cache 简介在 Spring 3.1 中引入了多 Cache 的支持，在 spring - context 包中定义了 org.springframework.cache.Cache 和 org.springframework.cache.CacheManager 两个接口来统一不同的缓存技术。Cache 接口包含缓存的常用操作：增加、删除、读取等。CacheManager 是 
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2021/02/01/Spring-Cache/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/12/25/Java-内部类/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2020/12/25/Java-内部类/" itemprop="url">Java 内部类</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-25T18:20:52+08:00">
+                2020-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          内部类的作用首先我们要知道什么事内部类
+
+内部类（inner class）：定义在另一个类中的类
+
+内部类有什么作用：
+
+内部类方法可以访问该类定义所在作用域中的数据，包括 private 修饰的私有数据
+
+
+内部类可以对同一包中的其他类隐藏起来
+
+
+内部类可以实现 Java 单继承的缺陷
+
+内部类方法可以访问该类定义所在作用域中的数据我们看下面的代码
+1234567891011121314151
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2020/12/25/Java-内部类/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/12/21/Linux-零拷贝原理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2020/12/21/Linux-零拷贝原理/" itemprop="url">Linux 零拷贝原理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-21T15:17:12+08:00">
+                2020-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/杂记/" itemprop="url" rel="index">
+                    <span itemprop="name">杂记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          零拷贝就是没有把数据从一个存储区域拷贝到另一个存储区域，但是没有数据的复制，怎么可能实现数据的传输呢？其实我们在 Java NIO、netty、kafka 遇到的零拷贝，并不是不复制数据，而是减少不必要的数据拷贝次数，从而提升代码的性能
+零拷贝的好处
+减少或避免不必要的 CPU 数据拷贝，从而释放 CPU 去执行其他任务
+
+零拷贝机制能减少用户空间和操作系统内核空间的上下文切换
+
+减少内存的占用
+
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2020/12/21/Linux-零拷贝原理/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/12/14/动态规划解题框架/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2020/12/14/动态规划解题框架/" itemprop="url">动态规划解题框架</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-14T16:12:43+08:00">
+                2020-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          动态规划问题一般形式就是求最值。既然要求最值，核心问题是什么？求解动态规划的核心问题就是穷举。因为要求最值吗，肯定要把所有可行的答案穷举出来，然后在其中找最值
+但是，动态规划的穷举有点特别，因为这类问题存在「重叠子问题」，如果暴力穷举的话效率会很低，所以需要「备忘录」来优化穷举过程，避免不必要的计算。而且，动态规划问题一定会具备「最优子结构」，才能通过子问题的最值得到原问题的最值
+另外，虽然动态规
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2020/12/14/动态规划解题框架/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/11/30/分库分表案例/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2020/11/30/分库分表案例/" itemprop="url">分库分表案例</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-30T14:49:34+08:00">
+                2020-11-30
               </time>
             
 
@@ -367,14 +983,12 @@
       
         
           
-          磁盘数据页的存储结构在深入研究索引之前，我们需要先来看磁盘上的数据文件中的数据页的物理存储结构。之前说过，数据库最终所有的数据（包括我们建的各种表以及表里的数据）都是要存放在磁盘上的文件里的，然后文件里存放的物理格式就是数据页，那么大量的数据页在磁盘文件里是怎么存储的呢？
-首先，大量的数据页是按顺序一页一页存放的，然后两两相邻的数据页之间会采用双向链表的格式互相引用，大概如下：
-
-上面画的这个图在
+          假设有这么一个订单系统，每天新增数据大概是 1W 左右，每个月是新增 30W 数据，每年是新增 360W 数据，那么最多 3 年就到千万级大表了，这个就会导致你涉及订单的操作，速度挺慢的。
+所以要做分库分表。订单表在拆分的时候，往往要考虑三个维度。一个是要按照订单 id 为粒度去分库分表，也就是把订单 id 进行 hash 之后，对表数量进行取模然后把订单数据均匀分散到 100 ~ 1000 个表
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/07/03/MySQL-之索引讲解（上）/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/11/30/分库分表案例/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -425,7 +1039,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/11/24/上亿数据量的用户表如何进行水平拆分/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -444,7 +1058,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/" itemprop="url">MySQL 不确定性的性能抖动优化实践</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/11/24/上亿数据量的用户表如何进行水平拆分/" itemprop="url">上亿数据量的用户表如何进行水平拆分</a></h1>
         
 
         <div class="post-meta">
@@ -456,8 +1070,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-29T17:22:49+08:00">
-                2020-06-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-24T18:28:00+08:00">
+                2020-11-24
               </time>
             
 
@@ -518,14 +1132,12 @@
       
         
           
-          今天我们说说，线上数据库时不时莫名地来一次性能抖动的问题，而且造成性能抖动的还不是之前我们说过的数据库锂电池充放电问题，而是另一个新的问题，跟我们之前讲解的原理是息息相关的
-我们平时在数据库里执行的更新语句，实际上都是从磁盘上加载数据页到数据库内存的缓存页里来，接着就直接更新内存里的缓存页吗，同时还更新对应的 redo log 写入一个 buffer 中
-
-既然我们更新了 Buffer Pool 
+          今天我们只讲解分库分表的整体方案设计，但是在进行具体的方案落地的时候，是需要数据库中间件技术的支持的，业内常用的一般有 Sharding - Sphere 以及 MyCat 两种，各自用的公司也很多，你们可以自行选择一个数据库中间件技术，熟悉一下它们的用法
+今天要说的是海量用户数据的分库分表的方案。一般公司都会有个用户中心，而且用户中心就是负责所有用户的数据管理，包括了用户的数据存储，用户信息的增
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/29/MySQL-不确定性的性能抖动优化实践/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/11/24/上亿数据量的用户表如何进行水平拆分/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -576,7 +1188,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/28/MySQL-锁详解/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/11/02/MySQL-主从复制原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -595,7 +1207,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/28/MySQL-锁详解/" itemprop="url">MySQL 锁详解</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/11/02/MySQL-主从复制原理/" itemprop="url">MySQL 主从复制原理</a></h1>
         
 
         <div class="post-meta">
@@ -607,8 +1219,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-28T14:00:17+08:00">
-                2020-06-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-02T11:22:42+08:00">
+                2020-11-02
               </time>
             
 
@@ -669,13 +1281,11 @@
       
         
           
-          之前说过，脏写是绝对不允许的，那么这个脏写是靠什么防止的呢？其实就是靠锁机制，依靠锁机制让多个事务更新一行数据的时候串行化，避免同时更新一行数据。
-在 MySQL 里，假设有一行数据摆在那不动，此时有一个事务来了要更新这行数据，这个时候它会先看看这行数据此时有没有人加锁？如果没有，此时这个事务就会创建一个锁，里面包含了自己的 trx_id 和等待状态，然后把锁跟这行数据关联在一起。
-因为更新一行数
+          MySQL 的主从复制架构，就是部署两台服务器，每台服务器上都有一个 MySQL，其中一个 MySQL 是 master（主节点），另一个 MySQL 是 slave（从节点）。然后我们的系统平时连接到 master 节点写入数据，当然也可以从里面查询，跟你用一个单机版的 MySQL 是一样的。但是 master 节点会把写入的数据自动复制到 slave 节点去，让 slave 节点可以跟 mas
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/28/MySQL-锁详解/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/11/02/MySQL-主从复制原理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -726,7 +1336,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/10/20/SQL-调优案例四/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -745,7 +1355,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/" itemprop="url">详解 MVCC -- 多版本并发控制Ⅱ</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/10/20/SQL-调优案例四/" itemprop="url">SQL 调优案例四</a></h1>
         
 
         <div class="post-meta">
@@ -757,8 +1367,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-24T13:42:54+08:00">
-                2020-06-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-20T10:46:51+08:00">
+                2020-10-20
               </time>
             
 
@@ -819,12 +1429,12 @@
       
         
           
-          Read Committed（读已提交）隔离级别现在我们讲讲基于 ReadView 机制是如何实现 Read Committed 隔离级别的。所谓的Read Committed 隔离级别，简称为 RC，是说你事务运行期间，只要别的事务修改数据还提交了，你就是可以读到人家修改的数据的，所以是会发生不可重复读的问题，包括幻读的问题，都会有的。
-而 ReadView 机制，它是基于 undo log 版
+          这个案例的背景是，有人删除了千万级的数据，结果导致了频繁的慢查询，接下来说一下这个案例排查、定位以及解决的一个过程。当时是从线上收到大量的慢查询告警开始的，当我们收到大量的慢查询告警之后，就去检查慢查询的 SQL，结果不是什么特别的 SQL，这些 SQL 语句主要都是针对一个表的，比较简单，看起来不应该会慢查询
+那么有没有可能，慢查询不是 SQL 的问题，而是 MySQL 生产服务器的问题？实际上
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/10/20/SQL-调优案例四/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -875,7 +1485,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/09/25/SQL-调优案例三/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -894,7 +1504,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/" itemprop="url">详解 MVCC -- 多版本并发控制</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/09/25/SQL-调优案例三/" itemprop="url">SQL 调优案例三</a></h1>
         
 
         <div class="post-meta">
@@ -906,8 +1516,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-23T16:56:57+08:00">
-                2020-06-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-25T15:22:23+08:00">
+                2020-09-25
               </time>
             
 
@@ -968,12 +1578,12 @@
       
         
           
-          MySQL 默认的事务隔离级别是 RR（Read Repeatable 可重复读），即脏写、脏读、不可重复读、幻读都不会发生，这是怎么做到的？这就是由经典的 MVCC 多版本并发控制机制实现的。在讲解 MVCC 机制之前，我们得先讲讲 undo log 版本连。
-理解 MVCC 机制的前奏：undo log 版本链简单来说，我们每条数据其实都有两个子段，一个是 trx_id，一个是 roll_po
+          案例背景一个商品评论系统的数据量非常大，拥有十亿量级的评论数据，所以对这个评论数据库，做了分库分表，基本上分完库和表后，单表的评论数据在百万级别。每一个商品的所有评论都是放在一个库的一张表里的，这样可以确保你作为用户在分页查询一个商品的评论时，一般都是直接从一个库的一张表里执行分页查询语句就可以了
+在电商网站里，有一些热门的商品的评论可能多达几十万条。然后有些用户就喜欢不停的对某个热门商品的评论不
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/23/详解-MVCC-多版本并发控制/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/09/25/SQL-调优案例三/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1024,7 +1634,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/22/适配器模式/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/09/24/SQL-调优案例二/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1043,7 +1653,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/06/22/适配器模式/" itemprop="url">适配器模式</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/09/24/SQL-调优案例二/" itemprop="url">SQL 调优案例二</a></h1>
         
 
         <div class="post-meta">
@@ -1055,157 +1665,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-22T16:53:18+08:00">
-                2020-06-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          有的笔记本电脑的工作电压是 20V，而我国的家庭用电是 220V，如何让 20V 的笔记本电脑能够在 220V 的电压下工作？答案是引入一个电源适配器（AC Adapter），俗称充电器或者变压器。有了这个电源适配器，生活用电和笔记本电脑即可兼容。
-在软件开发中，有时也存在这种不兼容的情况，也可以像引入一个电源适配器一样引入一个称之为适配器的角色来协调这些不兼容的结构，这种设计方案即为适配器模式。
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/22/适配器模式/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/22/MySQL-多事务运行场景/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2020/06/22/MySQL-多事务运行场景/" itemprop="url">MySQL 多事务运行场景</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-22T10:53:35+08:00">
-                2020-06-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-24T16:24:53+08:00">
+                2020-09-24
               </time>
             
 
@@ -1266,457 +1727,11 @@
       
         
           
-          平时我们执行增删改的时候，无非就是从磁盘加载数据到 buffer pool 的缓存页里去，对缓存页进行更新，同时记录下来 undo log 回滚日志和 redo log 重做日志，应对的是事务提交之后 MySQL 挂了恢复数据的场景，以及事务回滚的场景
-接下来我们就要理解到「事务」这个层面了。平时我们一般都是写一个业务系统，然后业务系统对去对数据库执行增删改查，然后通常而言，我们都是在业务系统里开
+          案例背景先从一个线上的商品系统出现的一个慢查询告警开始讲起。一天晚上，我们收到了线上数据库的频繁报警，这个报警的意思是，数据库突然涌现出了大量的慢查询，而且因为大量的慢查询，导致每一个数据库连接执行一个慢查询都要耗费很久。那样，必然会导致突然过来的很多查询需要让数据库开辟出来更多的连接，因此这个时候报警也告诉我们，数据库的连接突然暴增了，而且每个连接都打满，每个连接都要执行一个慢查询，慢查询还特别
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/22/MySQL-多事务运行场景/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/18/MySQL-之-undo-日志/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2020/06/18/MySQL-之-undo-日志/" itemprop="url">MySQL 之 undo 日志</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-18T19:37:58+08:00">
-                2020-06-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          之前我们已经讲了在执行增删改操作时候的 redo log 的重做日志原理，说白了就是你对 buffer pool 里的缓存页执行增删改操作的时候，必须要写对应的 redo log 记录下来你做了哪些修改。而 redo log 都是先进入 redo log buffer 中的一个 block，然后事务提交的时候就会刷入磁盘文件里去。这样万一你提交事务了，结果事务修改的缓存页还没来得及刷入磁盘上的数据
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/18/MySQL-之-undo-日志/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/" itemprop="url">MySQL 之 redo log buffer</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-16T10:53:23+08:00">
-                2020-06-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          redo log buffer之前说了一下 redo log block 这个概念，现在都知道平时我们执行完增删改之后，要写入磁盘的 redo log，其实应该是先进入到 redo log block 这个数据结构里去的，然后再进入到磁盘文件里。
-那么 redo log 是如何通过内存缓冲之后，再进入磁盘文件里去的？这就涉及到了一个新的组件，redo log buffer，它就是 MySQL 专门
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/11/MySQL-之-redo-日志/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2020/06/11/MySQL-之-redo-日志/" itemprop="url">MySQL 之 redo 日志</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-11T15:13:56+08:00">
-                2020-06-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          之前我们说过，在我们执行增删改操作的时候，首先会在 Buffer Pool 中更新缓存页。而在更新完 Buffer Pool 中的缓存页之后，必须要写一条 redo log，这样才能记录下来我们对数据库做的修改。redo log 可以保证我们事务提交之后，如果事务中的增删改 SQL 语句更新的缓存页还没刷到磁盘上去，此时 MySQL 宕机了，那么 MySQL 重启之后，就可以把 redo log 
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/06/11/MySQL-之-redo-日志/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/09/24/SQL-调优案例二/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1758,7 +1773,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/CKING.github.io/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/CKING.github.io/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1806,7 +1821,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-count">183</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1817,7 +1832,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1828,7 +1843,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

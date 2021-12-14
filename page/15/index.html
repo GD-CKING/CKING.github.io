@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/16/分布式事务方案/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/10/06/Redis在实践中的一些常见问题与优化思路/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/08/16/分布式事务方案/" itemprop="url">分布式事务方案</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2019/10/06/Redis在实践中的一些常见问题与优化思路/" itemprop="url">Redis在实践中的一些常见问题与优化思路</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-16T10:04:21+08:00">
-                2019-08-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-06T15:47:00+08:00">
+                2019-10-06
               </time>
             
 
@@ -328,8 +328,603 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          fork耗时操作导致高并发请求延时​        Redis在开启RDB和AOF持久化机制的时候，会有生成RDB快照，AOF rewrite等耗费磁盘IO的操作，此时主进程会fork子进程去执行。fork的时候，子进程需要拷贝父进程的空间内存页表的，这个也会耗费一定的时间。一般来说，如果父进程内存有1个G的数据，那么fork可能会耗费20ms左右，如果是10G30G，那么就会耗费200600ms
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2019/10/06/Redis在实践中的一些常见问题与优化思路/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/10/06/从零开始搭建Redis集群/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/" itemprop="url">从零开始搭建Redis集群</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-06T15:31:28+08:00">
+                2019-10-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          ​        Redis Cluster集群，要求至少3个master去组成一个高可用，健壮的分布式的集群，每个master都建议至少给一个slave，因此，最少要求3个master，3个slave。在正式环境中，建议在6台机器上搭建。也可是3台，但要保证每个master都跟自己的slave不在同一台机器上。
+搭建Redis​        搭建Redis Cluster之前，我们需要先搭建r
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2019/10/06/从零开始搭建Redis集群/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/29/命令模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2019/09/29/命令模式/" itemprop="url">命令模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-29T14:35:36+08:00">
+                2019-09-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          ​        在软件开发中有很多类似这样的一个场景：一个按钮，它可能是一个“关闭窗口”请求的发送者，而按钮点击事件处理类则是该请求的接收者。为了降低系统的耦合度，将请求的发送者和接收者解耦，可以使用一种被称之为命令模式的设计模式来设计系统。在命令模式中，发送者与接收者之间引入了新的命令对象，将发送者的请求封装在命令模式中，再通过命令对象来调用接收者的方法。
+​        在软件开发中，经常
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2019/09/29/命令模式/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/25/策略模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2019/09/25/策略模式/" itemprop="url">策略模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-25T09:44:01+08:00">
+                2019-09-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          ​        在软件开发中，常常会遇到这种情况：实现某个功能有多条途径，每一条途径对应一种算法，此时可以使用一种设计模式来实现灵活地选择解决途径，也能够方便地增加新的解决途径。那就是策略模式。
+​        在策略模式中，可以定义一些独立的类来封装不同的算法，每一个类封装一种具体的算法。在这里，每一个封装算法的类都可以称之为一种策略，为了保证这些策略在使用时具有一致性，一般会提供一个抽象的
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2019/09/25/策略模式/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/22/生产环境中redis的数据备份和灾难恢复策略/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2019/09/22/生产环境中redis的数据备份和灾难恢复策略/" itemprop="url">生产环境中redis的数据备份和灾难恢复策略</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-22T22:20:15+08:00">
+                2019-09-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -370,20 +965,16 @@
           
 本节思维导图
 
+![生产环境中的数据 备份和灾难恢复](生产环境中redis的数据备份和灾难恢复策略/生产环境中的数据 备份和灾难恢复.png)
+​        我们生产环境中redis的数据备份和灾难恢复策略简单地说就是：开启AOF机制，并用RDB做冷备。
+数据备份方案​    具体的数据备份方案如下：
 
-目前分布式事务的实现方案主要有以下5种：
-
-XA方案
-TCC方案
-本地消息表
-可靠消息最终一致性方案
-最大努力通知方案
-
-两阶段提交方案/XA方案​        所谓的XA方案，就是两阶段提交。有一个事务管理器的概念，负责协调多个数据库（资源管理器）的事务，事务管理器先询问各个数据库是否准备好了，如果数据库都准备好了，就正式提交事务，在各个数据库上执行。如果任何其中一个数据库
+写crontab定时调度脚本去做数据备份。
+每小时都备份一份rdb，可以copy到一个
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/16/分布式事务方案/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2019/09/22/生产环境中redis的数据备份和灾难恢复策略/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -434,7 +1025,7 @@ TCC方案
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/16/JVM中的一些参数介绍/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -453,7 +1044,7 @@ TCC方案
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/" itemprop="url">如何设计一个能抗住上万服务实例的注册中心</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2019/09/16/JVM中的一些参数介绍/" itemprop="url">JVM中的一些参数介绍</a></h1>
         
 
         <div class="post-meta">
@@ -465,798 +1056,8 @@ TCC方案
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-15T15:01:08+08:00">
-                2019-08-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          ​        之前说过ZooKeeper和Eureka由于自己的特性，都不太适合支撑大规模的服务实例。Eureka是peer-to-peer模式，每台机器都是高并发请求的话会有瓶颈。而ZooKeeper是每次服务上下线，就会全量通知其他服务，导致网络宽带被打满，这也是一个瓶颈。具体可以查看服务注册中心的选型调研这篇文章。那么怎样才能实现一个能抗住上万服务实例的注册中心呢？
-​        目
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/15/如何设计一个能抗住上万服务实例的注册中心/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/13/Zuul-实现动态路由/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/08/13/Zuul-实现动态路由/" itemprop="url">Zuul-实现动态路由</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-13T19:46:41+08:00">
-                2019-08-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/SpringCloud/" itemprop="url" rel="index">
-                    <span itemprop="name">SpringCloud</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          ​        一般情况下，Zuul需要在配置文件里写好路由信息，这样zuul才可以通过这些路由信息根据连接转发到相应的服务上去。但每增加一个服务，就需要停下网关去重新编写配置文件，这样就比较麻烦了。因此，就有人提出了动态路由的方法。
-​        动态路由有很多方式实现，这里主要讲一下用数据库去实现动态路由。
-​        首先，先创建一个表，用于存储路由信息：
-12345678910
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/13/Zuul-实现动态路由/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/13/Eureka的一些参数配置优化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/08/13/Eureka的一些参数配置优化/" itemprop="url">Eureka的一些参数配置优化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-13T11:17:32+08:00">
-                2019-08-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/SpringCloud/" itemprop="url" rel="index">
-                    <span itemprop="name">SpringCloud</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          
-本节思维导图
-
-
-​        Eureka的默认配置是比较糟糕的，一般服务的上线和下线极端情况下需要一分多钟才能感知到，服务故障极端情况下需要两到三分钟才能感知到，这相对于ZooKeeper的秒级感知来说实在是太慢了。因此我们可以通过修改Eureka的一些配置参数来达到秒级通知的效果。
-Eureka-Server端的配置eureka.server.responseCacheUpdateIn
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/13/Eureka的一些参数配置优化/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/11/服务注册中心的选型调研/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/08/11/服务注册中心的选型调研/" itemprop="url">服务注册中心的选型调研</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-11T21:43:40+08:00">
-                2019-08-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          
-本节思维导图
-
-
-​        目前市场上使用最多的服务注册中心应该是Eureka和Zookeeper，当然Consul和Nacos，也在慢慢崛起。本文主要从集群模式、一致性保障、时效性和容量这几个角度来讨论Eureka和ZooKeeper的区别。
-服务注册发现的集群模式Eureka​        Eureka的集群模式，简单地说就是peer-to-peer。部署一个集群，但是集群里每个机
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/11/服务注册中心的选型调研/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/11/SpringCloud常用组件原理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/08/11/SpringCloud常用组件原理/" itemprop="url">SpringCloud常用组件原理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-11T17:05:10+08:00">
-                2019-08-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/SpringCloud/" itemprop="url" rel="index">
-                    <span itemprop="name">SpringCloud</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          ​        Spring Cloud是一个全家桶式的技术栈，包含了很多组件。本文主要简单介绍下最核心的几个组件的底层原理。包括Eureka、Ribbon、Feign、Hystrix和Zuul这几个组件。
-业务场景介绍​        文章先假定一个业务场景：现在开发一个电商系统，要实现支付订单的功能，流程如下：
-
-创建一个订单之后，如果用户立刻支付了这个订单，我们需要将订单状态更新为“已支付
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/11/SpringCloud常用组件原理/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/09/JVM内存区域/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/08/09/JVM内存区域/" itemprop="url">JVM内存区域</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-09T14:18:52+08:00">
-                2019-08-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-16T11:39:52+08:00">
+                2019-09-16
               </time>
             
 
@@ -1317,17 +1118,40 @@ Eureka-Server端的配置eureka.server.responseCacheUpdateIn
       
         
           
-          
-JVM内存布局
+          JVM配置常用参数堆参数
 
 
-存放类的方法区​        这个方法区是在JDK1.8以前的版本里，代表JVM中的一块区域。主要是放从“.class”文件里加载进来的类，还会有一些类似常量池的东西放在这个区域。JDK1.8以后，这个区域改了名字，叫“Metaspace”，也叫“元空间”。
-​        还是拿之前的代码举例，如下：
-123456public class Test &#123;    
+参数
+描述
+
+
+
+-Xms
+设置JVM启动时堆内存的初始化大小
+
+
+-Xmx
+设置堆内存最大值
+
+
+-Xmn
+设置年轻代的空间大小，剩下的为老年代的空间大小
+
+
+-XX:PermGen
+设置永久代内存的初始化大小（JDK1.8开始废弃了永久代）
+
+
+-XX:MaxPermGen
+设置永久代的最大值
+
+
+-XX:SurvivorRatio
+设置Eden区和Survivo
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/09/JVM内存区域/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2019/09/16/JVM中的一些参数介绍/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1378,7 +1202,7 @@ JVM内存布局
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/07/JVM类加载机制/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/15/如何保证MQ的高可用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1397,7 +1221,7 @@ JVM内存布局
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/08/07/JVM类加载机制/" itemprop="url">JVM类加载机制</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2019/09/15/如何保证MQ的高可用/" itemprop="url">如何保证MQ的高可用</a></h1>
         
 
         <div class="post-meta">
@@ -1409,8 +1233,8 @@ JVM内存布局
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-07T14:25:02+08:00">
-                2019-08-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-15T20:38:55+08:00">
+                2019-09-15
               </time>
             
 
@@ -1432,8 +1256,181 @@ JVM内存布局
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/消息队列/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          RabbitMQ 的高可用RabbitMQ 是比较有代表性的，因为是基于主从（非分布式）做高可用的。
+RabbitMQ 有三种模式：单机模式、普通集群模式和镜像集群模式
+单机模式单机模式，就是 Demo 级别的，一般就是你自己启动做做 Demo，很少生产使用单机模式
+普通集群模式（无高可用性）普通集群模式，就是在多台机器上启动多个 RabbitMQ 实例，每个机器启动一个。你创建的 queue，只
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2019/09/15/如何保证MQ的高可用/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/15/MySQL读写分离/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2019/09/15/MySQL读写分离/" itemprop="url">MySQL读写分离</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-15T19:39:28+08:00">
+                2019-09-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/数据库/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
                   </a>
                 </span>
 
@@ -1475,11 +1472,13 @@ JVM内存布局
 本节思维导图
 
 
-JVM什么情况下会加载一个类​        首先，我们应该清楚一个类从加载到使用，一般会经过加载–&gt;链接–&gt;初始化–&gt;使用–&gt;卸载这几个过程，其实链接阶段又可以细分为三个：验证–&gt;准备–&gt;解析。所以首先要明白的一个问题就是，JVM在执行我们代码的时候，什么时候去加载一个类呢？即什么时间会从“.class”字节码文件中加载这个类到JVM内存中
+​        当并发量到达一定程度后，一般都是要做读写分离的。因为大部分情况下都是读多写少。所以针对这个情况，都是写一个主库，但是主库挂多个从库，然后从多个从库读数据，就可以支撑更高的读并发压力了。
+如何实现MySQL的读写分离​        基于主从架构。简单来说就是搞一个主库，挂多个从库，然后我们就单单只是写主库，然后主库会自动把数据给同步到从库上去。
+MySQL主从
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/07/JVM类加载机制/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2019/09/15/MySQL读写分离/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1530,7 +1529,7 @@ JVM什么情况下会加载一个类​        首先，我们应该清楚一个
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/07/dubbo的负载均衡策略和集群容错策略/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/15/分库分表后的主键ID如何生成/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1549,7 +1548,7 @@ JVM什么情况下会加载一个类​        首先，我们应该清楚一个
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2019/08/07/dubbo的负载均衡策略和集群容错策略/" itemprop="url">dubbo的负载均衡策略、集群容错策略和动态代理策略</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2019/09/15/分库分表后的主键ID如何生成/" itemprop="url">分库分表后的主键ID如何生成</a></h1>
         
 
         <div class="post-meta">
@@ -1561,8 +1560,174 @@ JVM什么情况下会加载一个类​        首先，我们应该清楚一个
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-07T10:07:12+08:00">
-                2019-08-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-15T15:40:15+08:00">
+                2019-09-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/数据库/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          
+本节思维导图
+
+
+​        分库分表后，主键ID的生成就成了一个问题，我们需要生成一个全局唯一的ID来支持。有以下方法来生成全局唯一的ID主键
+数据库自增ID​        这个就是说你的系统里每次得到一个ID，都是往一个库的一个表里插入一条没什么业务含义的数据，用于专门生成主键ID。然后获取到相应的ID后，就往对应的分库分表里去写入。
+
+优缺点​        这个方案的好处就是方便
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2019/09/15/分库分表后的主键ID如何生成/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/09/10/简单讲一下分库分表/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2019/09/10/简单讲一下分库分表/" itemprop="url">简单讲一下分库分表</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-10T21:55:58+08:00">
+                2019-09-10
               </time>
             
 
@@ -1595,8 +1760,8 @@ JVM什么情况下会加载一个类​        首先，我们应该清楚一个
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/dubbo/" itemprop="url" rel="index">
-                    <span itemprop="name">dubbo</span>
+                  <a href="/CKING.github.io/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
                   </a>
                 </span>
 
@@ -1634,169 +1799,13 @@ JVM什么情况下会加载一个类​        首先，我们应该清楚一个
       
         
           
-          
-本节思维导图
-
-
-dubbo的负载均衡策略random loadbalance​        随机调用实现负载均衡。这是dubbo默认的负载均衡策略。可以对provider设置不同的权重，会按照权重来负载均衡，权重大分配流量越高。一般使用这个策略即可。
-roundrobin loadbalance​        均匀地将流量打到各个机器上，但如果各个机器性能不一样，容易导致性能差的机器负载过
+          分库分表​        分库分表是两回事，可能是光分库不分表，也可能是光分表不分库，都有可能。
+分表​        如果你单表都几千万数据了，单表数据量太大，会极大影响你的Sql执行的性能，到了后面sql可能就跑的很慢了。一般来说，单表到了几百万的时候，性能就会相对差一些，你就得分表了。
+​        分表，就是把一个表的数据放到多个表中，然后查询的时候你就查一个表。比如按照用户ID来分表
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/07/dubbo的负载均衡策略和集群容错策略/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2019/08/06/dubbo支持的通信协议、序列化协议以及hession的数据结构/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2019/08/06/dubbo支持的通信协议、序列化协议以及hession的数据结构/" itemprop="url">dubbo支持的通信协议、序列化协议以及hession的数据结构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-06T10:15:36+08:00">
-                2019-08-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/dubbo/" itemprop="url" rel="index">
-                    <span itemprop="name">dubbo</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          
-本节思维导图
-
-
-dubbo支持的通信协议dubbo协议​        默认就是走dubbo协议，单一长连接，进行的是NIO异步通信，基于hession作为序列化协议。使用的场景是：传输数据量小（每次请求在100kb以内），但是并发量高。
-​        为了支持高并发场景，一般是服务提供者就几台机器，但是服务消费者有上百台，可能每天调用量达到上亿次，此时用长连接是最合适的，就是跟每个服务消
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2019/08/06/dubbo支持的通信协议、序列化协议以及hession的数据结构/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2019/09/10/简单讲一下分库分表/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1838,7 +1847,7 @@ dubbo支持的通信协议dubbo协议​        默认就是走dubbo协议，单
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/14/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/CKING.github.io/page/16/">16</a><a class="page-number" href="/CKING.github.io/page/17/">17</a><a class="extend next" rel="next" href="/CKING.github.io/page/16/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/14/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/CKING.github.io/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/16/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1886,7 +1895,7 @@ dubbo支持的通信协议dubbo协议​        默认就是走dubbo协议，单
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-count">183</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1897,7 +1906,7 @@ dubbo支持的通信协议dubbo协议​        默认就是走dubbo协议，单
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1908,7 +1917,7 @@ dubbo支持的通信协议dubbo协议​        默认就是走dubbo协议，单
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

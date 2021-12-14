@@ -79,20 +79,21 @@
 
 
 
-<meta name="description" content="哨兵的介绍​        sentinel，也叫哨兵。哨兵是Redis集群机构中非常重要的一个组件，有以下功能：  集群监控：负责监控redis master和slave进程是否正常工作。 消息通知：如果某个redis实例有故障，那么哨兵负责发送消息作为报警通知给管理员。 故障转移：如果master node挂掉了，会自动转移到slave node上。 配置中心：如果故障转移发生了，通知clie">
+<meta name="description" content="哨兵的介绍sentinel，也叫哨兵。哨兵是Redis集群机构中非常重要的一个组件，有以下功能：  集群监控：负责监控redis master和slave进程是否正常工作。 消息通知：如果某个redis实例有故障，那么哨兵负责发送消息作为报警通知给管理员。 故障转移：如果master node挂掉了，会自动转移到slave node上。 配置中心：如果故障转移发生了，通知client客户端新的m">
 <meta name="keywords" content="分布式,Redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis哨兵集群实现高可用">
 <meta property="og:url" content="https://github.com/2019/07/29/Redis哨兵集群实现高可用/index.html">
 <meta property="og:site_name" content="Ckin&#39;s Blog">
-<meta property="og:description" content="哨兵的介绍​        sentinel，也叫哨兵。哨兵是Redis集群机构中非常重要的一个组件，有以下功能：  集群监控：负责监控redis master和slave进程是否正常工作。 消息通知：如果某个redis实例有故障，那么哨兵负责发送消息作为报警通知给管理员。 故障转移：如果master node挂掉了，会自动转移到slave node上。 配置中心：如果故障转移发生了，通知clie">
+<meta property="og:description" content="哨兵的介绍sentinel，也叫哨兵。哨兵是Redis集群机构中非常重要的一个组件，有以下功能：  集群监控：负责监控redis master和slave进程是否正常工作。 消息通知：如果某个redis实例有故障，那么哨兵负责发送消息作为报警通知给管理员。 故障转移：如果master node挂掉了，会自动转移到slave node上。 配置中心：如果故障转移发生了，通知client客户端新的m">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/07/29/Redis哨兵集群实现高可用/%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/07/29/Redis哨兵集群实现高可用/%E5%93%A8%E5%85%B5%E9%9B%86%E7%BE%A4.png">
-<meta property="og:updated_time" content="2019-09-08T07:36:47.429Z">
+<meta property="og:updated_time" content="2021-12-14T00:45:31.379Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis哨兵集群实现高可用">
-<meta name="twitter:description" content="哨兵的介绍​        sentinel，也叫哨兵。哨兵是Redis集群机构中非常重要的一个组件，有以下功能：  集群监控：负责监控redis master和slave进程是否正常工作。 消息通知：如果某个redis实例有故障，那么哨兵负责发送消息作为报警通知给管理员。 故障转移：如果master node挂掉了，会自动转移到slave node上。 配置中心：如果故障转移发生了，通知clie">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/07/29/Redis哨兵集群实现高可用/%E5%93%A8%E5%85%B5%E9%9B%86%E7%BE%A4.png">
+<meta name="twitter:description" content="哨兵的介绍sentinel，也叫哨兵。哨兵是Redis集群机构中非常重要的一个组件，有以下功能：  集群监控：负责监控redis master和slave进程是否正常工作。 消息通知：如果某个redis实例有故障，那么哨兵负责发送消息作为报警通知给管理员。 故障转移：如果master node挂掉了，会自动转移到slave node上。 配置中心：如果故障转移发生了，通知client客户端新的m">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/07/29/Redis哨兵集群实现高可用/%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F.png">
 
 
 
@@ -382,7 +383,8 @@
       
 
       
-        <h2 id="哨兵的介绍"><a href="#哨兵的介绍" class="headerlink" title="哨兵的介绍"></a>哨兵的介绍</h2><p>​        sentinel，也叫哨兵。哨兵是Redis集群机构中非常重要的一个组件，有以下功能：</p>
+        <p><img src="/CKING.github.io/2019/07/29/Redis哨兵集群实现高可用/%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F.png" alt="哨兵模式"></p>
+<h2 id="哨兵的介绍"><a href="#哨兵的介绍" class="headerlink" title="哨兵的介绍"></a>哨兵的介绍</h2><p>sentinel，也叫哨兵。哨兵是Redis集群机构中非常重要的一个组件，有以下功能：</p>
 <ul>
 <li>集群监控：负责监控redis master和slave进程是否正常工作。</li>
 <li>消息通知：如果某个redis实例有故障，那么哨兵负责发送消息作为报警通知给管理员。</li>
@@ -604,7 +606,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">161</span>
+                  <span class="site-state-item-count">183</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -615,7 +617,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/CKING.github.io/categories/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -626,7 +628,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
