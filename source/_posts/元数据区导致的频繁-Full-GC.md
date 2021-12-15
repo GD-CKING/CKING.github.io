@@ -73,7 +73,7 @@ categories: JVM
 
 
 
-这是一个非常实用的技巧。频繁 Full GC 不光是老年嗲触发的，有时候也会因为 Metaspace 区域的类太多而触发。
+这是一个非常实用的技巧。频繁 Full GC 不光是老年代触发的，有时候也会因为 Metaspace 区域的类太多而触发。
 
 
 

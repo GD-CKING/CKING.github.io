@@ -169,7 +169,7 @@ channel.txCommit
 
 ​		这个时候可以用RabbitMQ提供的`ack`机制，即，你必须关闭RabbitMQ的自动`ack`,可以通过一个api来调用就行，然后每次你自己代码里确保处理完的时候，再在程序里`ack`一把。这样的话，如果你还没处理完，就没有`ack`,RabbitMQ就认为你还没处理完，这个时候RabbitMQ会把这个消费分配给别的consumer去处理，消息是不会丢的。
 
-![消息传输解决方案](消息队列之RabbitMQ\消息传输解决方案.png)
+![消息传输解决方案](消息队列之RabbitMQ/消息传输解决方案.png)
 
 ## RabbitMQ的消息顺序性
 
