@@ -243,7 +243,7 @@ RocketMQ 的消费者中会注册一个监听器，就是上面小块代码中�
 
 
 
-如果是红包系统获取到一批消息之后，还没处理完，也没返回 ConsumeConcurrentlyStatus.CONSUME_SUCCESS 这个状态，自然美提交这批消息的 offset 给 Broker，此时红包系统突然挂了，会怎么样？
+如果是红包系统获取到一批消息之后，还没处理完，也没返回 ConsumeConcurrentlyStatus.CONSUME_SUCCESS 这个状态，自然没提交这批消息的 offset 给 Broker，此时红包系统突然挂了，会怎么样？
 
 
 

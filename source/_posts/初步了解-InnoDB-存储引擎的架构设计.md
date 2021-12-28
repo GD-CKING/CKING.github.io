@@ -5,6 +5,10 @@ tags: MySQL
 categories: MySQL
 ---
 
+![思维导图](初步了解-InnoDB-存储引擎的架构设计/思维导图.png)
+
+
+
 我们知道，MySQL 最常用的就是 InnoDB 存储引擎，那么我们今天借助一条更新语句的执行，来初步地了解一下 InnoDB 存储引擎的架构设计。
 
 

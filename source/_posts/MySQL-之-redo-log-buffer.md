@@ -11,7 +11,7 @@ categories: MySQL
 
 
 
-那么 redo log 是如何通过内存缓冲之后，再进入磁盘文件里去的？这就涉及到了一个新的组件，redo log buffer，它就是 MySQL 专门设计了用来缓冲 redo log 写入的。这个 redo log buffer 其实就是 MySQL 在启动的时候，就跟操作系统申请的一块连续内存空间，大概可以认为相当于是 buffer pool 吧。那个 buffer pool 是申请之后划分了 N 多个孔的缓存页和一些链表结构，让你把磁盘上的数据页加载到内存里来的
+那么 redo log 是如何通过内存缓冲之后，再进入磁盘文件里去的？这就涉及到了一个新的组件，redo log buffer，它就是 MySQL 专门设计了用来缓冲 redo log 写入的。这个 redo log buffer 其实就是 MySQL 在启动的时候，就跟操作系统申请的一块连续内存空间，大概可以认为相当于是 buffer pool 吧。那个 buffer pool 是申请之后划分了 N 多个空的缓存页和一些链表结构，让你把磁盘上的数据页加载到内存里来的
 
 
 
