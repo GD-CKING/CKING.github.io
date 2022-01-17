@@ -65,7 +65,7 @@ select count(*) from tradelog where month(t_modified) = 7
 
 
 
-实际上，**B+ 数提供的这个快速定位能力，来源于同一层兄弟节点的有序性**
+实际上，**B+ 树提供的这个快速定位能力，来源于同一层兄弟节点的有序性**
 
 
 
@@ -250,7 +250,7 @@ select d.* from tradelog l,trade_detail d where d.tradeid = l.tradelog and l.id 
 
 
 
-着这个执行计划里，是从 tradelog 表中取 tradeid 字段，再去 trade_detail 表里查询匹配字段。因此，我们把 tradelog 成为驱动表，把 trade_detail 成为驱动表，把 tradeid 成为关联字段
+着这个执行计划里，是从 tradelog 表中取 tradeid 字段，再去 trade_detail 表里查询匹配字段。因此，我们把 tradelog 称为驱动表，把 trade_detail 称为被驱动表，把 tradeid 成为关联字段
 
 
 
