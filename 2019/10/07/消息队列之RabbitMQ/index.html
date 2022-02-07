@@ -96,10 +96,10 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E9%95%9C%E5%83%8F%E6%A8%A1%E5%BC%8F.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%B9%8BRabbitMQ%5C%E6%B6%88%E6%81%AF%E4%BC%A0%E8%BE%93%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E4%BC%A0%E8%BE%93%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E9%94%99%E4%B9%B1.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E9%A1%BA%E5%BA%8F.png">
-<meta property="og:updated_time" content="2020-01-22T01:08:35.208Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.260Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="消息队列之RabbitMQ">
 <meta name="twitter:description" content="本节思维导图   ​        RabbitMQ是一个消息代理，一个消息系统的媒介。它可以为你的应用提供一个通用的消息发送和接收平台，并且保证消息在传输过程中的安全。 基础概念​        RabbitMQ中除了正常的生产者消费者之外，还有一些其他的概念来支撑这样一个复杂的消息队列。 Broker​        Broker是消息服务中间件的一个服务节点，大部分情况下可以把一个Brok">
@@ -443,7 +443,7 @@
 <p>​        但是哪怕是你给RabbitMQ开启了持久化机制，也有一种可能，就是这个消息写到了RabbitMQ中，但是还没来得及持久化到磁盘上，结果RabbitMQ挂了，就会导师内存里的一点点数据丢失。所以，持久化可以跟生产者那边的<code>confirm</code>机制配合起来，只有消息被持久化到磁盘之后，才会通知生产这<code>ack</code>了。这样即便是持久化到磁盘之前，RabbitMQ挂了，数据丢了，生产者收不到<code>ack</code>，你也是可以自己重发的。</p>
 <h3 id="消费端弄丢了数据"><a href="#消费端弄丢了数据" class="headerlink" title="消费端弄丢了数据"></a>消费端弄丢了数据</h3><p>​        如果消费端<strong>刚消费到消息，但还没处理，结果进程挂了</strong>，这样就尴尬了。RabbitMQ认为你都消费了，这数据也就丢了。</p>
 <p>​        这个时候可以用RabbitMQ提供的<code>ack</code>机制，即，你必须关闭RabbitMQ的自动<code>ack</code>,可以通过一个api来调用就行，然后每次你自己代码里确保处理完的时候，再在程序里<code>ack</code>一把。这样的话，如果你还没处理完，就没有<code>ack</code>,RabbitMQ就认为你还没处理完，这个时候RabbitMQ会把这个消费分配给别的consumer去处理，消息是不会丢的。</p>
-<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%B9%8BRabbitMQ%5C%E6%B6%88%E6%81%AF%E4%BC%A0%E8%BE%93%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.png" alt="消息传输解决方案"></p>
+<p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E4%BC%A0%E8%BE%93%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.png" alt="消息传输解决方案"></p>
 <h2 id="RabbitMQ的消息顺序性"><a href="#RabbitMQ的消息顺序性" class="headerlink" title="RabbitMQ的消息顺序性"></a>RabbitMQ的消息顺序性</h2><p>​        举个例子，一个mysql binlog同步的系统，日同步数据要达到上亿，就是说数据从一个mysql库原封不动同步到另一个mysql库里面去（mysql -&gt; mysql）。然后你在mysql里增删改一条数据，对应出来增删改3条<code>binlog</code>日志，接着这三条<code>binlog</code>发送到MQ里面，再消费出来依次执行，要保证是按顺序执行的。否则本来是：增加、修改、删除，最后换了顺序给执行成删除、修改、增加。这就错了。</p>
 <p>​        先看看RabbitMQ消息会错乱的场景：在RabbitMQ中，一个queue，多个consumer、比如生产者向RabbitMQ里发送了三条数据，顺序依次是data1/data2/data3，压入的是RabbitMQ的一个内存队列。有三个消费者分别从MQ中消费这三条数据中的一条，结果消费者2先执行完操作，把data2存入数据库，然后是data1/data3，这样就乱了。</p>
 <p><img src="/CKING.github.io/2019/10/07/消息队列之RabbitMQ/%E6%B6%88%E6%81%AF%E9%94%99%E4%B9%B1.png" alt="消息错乱"></p>
@@ -588,7 +588,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -663,7 +663,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

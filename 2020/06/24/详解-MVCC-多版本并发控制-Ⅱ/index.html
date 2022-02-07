@@ -100,7 +100,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RR5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RR6.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RR7.png">
-<meta property="og:updated_time" content="2021-10-15T00:16:22.081Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.261Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="详解 MVCC -- 多版本并发控制Ⅱ">
 <meta name="twitter:description" content="Read Committed（读已提交）隔离级别现在我们讲讲基于 ReadView 机制是如何实现 Read Committed 隔离级别的。所谓的Read Committed 隔离级别，简称为 RC，是说你事务运行期间，只要别的事务修改数据还提交了，你就是可以读到人家修改的数据的，所以是会发生不可重复读的问题，包括幻读的问题，都会有的。 而 ReadView 机制，它是基于 undo log 版">
@@ -401,7 +401,7 @@
 <p><img src="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RC5.png" alt="RC5"></p>
 <p>此时事务 A 再次基于这个 ReadView 去查询，会发现这条数据的 trx_id = 70，虽然在 ReadView 的 min_trx_id 和 max_trx_id 范围之间，但是此时并不在 m_ids 列表内，说明事务 B 在生成本次 ReadView 之前就已经提交了。那么既然在生成本次 ReadView 之前，事务 B 就已经提交了，就说明这次你查询就可以查到事务 B 修改过的这个值了，此时事务 A 就会查到值 B</p>
 <p><img src="/CKING.github.io/2020/06/24/详解-MVCC-多版本并发控制-Ⅱ/RC6.png" alt="RC6"></p>
-<p>现在，RC 隔离级别如何实现的，现在应该清楚了，它的关键点在于每次查询都生成新的 ReadView，俺么如果在你这次查询之前，有事务修改了数据还提交了，你这次查询生成的 ReadView 里，那个 m_ids 列表当然不包含这个已经提交的事务了。既然不包含已经提交的事务了，那么当然可以读到人家修改过的值了</p>
+<p>现在，RC 隔离级别如何实现的，现在应该清楚了，它的关键点在于每次查询都生成新的 ReadView，那么如果在你这次查询之前，有事务修改了数据还提交了，你这次查询生成的 ReadView 里，那个 m_ids 列表当然不包含这个已经提交的事务了。既然不包含已经提交的事务了，那么当然可以读到人家修改过的值了</p>
 <p>实际上，基于 undo log 多版本链条以及 ReadView 机制实现的多事务并发执行的 RC 隔离级别、RR（可重复读）隔离级别，就是数据库的 MVCC 多版本并发控制机制。</p>
 <h2 id="Read-Repeatable（可重复读）隔离级别"><a href="#Read-Repeatable（可重复读）隔离级别" class="headerlink" title="Read Repeatable（可重复读）隔离级别"></a>Read Repeatable（可重复读）隔离级别</h2><p>现在我们讲讲 MySQL 中的 RR（Read Repeatable 可重复读）隔离级别，是如何同时避免不可重复读问题和幻读问题的。</p>
 <p>在 MySQL 中让多个事务并发执行的时候能够相互隔离，避免同时读写一条数据的时候有影响，是依托 undo log 版本链条和 ReadView 机制来实现的。而 RR 级别，就是你这个事务读一条数据，无论读多少次，都是一个值，别的事务修改数据之后哪怕提交了，你也是看不到人家修改的值的，这就避免了不可重复读的问题。</p>
@@ -571,7 +571,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -646,7 +646,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/01/Spring-Cache/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/01/Spring-Cache/" itemprop="url">Spring Cache</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/" itemprop="url">Spring 单例 Bean 创建</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-01T15:55:27+08:00">
-                2021-02-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T16:17:32+08:00">
+                2021-09-08
               </time>
             
 
@@ -367,11 +367,18 @@
       
         
           
-          Spring Cache 简介在 Spring 3.1 中引入了多 Cache 的支持，在 spring - context 包中定义了 org.springframework.cache.Cache 和 org.springframework.cache.CacheManager 两个接口来统一不同的缓存技术。Cache 接口包含缓存的常用操作：增加、删除、读取等。CacheManager 是 
+          本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：
+
+getSingleton
+createBean
+getObjectForBeanInstance
+
+getSingleton我们先看一下 getSingleton的源码
+1234567891011121314151617181920212223242526272829303132333435363738394041
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/01/Spring-Cache/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -422,7 +429,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/12/25/Java-内部类/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/前缀和技巧/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -441,7 +448,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/12/25/Java-内部类/" itemprop="url">Java 内部类</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/前缀和技巧/" itemprop="url">前缀和技巧</a></h1>
         
 
         <div class="post-meta">
@@ -453,326 +460,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-25T18:20:52+08:00">
-                2020-12-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          内部类的作用首先我们要知道什么事内部类
-
-内部类（inner class）：定义在另一个类中的类
-
-内部类有什么作用：
-
-内部类方法可以访问该类定义所在作用域中的数据，包括 private 修饰的私有数据
-
-
-内部类可以对同一包中的其他类隐藏起来
-
-
-内部类可以实现 Java 单继承的缺陷
-
-内部类方法可以访问该类定义所在作用域中的数据我们看下面的代码
-1234567891011121314151
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/12/25/Java-内部类/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/12/21/Linux-零拷贝原理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2020/12/21/Linux-零拷贝原理/" itemprop="url">Linux 零拷贝原理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-21T15:17:12+08:00">
-                2020-12-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/杂记/" itemprop="url" rel="index">
-                    <span itemprop="name">杂记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          零拷贝就是没有把数据从一个存储区域拷贝到另一个存储区域，但是没有数据的复制，怎么可能实现数据的传输呢？其实我们在 Java NIO、netty、kafka 遇到的零拷贝，并不是不复制数据，而是减少不必要的数据拷贝次数，从而提升代码的性能
-零拷贝的好处
-减少或避免不必要的 CPU 数据拷贝，从而释放 CPU 去执行其他任务
-
-零拷贝机制能减少用户空间和操作系统内核空间的上下文切换
-
-减少内存的占用
-
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/12/21/Linux-零拷贝原理/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/12/14/动态规划解题框架/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2020/12/14/动态规划解题框架/" itemprop="url">动态规划解题框架</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-14T16:12:43+08:00">
-                2020-12-14
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
+                2021-09-08
               </time>
             
 
@@ -833,13 +522,15 @@
       
         
           
-          动态规划问题一般形式就是求最值。既然要求最值，核心问题是什么？求解动态规划的核心问题就是穷举。因为要求最值吗，肯定要把所有可行的答案穷举出来，然后在其中找最值
-但是，动态规划的穷举有点特别，因为这类问题存在「重叠子问题」，如果暴力穷举的话效率会很低，所以需要「备忘录」来优化穷举过程，避免不必要的计算。而且，动态规划问题一定会具备「最优子结构」，才能通过子问题的最值得到原问题的最值
-另外，虽然动态规
+          前缀和技巧适用于快速计算一个索引区间内的元素之和
+这道题 303.区域和检索 - 数组不可变 就是前缀和的基本使用场景：
+
+题目要求你实现这样一个类：
+12345678910class NumArray &#123;    public NumArray(int[] nums) &#123;    &#125;        public int sumRange(int left, int ri
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/12/14/动态规划解题框架/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/前缀和技巧/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -890,7 +581,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/11/30/分库分表案例/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/差分数组技巧/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -909,7 +600,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/11/30/分库分表案例/" itemprop="url">分库分表案例</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/08/差分数组技巧/" itemprop="url">差分数组技巧</a></h1>
         
 
         <div class="post-meta">
@@ -921,8 +612,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-30T14:49:34+08:00">
-                2020-11-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
+                2021-09-08
               </time>
             
 
@@ -944,8 +635,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -983,12 +674,13 @@
       
         
           
-          假设有这么一个订单系统，每天新增数据大概是 1W 左右，每个月是新增 30W 数据，每年是新增 360W 数据，那么最多 3 年就到千万级大表了，这个就会导致你涉及订单的操作，速度挺慢的。
-所以要做分库分表。订单表在拆分的时候，往往要考虑三个维度。一个是要按照订单 id 为粒度去分库分表，也就是把订单 id 进行 hash 之后，对表数量进行取模然后把订单数据均匀分散到 100 ~ 1000 个表
+          本文将一个和前缀和思想非常类似的算法技巧：差分数组。前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和；而差分数组主要适用场景是频繁对原始数组的某个区间的元素进行增减
+比如，我给你输入一个数组 nums，然后要求给区间 nums[2..6] 全部加 1，再给 nums[3..9] 全部减 3，再给 nums[0..4] 全部加 2，再给..
+一通操作之后，然后问你，最后 n
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/11/30/分库分表案例/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/08/差分数组技巧/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1039,7 +731,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/11/24/上亿数据量的用户表如何进行水平拆分/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1058,7 +750,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/11/24/上亿数据量的用户表如何进行水平拆分/" itemprop="url">上亿数据量的用户表如何进行水平拆分</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/" itemprop="url">Spring Ioc 容器初始化</a></h1>
         
 
         <div class="post-meta">
@@ -1070,8 +762,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-24T18:28:00+08:00">
-                2020-11-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-11T17:29:18+08:00">
+                2021-08-11
               </time>
             
 
@@ -1093,8 +785,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1132,12 +824,12 @@
       
         
           
-          今天我们只讲解分库分表的整体方案设计，但是在进行具体的方案落地的时候，是需要数据库中间件技术的支持的，业内常用的一般有 Sharding - Sphere 以及 MyCat 两种，各自用的公司也很多，你们可以自行选择一个数据库中间件技术，熟悉一下它们的用法
-今天要说的是海量用户数据的分库分表的方案。一般公司都会有个用户中心，而且用户中心就是负责所有用户的数据管理，包括了用户的数据存储，用户信息的增
+          思维导图![Spring Ioc 容器初始化](Spring-Ioc-容器初始化/Spring Ioc 容器初始化.png)
+Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spring 容器，该容器会读取配置文件 /beans.xml，并统一管理由该文件中定义好的 bean 实例对象，如果要获取某个 bean 实例，使用 getBean 方法就行。假设将 Us
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/11/24/上亿数据量的用户表如何进行水平拆分/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1188,7 +880,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/11/02/MySQL-主从复制原理/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/04/08/Spring-事务同步机制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1207,7 +899,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/11/02/MySQL-主从复制原理/" itemprop="url">MySQL 主从复制原理</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/" itemprop="url">Spring 事务同步机制</a></h1>
         
 
         <div class="post-meta">
@@ -1219,8 +911,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-02T11:22:42+08:00">
-                2020-11-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-08T11:00:09+08:00">
+                2021-04-08
               </time>
             
 
@@ -1242,8 +934,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1281,11 +973,15 @@
       
         
           
-          MySQL 的主从复制架构，就是部署两台服务器，每台服务器上都有一个 MySQL，其中一个 MySQL 是 master（主节点），另一个 MySQL 是 slave（从节点）。然后我们的系统平时连接到 master 节点写入数据，当然也可以从里面查询，跟你用一个单机版的 MySQL 是一样的。但是 master 节点会把写入的数据自动复制到 slave 节点去，让 slave 节点可以跟 mas
+          Spring 事务极简介绍Spring 有「声明式事务」和「编程式事务」：
+
+声明式事务只需要提供 Transactional 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可
+
+编程式事务则需要使用 Spring 提供的模板，如 TransactionTemplate，或者直接使用底层的 PlatformTransactionManage
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/11/02/MySQL-主从复制原理/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1336,7 +1032,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/10/20/SQL-调优案例四/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/03/29/I-0-多路复用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1355,7 +1051,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/10/20/SQL-调优案例四/" itemprop="url">SQL 调优案例四</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/03/29/I-0-多路复用/" itemprop="url">I/0 多路复用</a></h1>
         
 
         <div class="post-meta">
@@ -1367,8 +1063,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-20T10:46:51+08:00">
-                2020-10-20
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-29T15:12:56+08:00">
+                2021-03-29
               </time>
             
 
@@ -1390,8 +1086,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
                   </a>
                 </span>
 
@@ -1429,12 +1125,12 @@
       
         
           
-          这个案例的背景是，有人删除了千万级的数据，结果导致了频繁的慢查询，接下来说一下这个案例排查、定位以及解决的一个过程。当时是从线上收到大量的慢查询告警开始的，当我们收到大量的慢查询告警之后，就去检查慢查询的 SQL，结果不是什么特别的 SQL，这些 SQL 语句主要都是针对一个表的，比较简单，看起来不应该会慢查询
-那么有没有可能，慢查询不是 SQL 的问题，而是 MySQL 生产服务器的问题？实际上
+          最基本的 Socket 模型要想客户端和服务器能在网络中通信，必须要使用 Socket 编程，它是进程间通信里比较特别的方式，特别之处在于它是可以跨主机间通信
+Socket 的中文名叫「插口」。事实上，双方要进行网络通信前，各自得创建一个 Socket，这相当于客户端和服务器都开了一个「口子」，双方读取和发送数据的时候，都通过这个口子。这样，是不是觉得很像弄了一根网线，一头插在客户端，一头插在服务
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/10/20/SQL-调优案例四/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/03/29/I-0-多路复用/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1485,7 +1181,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/09/25/SQL-调优案例三/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1504,7 +1200,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/09/25/SQL-调优案例三/" itemprop="url">SQL 调优案例三</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/" itemprop="url">大规模集群下 Hadoop NameNode 如何承受每秒上千万的高并发访问</a></h1>
         
 
         <div class="post-meta">
@@ -1516,8 +1212,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-25T15:22:23+08:00">
-                2020-09-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-10T14:23:12+08:00">
+                2021-02-10
               </time>
             
 
@@ -1539,8 +1235,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -1578,12 +1274,21 @@
       
         
           
-          案例背景一个商品评论系统的数据量非常大，拥有十亿量级的评论数据，所以对这个评论数据库，做了分库分表，基本上分完库和表后，单表的评论数据在百万级别。每一个商品的所有评论都是放在一个库的一张表里的，这样可以确保你作为用户在分页查询一个商品的评论时，一般都是直接从一个库的一张表里执行分页查询语句就可以了
-在电商网站里，有一些热门的商品的评论可能多达几十万条。然后有些用户就喜欢不停的对某个热门商品的评论不
+          我们分析一下，高并发请求 NameNode 会遇到什么问题
+我们知道，每次请求 NameNode 修改一条元数据（比如说申请上传一个文件，那么就需要在内存目录树种加入一个文件），都要写一条 edits log，包括两个步骤：
+
+写入本地磁盘
+
+通过网络传输给 JournalNodes 集群
+
+
+但是这存在多线程并发安全问题。NameNode 在写 edits log 时的第一条原则：
+
+必须保证每
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/09/25/SQL-调优案例三/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1634,7 +1339,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/09/24/SQL-调优案例二/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/09/Hadoop-基本架构原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1653,7 +1358,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/09/24/SQL-调优案例二/" itemprop="url">SQL 调优案例二</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/" itemprop="url">Hadoop 基本架构原理</a></h1>
         
 
         <div class="post-meta">
@@ -1665,8 +1370,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-24T16:24:53+08:00">
-                2020-09-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-09T16:37:37+08:00">
+                2021-02-09
               </time>
             
 
@@ -1688,8 +1393,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
                   </a>
                 </span>
 
@@ -1727,11 +1432,334 @@
       
         
           
-          案例背景先从一个线上的商品系统出现的一个慢查询告警开始讲起。一天晚上，我们收到了线上数据库的频繁报警，这个报警的意思是，数据库突然涌现出了大量的慢查询，而且因为大量的慢查询，导致每一个数据库连接执行一个慢查询都要耗费很久。那样，必然会导致突然过来的很多查询需要让数据库开辟出来更多的连接，因此这个时候报警也告诉我们，数据库的连接突然暴增了，而且每个连接都打满，每个连接都要执行一个慢查询，慢查询还特别
+          Hadoop 是目前大数据领域最主流的一套技术体系，包含了多种技术。包括 HDFS（分布式文件系统）、YARN（分布式资源调度系统）、MapReduce（分布式计算系统）等等
+我们用一个简单的场景来阐述一下 Hadoop。假如你现在公司里的数据都是放在 MySQL 里的，并且全部放在一台数据库服务器上，假设这台服务器的磁盘空间有 2T ，如下：
+
+如果你不停地往这台服务器的 MySQL 里放数据，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/09/24/SQL-调优案例二/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/" itemprop="url">分布式事务 -- TCC Saga 入门级理解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-05T14:51:46+08:00">
+                2021-02-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作
+用电商场景来说就是以下几个步骤：
+
+用户在订单平台操作下单
+
+占库存
+
+占钱款
+
+生成一笔订单
+
+
+如图所示：
+
+分布式系统上图是
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/03/公司的分布式缓存架构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/" itemprop="url">公司的分布式缓存架构</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-03T15:11:32+08:00">
+                2021-02-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/杂记/" itemprop="url" rel="index">
+                    <span itemprop="name">杂记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          Spring Cache在讨论公司的分布式缓存架构之前，我们先拿 Spring Cache 缓存作为一个参考系。简单来说，Spring Cache 有两个优点：
+
+基于 Spring AOP 注解
+上手简单
+对业务侵入性低
+
+
+提供标准的 Cache 抽象（JSR 107），具体的 Cache、CacheManager 依赖各自实现
+
+
+SpaceStation 实践在 Spring Cache 
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1773,7 +1801,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/CKING.github.io/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/CKING.github.io/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/20/">20</a><a class="extend next" rel="next" href="/CKING.github.io/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1821,7 +1849,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1880,7 +1908,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

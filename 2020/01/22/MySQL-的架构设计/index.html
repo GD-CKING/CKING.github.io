@@ -79,14 +79,15 @@
 
 
 
-<meta name="description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个黑">
+<meta name="description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个">
 <meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL 的架构设计">
 <meta property="og:url" content="https://github.com/2020/01/22/MySQL-的架构设计/index.html">
 <meta property="og:site_name" content="Ckin&#39;s Blog">
-<meta property="og:description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个黑">
+<meta property="og:description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/MySQL%E8%BF%9E%E6%8E%A5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E7%BA%BF%E7%A8%8B%E5%A4%84%E7%90%86.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/SQL%E6%8E%A5%E5%8F%A3.png">
@@ -95,11 +96,11 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%89%A7%E8%A1%8C%E5%99%A8.png">
-<meta property="og:updated_time" content="2020-01-26T13:00:20.693Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.143Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL 的架构设计">
-<meta name="twitter:description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个黑">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/MySQL%E8%BF%9E%E6%8E%A5.png">
+<meta name="twitter:description" content="一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。  当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
 
 
 
@@ -378,7 +379,8 @@
       
 
       
-        <p>一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。</p>
+        <p><img src="/CKING.github.io/2020/01/22/MySQL-的架构设计/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png" alt="思维导图"></p>
+<p>一般情况下，我们的系统采用数据库连接池的方法去并发访问数据库，然后数据库自己也会维护一个连接池，其中管理了各种系统跟这台数据库服务器建立的所有连接。</p>
 <p><img src="/CKING.github.io/2020/01/22/MySQL-的架构设计/MySQL%E8%BF%9E%E6%8E%A5.png" alt="MySQL 连接"></p>
 <p>当我们的系统只要能从连接池获取到一个数据库连接之后，我们就可以执行增删改查的SQL语句了。但大部分人都停留在把 MySQL 当成一个黑盒的阶段，只知道执行相应的 SQL 语句就可以得到相应的结果，如果语句性能差了，就在表里建几个索引，完全当它是个黑盒子，来建表以及执行 SQL 语句。</p>
 <p>接下来我们就要深入底层，去探索数据库的工作原理以及生产问题的优化手段。</p>
@@ -560,7 +562,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -635,7 +637,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

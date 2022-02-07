@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/" itemprop="url">Spring 单例 Bean 创建</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/" itemprop="url">MySQL 之普通索引和唯一索引</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,464 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T16:17:32+08:00">
-                2021-09-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-02T20:38:19+08:00">
+                2021-11-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          假设你在维护一个市民系统，每个人都有一个唯一的身份证号，而且业务代码已经保证不会写入两个重复的身份证号。如果市民系统需要按照身份证号查姓名，就会执行类似下面的语句：
+1select name from CUser where id_card = &apos;xxxxyyyzzz&apos;
+
+所以，一般都要在 id_card 字段上建索引
+由于身份证号字段比较大，所以不建议把身份证号当做主键。那么
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/01/SQL-更新语句是如何执行的/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2021/11/01/SQL-更新语句是如何执行的/" itemprop="url">SQL 更新语句是如何执行的</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-01T15:03:58+08:00">
+                2021-11-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          
+MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的？
+我们从一个表的一条更新语句说起，下面是这个表的创建语句，这个表有一个主键 ID 和一个整型字段 c
+1create table T(ID int primary key, c int);
+
+如果要将 ID  = 2 这一行的值加 1，SQL 语句就会这么写：
+1update T set c = c + 1 where ID = 2;
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2021/11/01/SQL-更新语句是如何执行的/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/" itemprop="url">Synchronized 锁升级优化的全流程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-30T15:49:20+08:00">
+                2021-09-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          本文主要谈一下 Synchronized 锁的各种优化：包括偏向锁、轻量级锁、重量级锁，以及它们之间是如何获取和释放锁、锁之间是如何进行升级和膨胀的
+偏向锁从 JDK 1.6 开始，JVM 对比较重的 Synchronized 就引入了各种锁优化的机制，偏向锁算是最轻的一种锁，应用的场景也是最简单的，即偏向锁是专门为了优化线程多次获取同一把锁的场景量身打造的
+比如说方式 A 是被 Synchron
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/26/Spring-事务失效情况/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2021/09/26/Spring-事务失效情况/" itemprop="url">Spring 事务失效情况</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-26T19:16:19+08:00">
+                2021-09-26
               </time>
             
 
@@ -367,18 +823,12 @@
       
         
           
-          本文主要讲解单例 Bean 的创建过程。这里主要分为三个部分创建单例 Bean：
-
-getSingleton
-createBean
-getObjectForBeanInstance
-
-getSingleton我们先看一下 getSingleton的源码
-1234567891011121314151617181920212223242526272829303132333435363738394041
+          没有被 Spring 管理没有被 Spring 管理的 Bean，如果其中出现了方法需要进行事务处理的情况，此时的事务不会执行。如下，在 OrderServiceImpl 类中如果将 @Service 注释掉，那么此类对应的 bean 也就不会被 Spring IOC 容器管理。即使 updateOrder 上面注释了 @Transactional，这个方法也不会执行事务
+12345678//@S
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/08/Spring-单例-Bean-创建/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/26/Spring-事务失效情况/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -429,7 +879,7 @@ getSingleton我们先看一下 getSingleton的源码
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/前缀和技巧/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/26/Spring-事务框架源码初探/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -448,7 +898,7 @@ getSingleton我们先看一下 getSingleton的源码
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/08/前缀和技巧/" itemprop="url">前缀和技巧</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/26/Spring-事务框架源码初探/" itemprop="url">Spring 事务框架源码初探</a></h1>
         
 
         <div class="post-meta">
@@ -460,310 +910,8 @@ getSingleton我们先看一下 getSingleton的源码
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
-                2021-09-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          前缀和技巧适用于快速计算一个索引区间内的元素之和
-这道题 303.区域和检索 - 数组不可变 就是前缀和的基本使用场景：
-
-题目要求你实现这样一个类：
-12345678910class NumArray &#123;    public NumArray(int[] nums) &#123;    &#125;        public int sumRange(int left, int ri
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/08/前缀和技巧/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/08/差分数组技巧/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2021/09/08/差分数组技巧/" itemprop="url">差分数组技巧</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-08T10:38:54+08:00">
-                2021-09-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          本文将一个和前缀和思想非常类似的算法技巧：差分数组。前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和；而差分数组主要适用场景是频繁对原始数组的某个区间的元素进行增减
-比如，我给你输入一个数组 nums，然后要求给区间 nums[2..6] 全部加 1，再给 nums[3..9] 全部减 3，再给 nums[0..4] 全部加 2，再给..
-一通操作之后，然后问你，最后 n
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/08/差分数组技巧/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/" itemprop="url">Spring Ioc 容器初始化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-11T17:29:18+08:00">
-                2021-08-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-26T11:47:18+08:00">
+                2021-09-26
               </time>
             
 
@@ -824,12 +972,13 @@ getSingleton我们先看一下 getSingleton的源码
       
         
           
-          思维导图![Spring Ioc 容器初始化](Spring-Ioc-容器初始化/Spring Ioc 容器初始化.png)
-Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spring 容器，该容器会读取配置文件 /beans.xml，并统一管理由该文件中定义好的 bean 实例对象，如果要获取某个 bean 实例，使用 getBean 方法就行。假设将 Us
+          事务开启分析Spring声明式事务是通过 AOP 增强实现的，所以现在分析 Spring 事务执行过程的时候离不开 AOP 拦截器执行链的描述，其中比较重要的拦截器就是 TransactionInterceptor 了
+
+如下，在 TransactionInterceptor 中有一个重要的方法 invoke，其中会获取带来对象的类型，同时会调用父类 TransactionAspectSuppor
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/08/11/Spring-Ioc-容器初始化/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/26/Spring-事务框架源码初探/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -880,7 +1029,7 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/04/08/Spring-事务同步机制/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -899,7 +1048,7 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/" itemprop="url">Spring 事务同步机制</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/" itemprop="url">Spring 同步和异步事件的使用场景</a></h1>
         
 
         <div class="post-meta">
@@ -911,8 +1060,8 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-08T11:00:09+08:00">
-                2021-04-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-25T14:17:39+08:00">
+                2021-09-25
               </time>
             
 
@@ -973,15 +1122,12 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
       
         
           
-          Spring 事务极简介绍Spring 有「声明式事务」和「编程式事务」：
-
-声明式事务只需要提供 Transactional 的注解，然后事务的开启和提交 / 回滚、资源的清理就都由 Spring 来管控，我们只需要关注业务代码即可
-
-编程式事务则需要使用 Spring 提供的模板，如 TransactionTemplate，或者直接使用底层的 PlatformTransactionManage
+          Spring 事件的监听机制可以理解为是一种观察者模式，有数据发布者（事件源）和数据接受者（监听器）。在 Java 中，事件对象都是继承 java.util.EventObject 对象，事件监听器都是 java.util.EventListener 实例
+其中，java.util.EventObject 是事件状态对象的基类，它封装了事件源对象以及和事件相关的信息。所有 java 的事件类都需要
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/04/08/Spring-事务同步机制/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1032,7 +1178,7 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/03/29/I-0-多路复用/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1051,7 +1197,7 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/03/29/I-0-多路复用/" itemprop="url">I/0 多路复用</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/" itemprop="url">Spring AOP 源码分析 2</a></h1>
         
 
         <div class="post-meta">
@@ -1063,8 +1209,8 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-29T15:12:56+08:00">
-                2021-03-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-18T11:08:38+08:00">
+                2021-09-18
               </time>
             
 
@@ -1086,8 +1232,8 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/网络编程/" itemprop="url" rel="index">
-                    <span itemprop="name">网络编程</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1125,12 +1271,16 @@ Ioc 是如何工作的如下代码所示，通过 ApplicationContext 创建 Spri
       
         
           
-          最基本的 Socket 模型要想客户端和服务器能在网络中通信，必须要使用 Socket 编程，它是进程间通信里比较特别的方式，特别之处在于它是可以跨主机间通信
-Socket 的中文名叫「插口」。事实上，双方要进行网络通信前，各自得创建一个 Socket，这相当于客户端和服务器都开了一个「口子」，双方读取和发送数据的时候，都通过这个口子。这样，是不是觉得很像弄了一根网线，一头插在客户端，一头插在服务
+          JDK 动态代理源码分析接着我们通过源码分析介绍 Spring AOP JDK 动态代理实现的原理。内容包括：
+
+invoke：实现 AOP 中具体的逻辑
+getProxy：获取产生的代理类
+
+invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lang.reflect 包中 Proxy 和 InvocationHandler 两个接口来实现的。对于 Invoca
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/03/29/I-0-多路复用/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1181,7 +1331,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/17/Spring-AOP-源码分析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1200,7 +1350,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/" itemprop="url">大规模集群下 Hadoop NameNode 如何承受每秒上千万的高并发访问</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/" itemprop="url">Spring AOP 源码分析</a></h1>
         
 
         <div class="post-meta">
@@ -1212,8 +1362,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-10T14:23:12+08:00">
-                2021-02-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-17T10:38:19+08:00">
+                2021-09-17
               </time>
             
 
@@ -1235,8 +1385,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
-                    <span itemprop="name">大数据</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1274,21 +1424,12 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
       
         
           
-          我们分析一下，高并发请求 NameNode 会遇到什么问题
-我们知道，每次请求 NameNode 修改一条元数据（比如说申请上传一个文件，那么就需要在内存目录树种加入一个文件），都要写一条 edits log，包括两个步骤：
-
-写入本地磁盘
-
-通过网络传输给 JournalNodes 集群
-
-
-但是这存在多线程并发安全问题。NameNode 在写 edits log 时的第一条原则：
-
-必须保证每
+          AOP 框架有很多种，Spring 中的 AOP 是通过动态代理实现的。JDK 动态代理只在运行期，目标类加载后，为借口动态生成代理类，将切面织入代理类中
+这里通过一个例子来讲解 JDK 动态代理的原理。如下，定义一个 Service 接口，其中有一个 help 方法。用 ServiceImpl 去实现 Service 借口，在 help 方法中实现「打印买书」的输出。这个 ServiceImpl
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/10/大规模集群下-Hadoop-NameNode-如何承受每秒上千万的高并发访问/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1339,7 +1480,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/09/Hadoop-基本架构原理/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1358,7 +1499,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/" itemprop="url">Hadoop 基本架构原理</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/" itemprop="url">Spring 动态代理时是如何解决依赖循环的</a></h1>
         
 
         <div class="post-meta">
@@ -1370,8 +1511,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-09T16:37:37+08:00">
-                2021-02-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-10T15:22:17+08:00">
+                2021-09-10
               </time>
             
 
@@ -1393,8 +1534,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/大数据/" itemprop="url" rel="index">
-                    <span itemprop="name">大数据</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1432,14 +1573,15 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
       
         
           
-          Hadoop 是目前大数据领域最主流的一套技术体系，包含了多种技术。包括 HDFS（分布式文件系统）、YARN（分布式资源调度系统）、MapReduce（分布式计算系统）等等
-我们用一个简单的场景来阐述一下 Hadoop。假如你现在公司里的数据都是放在 MySQL 里的，并且全部放在一台数据库服务器上，假设这台服务器的磁盘空间有 2T ，如下：
+          什么是依赖循环我们先回顾一下 Bean 的创建过程，在此之前，先看一下三级缓存的概念：
 
-如果你不停地往这台服务器的 MySQL 里放数据，
+singletonObjects：一级缓存。存储单例对象，Bean 已经实例化，初始化完成
+earlySingletonObjects：二级缓存。存储 singletonObject，这个 Bean 已经实例化，还没有初始化
+singletonFactories：三级缓存。存储 singletonFactor
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/09/Hadoop-基本架构原理/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1490,7 +1632,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/09/Spring-依赖循环/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1509,7 +1651,7 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/" itemprop="url">分布式事务 -- TCC Saga 入门级理解</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/09/09/Spring-依赖循环/" itemprop="url">Spring 依赖循环</a></h1>
         
 
         <div class="post-meta">
@@ -1521,8 +1663,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-05T14:51:46+08:00">
-                2021-02-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-09T15:37:37+08:00">
+                2021-09-09
               </time>
             
 
@@ -1544,8 +1686,8 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
                   </a>
                 </span>
 
@@ -1583,183 +1725,14 @@ Socket 的中文名叫「插口」。事实上，双方要进行网络通信前�
       
         
           
-          业务理解简单描述下业务场景：有四个模块 A、B、C、D，其中 B、C、D 是下游服务，A 是上游服务调用方。从前端进来一个请求进入 A，A 需要对这一个请求进行记录落库，之后串行地调用 B、C 服务，并且异步地调用 D 服务，调用结束后再对数据库里这批请求进行更新操作
-用电商场景来说就是以下几个步骤：
+          什么是依赖循环
+Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，并抛出 BeanCurrentlyInCreationException。所有要避免构造函数注入，可以使用 setter 注入替代
 
-用户在订单平台操作下单
-
-占库存
-
-占钱款
-
-生成一笔订单
-
-
-如图所示：
-
-分布式系统上图是
+根据官方文档说明，Spring 会自动解决基于 setter 注入的依赖循环，当然我们工作中现在都使用 @Autowired 注解来注入属性。@Autowired 是通过反射进行赋值
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/05/分布式事务-TCC-Saga-入门级理解/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/02/03/公司的分布式缓存架构/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/" itemprop="url">公司的分布式缓存架构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-03T15:11:32+08:00">
-                2021-02-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/杂记/" itemprop="url" rel="index">
-                    <span itemprop="name">杂记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          Spring Cache在讨论公司的分布式缓存架构之前，我们先拿 Spring Cache 缓存作为一个参考系。简单来说，Spring Cache 有两个优点：
-
-基于 Spring AOP 注解
-上手简单
-对业务侵入性低
-
-
-提供标准的 Cache 抽象（JSR 107），具体的 Cache、CacheManager 依赖各自实现
-
-
-SpaceStation 实践在 Spring Cache 
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/02/03/公司的分布式缓存架构/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/09/09/Spring-依赖循环/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1801,7 +1774,7 @@ SpaceStation 实践在 Spring Cache
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/CKING.github.io/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/CKING.github.io/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/20/">20</a><a class="extend next" rel="next" href="/CKING.github.io/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1849,7 +1822,7 @@ SpaceStation 实践在 Spring Cache
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1908,7 +1881,7 @@ SpaceStation 实践在 Spring Cache
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

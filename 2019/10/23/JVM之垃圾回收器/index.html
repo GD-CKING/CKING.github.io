@@ -90,12 +90,13 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/%E6%96%B0%E7%94%9F%E4%BB%A3.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/%E5%9C%BA%E6%99%AF.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/stop_the_world.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/parNew.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/%E5%88%9D%E5%A7%8B%E6%A0%87%E8%AE%B0.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/%E5%B9%B6%E5%8F%91%E6%A0%87%E8%AE%B0.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/%E9%87%8D%E6%96%B0%E6%A0%87%E8%AE%B0.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/10/23/JVM之垃圾回收器/%E5%B9%B6%E5%8F%91%E6%B8%85%E7%90%86.png">
-<meta property="og:updated_time" content="2019-11-03T09:03:48.295Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.128Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM之垃圾回收器">
 <meta name="twitter:description" content="​        在新生代和老年代进行垃圾回收的时候，都是要用垃圾回收器进行回收的，不同的区域用不同的垃圾回收器。常用的垃圾回收机有一下几种：  Serial和Serial Old垃圾回收器：分别用来回收新生代和老年代的垃圾对象。工作原理就是单线程运行，垃圾回收的时候会停止我们自己写的系统的其他工作线程，让我们系统直接卡死不动，然后让他们垃圾回收，这个现在一般写后台Java系统几乎不用。 ParN">
@@ -391,9 +392,9 @@
 <p>​        由上图可知，垃圾回收会通过一个后台运行的垃圾回收线程来执行它具体的一个逻辑。比如针对新声代我们会用ParNew垃圾回收器进行回收，然后ParNew垃圾回收器针对新生代采用的就是复制算法来垃圾回收。</p>
 <h3 id="GC的时候还能继续创建新的对象吗"><a href="#GC的时候还能继续创建新的对象吗" class="headerlink" title="GC的时候还能继续创建新的对象吗"></a>GC的时候还能继续创建新的对象吗</h3><p>​        我们写好的Java系统在运行期间能不能继续在新生代里创建新的对象？假设一个场景，如下图：</p>
 <p><img src="/CKING.github.io/2019/10/23/JVM之垃圾回收器/%E5%9C%BA%E6%99%AF.png" alt="场景"></p>
-<p>​        如果所示，如果一边垃圾回收器在想办法把Eden和Survivor2里的存活对象标记出来转移到Survivor2去，然后还在想办法把Eden和Survivor2的垃圾对象清理掉，结果这个时候系统程序还在不停的在Eden里创建新的对象。而这些新的对象很快就成了垃圾对象，有的还有人引用是存活对象。这样子就会全部乱套了，对于程序新创建的这些对象，你怎么让垃圾回收器去持续追踪这些新对象的新状态？所以，在垃圾回收过程中，同时还允许我们写的Java系统不停的运行在Eden里持续创建新的对象，目前来看是不合适的。</p>
+<p>​        如图所示，如果一边垃圾回收器在想办法把Eden和Survivor2里的存活对象标记出来转移到Survivor2去，然后还在想办法把Eden和Survivor2的垃圾对象清理掉，结果这个时候系统程序还在不停的在Eden里创建新的对象。而这些新的对象很快就成了垃圾对象，有的还有人引用是存活对象。这样子就会全部乱套了，对于程序新创建的这些对象，你怎么让垃圾回收器去持续追踪这些新对象的新状态？所以，在垃圾回收过程中，同时还允许我们写的Java系统不停的运行在Eden里持续创建新的对象，目前来看是不合适的。</p>
 <h2 id="Stop-the-World"><a href="#Stop-the-World" class="headerlink" title="Stop the World"></a>Stop the World</h2><p>​        由上述可知，平时使用的JVM最大的痛点，就是在垃圾回收的这个过程。因为在垃圾回收的时候，尽可能让垃圾回收器专心致志的干活，不能随便让我们写的Java系统继续创建对象了，所以此时JVM会在后台直接进入“stop the World”状态。即，<strong>它会直接停止我们写的Java系统的所有工作线程，让我们写的代码不再运行，然后让垃圾回收线程可以专心致志地进行垃圾回收的工作</strong>。</p>
-<p>![stop the world](JVM之垃圾回收器/stop the world.png)</p>
+<p><img src="/CKING.github.io/2019/10/23/JVM之垃圾回收器/stop_the_world.png" alt="stop the world"></p>
 <p>​        这样的话，就可以让我们的系统暂停运行，然后不再创建新的对象，同时让垃圾回收线程尽快完成垃圾回收的工作，就是标记和转移Eden和Survivor2的存活对象到Survivor1中去，然后尽快一次性地回收掉Eden和Survivor2中的垃圾对象。一旦垃圾回收完毕，既可以继续恢复我们写的Java系统的工作线程了，然后我们的那些代码就可以继续运行，继续在Eden中创建新的对象。</p>
 <h3 id="Stop-the-World造成的系统停顿"><a href="#Stop-the-World造成的系统停顿" class="headerlink" title="Stop the World造成的系统停顿"></a>Stop the World造成的系统停顿</h3><p>​        现在大家清楚了“Stop the World”对系统造成的影响了，假设我们的Minor GC要运行100ms，那么可能会导致我们系统直接停顿100ms不能处理任何请求。如果因为内存分配不合理，导致对象频繁进入老年代，平均七八分钟一次Full GC，而Full GC是最慢的，有的时候弄不好一次回收要运行几秒钟，甚至是几分钟都是有可能的。</p>
 <p>​        因此，无论是新生代GC还是老年代GC，都尽量不要让频率过高，也避免持续时间过长，避免影响系统正常运行，这也是使用JVM过程中一个最需要优化的地方，也是最大的一个痛点。</p>
@@ -403,7 +404,7 @@
 <p><img src="/CKING.github.io/2019/10/23/JVM之垃圾回收器/parNew.png" alt="parNew"></p>
 <h3 id="为线上系统指定使用ParNew垃圾回收器"><a href="#为线上系统指定使用ParNew垃圾回收器" class="headerlink" title="为线上系统指定使用ParNew垃圾回收器"></a>为线上系统指定使用ParNew垃圾回收器</h3><p>​        线上系统，如果部署到Tomcat时可以在Tomcat的<code>catalina.sh</code>中设置Tomcat的JVM参数，使用Spring Boot也可以在启动时指定JVM参数。</p>
 <p>​        在启动系统的时候，使用<code>-XX:+UseParNewGC</code>选项，就可以对系统指定使用ParNew垃圾回收器。那么Minor GC的时机，检查机制，包括垃圾回收的具体过程，以及对象升入老年代的机制，都是我们之前说的那套原理了，只不过，ParNew会使用多个线程来进行垃圾回收。</p>
-<h3 id="ParNew垃圾回收器默认情况下的线程数量"><a href="#ParNew垃圾回收器默认情况下的线程数量" class="headerlink" title="ParNew垃圾回收器默认情况下的线程数量"></a>ParNew垃圾回收器默认情况下的线程数量</h3><p>​        因为现在一般我们不熟系统的服务器都是多核CPU，所以为了在垃圾回收的时候充分利用多核CPU的资源，一旦我们指定了使用ParNew垃圾回收器之后，他默认给自己设置的垃圾回收线程的数量就是跟CPU的核数是一样的。</p>
+<h3 id="ParNew垃圾回收器默认情况下的线程数量"><a href="#ParNew垃圾回收器默认情况下的线程数量" class="headerlink" title="ParNew垃圾回收器默认情况下的线程数量"></a>ParNew垃圾回收器默认情况下的线程数量</h3><p>​        因为现在一般我们部署系统的服务器都是多核CPU，所以为了在垃圾回收的时候充分利用多核CPU的资源，一旦我们指定了使用ParNew垃圾回收器之后，他默认给自己设置的垃圾回收线程的数量就是跟CPU的核数是一样的。</p>
 <p>​        比如我们线上机器假设用的是4核CPU或者8核CPU，那么此时ParNew的垃圾回收线程数就会分别是4个线程、8个线程。</p>
 <p>​        这个东西一般不用我们手动去调节，因为跟CPU核数一致的线程数量，是可以充分进行并行处理的。如果要调节ParNew的垃圾回收线程数量，可以使用<code>-XX:ParallelGCThreads</code>参数即可。但是一般不建议随意动这个参数。</p>
 <h2 id="老年代垃圾回收器：CMS"><a href="#老年代垃圾回收器：CMS" class="headerlink" title="老年代垃圾回收器：CMS"></a>老年代垃圾回收器：CMS</h2><p>​        一般老年代我们选择的垃圾回收器是CMS，他采用的是标记整理算法，其实非常简单，就是先用之前讲过的标记方法区标记出哪些对象是垃圾对象，然后把这些垃圾对象清理掉。</p>
@@ -584,7 +585,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -659,7 +660,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

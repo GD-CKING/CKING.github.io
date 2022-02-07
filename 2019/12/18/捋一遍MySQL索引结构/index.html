@@ -96,7 +96,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/page.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/%E6%95%B0%E6%8D%AE.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/B+%E6%A0%91%E6%95%B0%E6%8D%AE.png">
-<meta property="og:updated_time" content="2020-03-09T03:24:25.211Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.259Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="捋一遍MySQL索引结构">
 <meta name="twitter:description" content="从一个简单的表开始​        首先我们先建一个表，语句如下： 1234567create table user(    id int primary key,    age int,    height int,    weight int,    name varchar(32))engine = innoDb;  ​        然后往这个表中插入一些数据： 12345INSERT I">
@@ -411,9 +411,9 @@
 </blockquote>
 <p>​        如果在插入时没有进行排序，那我们需要在继续往下寻找，逐条查找直到结尾也没有找到这条数据，才能返回不存在这条数据。当然，这只是排序优化的冰山一角。</p>
 <h2 id="上述页模式可能带来的问题"><a href="#上述页模式可能带来的问题" class="headerlink" title="上述页模式可能带来的问题"></a>上述页模式可能带来的问题</h2><p>​        说完了排序，我们就分析一下上面的那张页图，对于大数据量下有什么弊端，或者说，我们可以怎么对这个模式进行优化。</p>
-<p>​        不难看出，现阶段我们了解的页模式中，只有一个功能，<strong>就是在查询某条数据的时候直接将一整页的数据加载到内存中，以较少磁盘IO次数，从而提高性能</strong>。但是，我们也可以看到，现在的页模式内部，实际上是采用了链表的结构，前一条数据指向后一条数据，本质上还是通过数据的逐条比较来取出特定的数据。</p>
+<p>​        不难看出，现阶段我们了解的页模式中，只有一个功能，<strong>就是在查询某条数据的时候直接将一整页的数据加载到内存中，以减少磁盘IO次数，从而提高性能</strong>。但是，我们也可以看到，现在的页模式内部，实际上是采用了链表的结构，前一条数据指向后一条数据，本质上还是通过数据的逐条比较来取出特定的数据。</p>
 <p>​        如果这一页中有一百万条数据，我们要查的数据正好在最后一个，那么我们是不是一定要从前往后找到这一条数据呢r？如果是这样，我们需要查找的次数就达到了一百万次，即使是在内存中查找，这个效率也是不高的。那么有什么办法来优化这种情况下的查找效率呢？</p>
-<h2 id="页目录的引入"><a href="#页目录的引入" class="headerlink" title="页目录的引入"></a>页目录的引入</h2><p>​        打个比方，我们在看书的时候，如果要找到某一节，而这一节我们并不知道在哪一页，我们不需要从前往后，一节一节寻找我们需要的内容。以为在书的前面，存在目录，它会告诉你这一节在哪一页。<strong>在数据库的页中，实际上也使用了这种目录的结构，这就是页目录</strong>。</p>
+<h2 id="页目录的引入"><a href="#页目录的引入" class="headerlink" title="页目录的引入"></a>页目录的引入</h2><p>​        打个比方，我们在看书的时候，如果要找到某一节，而这一节我们并不知道在哪一页，我们不需要从前往后，一节一节寻找我们需要的内容。因为在书的前面，存在目录，它会告诉你这一节在哪一页。<strong>在数据库的页中，实际上也使用了这种目录的结构，这就是页目录</strong>。</p>
 <p>​        在引入页目录之后，我们所理解的页结构，就变成了这样：</p>
 <p><img src="/CKING.github.io/2019/12/18/捋一遍MySQL索引结构/%E9%A1%B5%E7%9B%AE%E5%BD%95.png" alt="页目录"></p>
 <p>​        分析下这张图，实际上页目录就像是我们在看书的时候书本的目录一样，目录项1就相当于第一节，目录项2就相当于第二节，而每一条数据就相当于书本的每一页，这张图就可以解释成：<strong>第一节从第一页开始，第二节从第三页开始。而实际上，每个目录项会存放自己这个目录项当中最小的id，也就是说，目录项1中会存放1，而目录项2会存放3。</strong></p>
@@ -518,7 +518,7 @@
 <li><p>对比各种执行方案的代价，找出成本最低的那一个</p>
 </li>
 </ul>
-<p>​        <strong>2、在费聚簇索引情况下通常需要通过叶子节点的指针回表查询数据，什么情况下不需要回表？</strong></p>
+<p>​        <strong>2、在非聚簇索引情况下通常需要通过叶子节点的指针回表查询数据，什么情况下不需要回表？</strong></p>
 <p>​        覆盖索引。覆盖索引是指一个查询语句的执行只用从索引中就能够取得，不必从数据表中读取。也可以称之为实现了索引覆盖。</p>
 <p>​        当一条查询语句符合覆盖索引条件时，MySQL只需要通过索引就可以返回查询所需要的数据，这样避免了查到索引后再返回表操作，减少I/O提高效率。</p>
 <p>​        例如，表<code>covering_index_sample</code>中有一个普通索引<code>idx_key1_key2(key1, key2)</code>。当我们通过SQL语句：<code>select key2 from covering_index_sample where key1 = &#39;keytest&#39;;</code>的时候，就可以通过覆盖索引查询，无需回表。</p>
@@ -676,7 +676,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -751,7 +751,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

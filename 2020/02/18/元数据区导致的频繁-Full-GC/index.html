@@ -92,7 +92,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/02/18/元数据区导致的频繁-Full-GC/%E5%85%83%E6%95%B0%E6%8D%AE%E5%8C%BA%E6%83%85%E5%86%B5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/02/18/元数据区导致的频繁-Full-GC/%E5%8E%9F%E5%9B%A0.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/02/18/元数据区导致的频繁-Full-GC/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6.png">
-<meta property="og:updated_time" content="2020-02-19T03:06:34.521Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.239Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="元数据区导致的频繁 Full GC">
 <meta name="twitter:description" content="场景一个新手工程师在网上看了某个 JVM 参数，在测试环境部署系统的时候，设置了一个 JVM 参数。由于测试环境有接触 Zabbix 监控系统，可以让你的系统进去，在上面可以看到每台机器的 CPU、磁盘、内存和网络的一些负载。 那个工程师设置了一个 JVM 参数之后，直接导致线上系统频繁接到 JVM 的 Full GC 的报警。于是就开始排查那个系统了。 查看 GC 日志之前有说过如果在系统启动的">
@@ -394,7 +394,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Loaded sun.reflect.GeneratedSerializationConstructorAccessor from _JVM Defined_Class]</span><br></pre></td></tr></table></figure>
 
 <p>明显可以看到，JVM 在运行期间不停地加载了大量的所谓 “GeneratedSerializationConstructorAccessor” 类到了 Metaspace 区域里去。就是因为 JVM 运行期间不停地加载这种奇怪的类，然后不停地把 Metaspace 区域占满，才会引发不停地执行 Full GC。</p>
-<p>这是一个非常实用的技巧。频繁 Full GC 不光是老年嗲触发的，有时候也会因为 Metaspace 区域的类太多而触发。</p>
+<p>这是一个非常实用的技巧。频繁 Full GC 不光是老年代触发的，有时候也会因为 Metaspace 区域的类太多而触发。</p>
 <h2 id="为什么会频繁加载奇怪的类"><a href="#为什么会频繁加载奇怪的类" class="headerlink" title="为什么会频繁加载奇怪的类"></a>为什么会频繁加载奇怪的类</h2><p>接着遇到类似这种情况，通过 Google 发现，那个类大概是你使用 Java 中的反射加载的，所谓反射代码类似如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Method method = XXX.class.getDeclareMethod(xx, xx);</span><br><span class="line">method.invoke(target, params);</span><br></pre></td></tr></table></figure>
 
@@ -557,7 +557,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -632,7 +632,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

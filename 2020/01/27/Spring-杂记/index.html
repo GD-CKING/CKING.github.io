@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/27/Spring-杂记/bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/27/Spring-杂记/springWebMvc.png">
-<meta property="og:updated_time" content="2020-01-27T09:52:35.304Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.239Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring 杂记">
 <meta name="twitter:description" content="Bean 的生命周期Spring Bean 的生命周期，大致上可以分为创建、使用、销毁三个阶段。具体由可以分为以下几个阶段： 实例化 Bean对于 BeanFactory 容器，当客户向容器请求一个尚未初始化的 bean 时，或初始化 bean 的时候需要注入另一个尚未初始化的依赖时，容器就会调用 createBean 进行实例化。对于 ApplicationContext 容器，当容器启动结束后">
@@ -395,6 +395,30 @@
 <h3 id="DisposableBean"><a href="#DisposableBean" class="headerlink" title="DisposableBean"></a>DisposableBean</h3><p>当 Bean 不再需要时，会经过清理阶段，如果 Bean 实现了 DisposableBean 接口，会调用其实现的 destroy() 方法。</p>
 <h3 id="destroy-method"><a href="#destroy-method" class="headerlink" title="destroy-method"></a>destroy-method</h3><p>最后，如果这个 Bean 的 Spring 配置中配置了 destroy-method 属性，会自动调用其配置的销毁方法。</p>
 <p><img src="/CKING.github.io/2020/01/27/Spring-杂记/bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="bean生命周期"></p>
+<h2 id="推断构造方法"><a href="#推断构造方法" class="headerlink" title="推断构造方法"></a>推断构造方法</h2><p>Spring 在基于某个类生成 Bean 的过程中，需要利用该类的构造方法来实例化得到一个对象，但是如果一个类存在多个构造方法，Spring 会使用哪个呢？</p>
+<p>Spring 的判断逻辑如下：</p>
+<ol>
+<li>如果一个类只存在一个构造方法，不管该构造方法是无参构造方法，还是有参构造方法，Spring 都会用这个构造方法</li>
+<li>如果一个类存在多个构造方法<ul>
+<li>这些构造方法中，存在一个无参的构造方法，那么 Spring 就会用这个无参的构造方法</li>
+<li>这些构造方法中，不存在一个无参的构造方法，那么 Spring 就会报错</li>
+</ul>
+</li>
+</ol>
+<p>Spring 的设计思想是这样的：</p>
+<ol>
+<li>如果一个类只有一个构造方法，那么没得选择，只能用这个构造方法</li>
+<li>如果一个类存在多个构造方法，Spring 不知道如何选择，就会看是否有无参的构造方法，以为无参构造方法本身表示了一种默认的意义</li>
+<li>如果某个构造方法上加了 <code>@Autowired</code> 注解，那就表示程序员告诉 Spring 就用这个加了注解的方法，那 Spring 就会用这个加了 <code>@Autowired</code> 注解构造方法了</li>
+</ol>
+<p>如果 Spring 选择了一个有参的构造方法，Spring 在调用这个有参构造方法时，需要传入参数，那这个参数是怎么来的？</p>
+<p>Spring 会根据入参的类型和入参的名字去 Spring 中找 Bean 对象（以单例 Bean 为例，Spring 会从单例池那个 Map 去找）：</p>
+<ol>
+<li>先根据入参类型去找，如果只知道一个，那就直接用来作为入参</li>
+<li>如果根据类型找到多个，则根据入参名字来确定唯一一个</li>
+<li>如果最终没有找到，则会报错，无法创建当前 Bean 对象</li>
+</ol>
+<p>确定用哪个构造方法，确定入参的 Bean 对象，这个过程就叫做推断构造方法</p>
 <h2 id="Spring-Web-MVC-执行流程"><a href="#Spring-Web-MVC-执行流程" class="headerlink" title="Spring Web MVC 执行流程"></a>Spring Web MVC 执行流程</h2><ol>
 <li>客户端（浏览器）发送请求，直接请求到 DispatcherServlet。（请求 DispatcherServlet）</li>
 <li>DispatcherServlet 根据请求信息调用 HandlerMapping，解析请求对应的 Handler。（查找 @Controller）</li>
@@ -554,7 +578,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -609,7 +633,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bean-的生命周期"><span class="nav-number">1.</span> <span class="nav-text">Bean 的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例化-Bean"><span class="nav-number">1.1.</span> <span class="nav-text">实例化 Bean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置对象属性（依赖注入）"><span class="nav-number">1.2.</span> <span class="nav-text">设置对象属性（依赖注入）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理-Aware-接口"><span class="nav-number">1.3.</span> <span class="nav-text">处理 Aware 接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BeanPostProcessor"><span class="nav-number">1.4.</span> <span class="nav-text">BeanPostProcessor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InitializingBean-与-init-method"><span class="nav-number">1.5.</span> <span class="nav-text">InitializingBean 与 init-method</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BeanPostProcessor-1"><span class="nav-number">1.6.</span> <span class="nav-text">BeanPostProcessor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DisposableBean"><span class="nav-number">1.7.</span> <span class="nav-text">DisposableBean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#destroy-method"><span class="nav-number">1.8.</span> <span class="nav-text">destroy-method</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Web-MVC-执行流程"><span class="nav-number">2.</span> <span class="nav-text">Spring Web MVC 执行流程</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bean-的生命周期"><span class="nav-number">1.</span> <span class="nav-text">Bean 的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例化-Bean"><span class="nav-number">1.1.</span> <span class="nav-text">实例化 Bean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置对象属性（依赖注入）"><span class="nav-number">1.2.</span> <span class="nav-text">设置对象属性（依赖注入）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理-Aware-接口"><span class="nav-number">1.3.</span> <span class="nav-text">处理 Aware 接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BeanPostProcessor"><span class="nav-number">1.4.</span> <span class="nav-text">BeanPostProcessor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InitializingBean-与-init-method"><span class="nav-number">1.5.</span> <span class="nav-text">InitializingBean 与 init-method</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BeanPostProcessor-1"><span class="nav-number">1.6.</span> <span class="nav-text">BeanPostProcessor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DisposableBean"><span class="nav-number">1.7.</span> <span class="nav-text">DisposableBean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#destroy-method"><span class="nav-number">1.8.</span> <span class="nav-text">destroy-method</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推断构造方法"><span class="nav-number">2.</span> <span class="nav-text">推断构造方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Web-MVC-执行流程"><span class="nav-number">3.</span> <span class="nav-text">Spring Web MVC 执行流程</span></a></li></ol></div>
             
 
           </div>
@@ -629,7 +653,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

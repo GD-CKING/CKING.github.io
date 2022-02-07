@@ -79,13 +79,13 @@
 
 
 
-<meta name="description" content="百万级商机的BI系统​        有这么一个场景，有一个服务于百万级商机的BI系统。所谓BI系统，简单来说，就是一个平台有数十万深圳上百万的商家在你的平台上做生意，会使用你的这个平台系统，此时会产生大量的数据。然后基于这些数据我们需要为商家提供一些数据报表，比如：每个商家每天有多少访客？有多少交易？付费转化率是多少？当然实际情况会比这个更复杂，这里只是说个概念。 ​        此时就需要一">
+<meta name="description" content="百万级商机的BI系统​        有这么一个场景，有一个服务于百万级商机的BI系统。所谓BI系统，简单来说，就是一个平台有数十万甚至上百万的商家在你的平台上做生意，会使用你的这个平台系统，此时会产生大量的数据。然后基于这些数据我们需要为商家提供一些数据报表，比如：每个商家每天有多少访客？有多少交易？付费转化率是多少？当然实际情况会比这个更复杂，这里只是说个概念。 ​        此时就需要一">
 <meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM之jstat案例分析-Young GC">
 <meta property="og:url" content="https://github.com/2020/01/02/JVM之jstat案例分析-Young-GC/index.html">
 <meta property="og:site_name" content="Ckin&#39;s Blog">
-<meta property="og:description" content="百万级商机的BI系统​        有这么一个场景，有一个服务于百万级商机的BI系统。所谓BI系统，简单来说，就是一个平台有数十万深圳上百万的商家在你的平台上做生意，会使用你的这个平台系统，此时会产生大量的数据。然后基于这些数据我们需要为商家提供一些数据报表，比如：每个商家每天有多少访客？有多少交易？付费转化率是多少？当然实际情况会比这个更复杂，这里只是说个概念。 ​        此时就需要一">
+<meta property="og:description" content="百万级商机的BI系统​        有这么一个场景，有一个服务于百万级商机的BI系统。所谓BI系统，简单来说，就是一个平台有数十万甚至上百万的商家在你的平台上做生意，会使用你的这个平台系统，此时会产生大量的数据。然后基于这些数据我们需要为商家提供一些数据报表，比如：每个商家每天有多少访客？有多少交易？付费转化率是多少？当然实际情况会比这个更复杂，这里只是说个概念。 ​        此时就需要一">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/BI.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D.png">
@@ -93,11 +93,12 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/jps.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/%E7%BB%9F%E8%AE%A1%E4%BF%A1%E6%81%AF.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/EU.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/Young_GC.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/YGC.png">
-<meta property="og:updated_time" content="2020-01-22T01:08:35.164Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.126Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM之jstat案例分析-Young GC">
-<meta name="twitter:description" content="百万级商机的BI系统​        有这么一个场景，有一个服务于百万级商机的BI系统。所谓BI系统，简单来说，就是一个平台有数十万深圳上百万的商家在你的平台上做生意，会使用你的这个平台系统，此时会产生大量的数据。然后基于这些数据我们需要为商家提供一些数据报表，比如：每个商家每天有多少访客？有多少交易？付费转化率是多少？当然实际情况会比这个更复杂，这里只是说个概念。 ​        此时就需要一">
+<meta name="twitter:description" content="百万级商机的BI系统​        有这么一个场景，有一个服务于百万级商机的BI系统。所谓BI系统，简单来说，就是一个平台有数十万甚至上百万的商家在你的平台上做生意，会使用你的这个平台系统，此时会产生大量的数据。然后基于这些数据我们需要为商家提供一些数据报表，比如：每个商家每天有多少访客？有多少交易？付费转化率是多少？当然实际情况会比这个更复杂，这里只是说个概念。 ​        此时就需要一">
 <meta name="twitter:image" content="https://github.com/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/BI.png">
 
 
@@ -377,7 +378,7 @@
       
 
       
-        <h2 id="百万级商机的BI系统"><a href="#百万级商机的BI系统" class="headerlink" title="百万级商机的BI系统"></a>百万级商机的BI系统</h2><p>​        有这么一个场景，有一个服务于百万级商机的BI系统。所谓BI系统，简单来说，就是一个平台有数十万深圳上百万的商家在你的平台上做生意，会使用你的这个平台系统，此时会产生大量的数据。然后基于这些数据我们需要为商家提供一些数据报表，比如：每个商家每天有多少访客？有多少交易？付费转化率是多少？当然实际情况会比这个更复杂，这里只是说个概念。</p>
+        <h2 id="百万级商机的BI系统"><a href="#百万级商机的BI系统" class="headerlink" title="百万级商机的BI系统"></a>百万级商机的BI系统</h2><p>​        有这么一个场景，有一个服务于百万级商机的BI系统。所谓BI系统，简单来说，就是一个平台有数十万甚至上百万的商家在你的平台上做生意，会使用你的这个平台系统，此时会产生大量的数据。然后基于这些数据我们需要为商家提供一些数据报表，比如：每个商家每天有多少访客？有多少交易？付费转化率是多少？当然实际情况会比这个更复杂，这里只是说个概念。</p>
 <p>​        此时就需要一套BI系统，所谓BI，全称是<code>Business Intelligence</code>，就是“商业智能”。就是把一些商家平时日常经营的数据收集起来进行分析，然后把各种数据报表展示给商家的一套系统。而所谓的商业智能，指的就是给你看一些数据报表，然后让你平时更好地了解自己的经营情况，然后让老板“智能”地去调整经营策略，提升业绩。</p>
 <p>​        所以类似这样的一个BI系统，大致的运行逻辑如下所示：</p>
 <ul>
@@ -397,7 +398,7 @@
 <p>​        刚开始系统部署非常简单，就是用几台机器来部署上述的BI系统，机器都是普通的4核8G配置。在这个配置下，一般来说给堆内存中的新生代分配的内存都在1.5G左右，Eden区大概也就1G左右的空间，如图：</p>
 <p><img src="/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D.png" alt="内存分配"></p>
 <h3 id="技术痛点：实时自动刷新报表-大数据量报表"><a href="#技术痛点：实时自动刷新报表-大数据量报表" class="headerlink" title="技术痛点：实时自动刷新报表 + 大数据量报表"></a>技术痛点：实时自动刷新报表 + 大数据量报表</h3><p>​        刚开始，在少数商家的量级下，这个系统是没多大问题，运行的非常良好。但是问题恰恰就出在突然使用系统的商家数量开始暴涨的时候，突然使用系统的商家开始越来越多，例如，当商家的数量级达到几万的时候。此时要给大家说明一个此类BI系统的特点，就是在BI系统中有一种数据报表，它是支持前端页面有一个JS脚本，自动每隔几秒钟就发送请求到后台刷新一下数据的，这种报表称之为“实时数据报表”</p>
-<p>​        那么大家设想一下，假设仅仅就几万商家作为你的系统用户，很可能同一时间打开那个实时报表的商家就有几千个，然胡每个商家打开实时报表后，前端页面都会每隔几秒钟发送请求到后台加载最新数据，基本上会出现BI系统部署的每台机器每秒的请求会达到几百个，这里我们假设就是每秒500个请求吧。然后每个请求都会加载出来一张报表需要的大量数据，因为BI系统可能还需要针对那些数据进行内存中的现场计算加工一下，才能返回给前端页面展示，根据我们之前的测算，每个请求大概需要加载出来100KB的数据进行计算，因此每秒500个请求，就需要记载出来50MB的数据到内存中进行计算，如图：</p>
+<p>​        那么大家设想一下，假设仅仅就几万商家作为你的系统用户，很可能同一时间打开那个实时报表的商家就有几千个，然后每个商家打开实时报表后，前端页面都会每隔几秒钟发送请求到后台加载最新数据，基本上会出现BI系统部署的每台机器每秒的请求会达到几百个，这里我们假设就是每秒500个请求吧。然后每个请求都会加载出来一张报表需要的大量数据，因为BI系统可能还需要针对那些数据进行内存中的现场计算加工一下，才能返回给前端页面展示，根据我们之前的测算，每个请求大概需要加载出来100KB的数据进行计算，因此每秒500个请求，就需要记载出来50MB的数据到内存中进行计算，如图：</p>
 <p><img src="/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/%E6%95%B4%E4%B8%AA%E6%B5%81%E7%A8%8B.png" alt="整个流程"></p>
 <h3 id="没什么大影响的频繁Young-GC"><a href="#没什么大影响的频繁Young-GC" class="headerlink" title="没什么大影响的频繁Young GC"></a>没什么大影响的频繁Young GC</h3><p>​        在上述系统运行模型下，基本上每秒会加载50MB的数据到Eden区中，只要区区20s，就会迅速填满Eden区，然后触发一次Young GC对新生代进行垃圾回收。当然1G左右的Eden进行Young GC速度相对是比较快的，可能也就几十ms的时间就可以搞定了。所以其实对系统性能影响并不大，而且上述BI系统场景下，基本上每次Young GC后存活对象可能就几十MB，甚至是几MB。</p>
 <p>​        所以如果仅仅只是这样的话，那么大家可能会看到如下场景，BI系统运行20s过后，就会突然卡顿个10ms，但是对终端用户和系统性能几乎是没有影响的。</p>
@@ -416,7 +417,7 @@
 <p>​        接着我们一点点来分析这个图。首先我们先看如下图所示的一段信息：</p>
 <p><img src="/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/EU.png" alt="EU"></p>
 <p>​        这个EU，就是之前我们所说的Eden区被使用的容量，可以发现它刚开始是3MB左右的内存使用量。接着从我们程序开始运行，会发现每秒钟都会有对象增长，从3MB左右到7MB左右，接着是12MB，17MB，22MB，每秒都会新增5MB左右的对象。这个跟我们写的代码是完全吻合的，我们就是每秒钟会增加5MB左右的对象。然后当Eden区使用量达到70多MB的时候，再要分配5MB的对象就失败了，此时就会触发一次Young GC，然后大家继续看下图：</p>
-<p>![Young GC](JVM之jstat案例分析-Young-GC/Young GC.png)</p>
+<p><img src="/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/Young_GC.png" alt="Young GC"></p>
 <p>​        注意看上面红圈里的内容，大家会发现，Eden区的使用量从70多MB降低为1MB多，这就是因为一次Young GC直接回收掉了大部分对象。所以我们现在就知道了，针对这个代码示例，可以清晰地从jstat中看出来，对象增速大致为5MB每秒，大致在十几秒左右会触发一次Young GC。这就是Young GC的触发频率，以及每次Young GC的耗时。接着看下图：</p>
 <p><img src="/CKING.github.io/2020/01/02/JVM之jstat案例分析-Young-GC/YGC.png" alt="YGC"></p>
 <p>​        上图清晰告诉你，一次Young GC回收70多MB对象，大概就1毫秒，所以Young GC其实是很快的，即使回收800MB的对象，也就10毫秒那样。所以如果是线上系统，Eden区800MB的话，每秒新增对象50MB，十多秒一次Young GC，也就10毫秒左右，系统卡顿10毫秒，几乎没什么大影响。所以我们继续推论，在这个示例中，80MB的Eden区，每秒新增对象5MB，大概十多秒触发一次Young GC，每次Young GC耗时在1毫秒左右。</p>
@@ -580,7 +581,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -655,7 +656,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

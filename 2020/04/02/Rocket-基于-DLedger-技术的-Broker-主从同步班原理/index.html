@@ -91,7 +91,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/02/Rocket-基于-DLedger-技术的-Broker-主从同步班原理/DLedgerlog.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/02/Rocket-基于-DLedger-技术的-Broker-主从同步班原理/%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/02/Rocket-基于-DLedger-技术的-Broker-主从同步班原理/leader%E6%95%85%E9%9A%9C.png">
-<meta property="og:updated_time" content="2020-04-02T07:44:16.423Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.218Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RocketMQ - 基于 DLedger 技术的 Broker 主从同步班原理">
 <meta name="twitter:description" content="之前有跟大家说过 Broker 的数据存储原理，接下来我们就说说 Broker 接收到数据写入之后，是如何同步给其他的 Broker 做多副本冗余的。这里就会牵扯到 DLedger 是个什么东西，因为我们是基于 DLedger 实现 Broker 多副本高可用的。 首先，我们回顾一下，producer 写入消息到 broker 之后，broker 会将消息写入本地 CommitLog 磁盘文件中，">
@@ -389,7 +389,7 @@
 <p>接着每个 Broker 会进入一个随机的休眠，比如 Broker01 休眠 3 秒，Broker02 休眠 5 秒，Broker03 休眠 4 秒。此时 Broker01 必然是先苏醒过来，它苏醒之后，会继续尝试投票给自己，并且发送自己的选票给别人。</p>
 <p>接着 Broker03 休眠 4 秒过后苏醒，它发现 Broker01 已经发送来了一个选票是投给 Broker01 自己的，此时它因为自己没投票，随意会尊重别人的选择，直接把票投给 Broker01了，同时把自己的投票发送给别人。</p>
 <p>接着 Broker02 苏醒了，它收到了 Broker01 投票给 Broker01 自己，Broker03 也投票给了 Broker01，此时它自己因为没投票，也会尊重别人的选择，直接把票投给 Broker01 了，并且把自己的投票发送给别人。</p>
-<p>此时所有 Broker 都会收到三张投票，都是投给 Broker01 的，那么 Broker01 就会当选为 Leader。气质只要有 （3 台机器 / 2）+ 1 个人投票给某人，就会选举它当 Leader，这个 （机器数量 / 2）+ 1 就是大多数的意思。</p>
+<p>此时所有 Broker 都会收到三张投票，都是投给 Broker01 的，那么 Broker01 就会当选为 Leader。其实只要有 （3 台机器 / 2）+ 1 个人投票给某人，就会选举它当 Leader，这个 （机器数量 / 2）+ 1 就是大多数的意思。</p>
 <p>这就是 Raft 协议中选举 Leader 算法的简单描述，简单来说，<strong>它确保有人可以成为 Leader 的核心机制就是一轮选举不出来 Leader 的话，就让大家随机休眠一下，先苏醒过来的人会投票给自己，其他人苏醒过后发现自己收到选票了，就会直接投票给那个人</strong>。依靠这个随机休眠的机制，基本上几轮投票过后，一般都是可以快速选举出来一个 Leader。</p>
 <p>因此，在三台 Broker 机器刚刚启动的时候，就是靠这个 Dledger 基于 Raft 协议实现的 Leader 选举机制，互相投票选举出一个 Leader，其他人就是 Follower，然后<strong>只有 Leader 可以接收数据写入，Follower 只能接收 Leader 同步过来的数据</strong>。</p>
 <h2 id="Dledger-是如何基于-Raft-协议进行多副本同步的"><a href="#Dledger-是如何基于-Raft-协议进行多副本同步的" class="headerlink" title="Dledger 是如何基于 Raft 协议进行多副本同步的"></a>Dledger 是如何基于 Raft 协议进行多副本同步的</h2><p>接下来，Leader Broker 收到消息之后，是怎么基于 DLedger 把数据同步给其他 Broker 的。Dledger 在进行同步的时候是采用 Raft 协议进行多副本同步的，我们接下来就说说 Raft 协议中的多副本同步机制。</p>
@@ -554,7 +554,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -629,7 +629,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

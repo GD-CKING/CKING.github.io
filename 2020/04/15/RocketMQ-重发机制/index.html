@@ -79,26 +79,27 @@
 
 
 
-<meta name="description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日志">
+<meta name="description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日">
 <meta name="keywords" content="消息队列">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RocketMQ-重发机制">
 <meta property="og:url" content="https://github.com/2020/04/15/RocketMQ-重发机制/index.html">
 <meta property="og:site_name" content="Ckin&#39;s Blog">
-<meta property="og:description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日志">
+<meta property="og:description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E7%94%9F%E4%BA%A7%E7%AB%AF%E9%87%8D%E5%8F%91.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%B6%88%E6%81%AF%E9%87%8D%E5%8F%91.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%B6%88%E8%B4%B9%E7%AB%AF%E9%87%8D%E5%8F%91.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E4%B8%9A%E5%8A%A1%E5%88%A4%E6%96%AD%E6%B3%95.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E7%8A%B6%E6%80%81%E5%88%A4%E6%96%AD%E6%B3%95.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/reconsume_later.png">
-<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/D:%5Cgit%5CCKING.github.io%5Csource_posts%5CRocketMQ-%E9%87%8D%E5%8F%91%E6%9C%BA%E5%88%B6%5C%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97.png">
-<meta property="og:updated_time" content="2020-04-16T09:34:39.699Z">
+<meta property="og:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97.png">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.220Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RocketMQ-重发机制">
-<meta name="twitter:description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日志">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E7%94%9F%E4%BA%A7%E7%AB%AF%E9%87%8D%E5%8F%91.png">
+<meta name="twitter:description" content="背景示例今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券 优惠券系统重复消费了一条消息目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。 通过查看日">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
 
 
 
@@ -377,7 +378,8 @@
       
 
       
-        <h2 id="背景示例"><a href="#背景示例" class="headerlink" title="背景示例"></a>背景示例</h2><p>今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券</p>
+        <p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png" alt="思维导图"></p>
+<h2 id="背景示例"><a href="#背景示例" class="headerlink" title="背景示例"></a>背景示例</h2><p>今天客户给技术团队反馈了一个问题，说是有用户在支付一个订单之后，一下子收到了多个优惠券，本来按照规则只应该有一个优惠券的。也就是说，我们给用户重复发放了一个优惠券</p>
 <h3 id="优惠券系统重复消费了一条消息"><a href="#优惠券系统重复消费了一条消息" class="headerlink" title="优惠券系统重复消费了一条消息"></a>优惠券系统重复消费了一条消息</h3><p>目前订单系统已经跟各个系统进行了解耦，也就是说当订单支付成功之后，会发送一条消息到 MQ 里去，然后红包系统从里面获取消息派发红包，优惠券系统从里面获取消息派发优惠券，其他系统也是同理。</p>
 <p>通过查看日志发现，优惠券系统对同一个订单支付成功的消息处理了两次，就导致给用户重复发放了两张优惠券。为什么优惠券会对同一个消息重复处理两次？</p>
 <h3 id="订单系统发送消息到-MQ-的时候会重复吗"><a href="#订单系统发送消息到-MQ-的时候会重复吗" class="headerlink" title="订单系统发送消息到 MQ 的时候会重复吗"></a>订单系统发送消息到 MQ 的时候会重复吗</h3><p>首先，我们的订单系统在收到一个支付成功的通知之后，它在发送消息到 MQ 的时候，会重发把一个消息发送两次吗？这是有可能的。</p>
@@ -437,7 +439,7 @@
 <p>上面这段配置的意思是，第一次重试是 1秒 后，第二次重试是 5秒 后，第三次重试是 10秒 后，第四次重试是 30秒 后，第五次重试是 1分钟 后，以此类推，最多重试 16 次。</p>
 <h3 id="连续重试-16-次还是无法处理消息"><a href="#连续重试-16-次还是无法处理消息" class="headerlink" title="连续重试 16 次还是无法处理消息"></a>连续重试 16 次还是无法处理消息</h3><p>如果在 16次 重试范围内消息处理成功了，自然没问题，但是如果你对一批消息重试了 16 次还是无法成功处理，这个时候就需要另外一个队列了，叫<strong>死信队列</strong>。所谓的死信队列，就是死掉的消息就放进这个队列里。</p>
 <p>什么是死掉的消息？就是一批消息交给你处理，你重试了 16 次还是一直没处理成功，就不要继续重试这批消息了，你就认为他们死掉了就可以了。然后这批消息就会自动进入死信队列。死信队列的名字是 “%DLQ%VoucherConsumerGroup”。我们在 RocketMQ 的管理后台上是可以看到的。如图：</p>
-<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/D:%5Cgit%5CCKING.github.io%5Csource_posts%5CRocketMQ-%E9%87%8D%E5%8F%91%E6%9C%BA%E5%88%B6%5C%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97.png" alt="死信队列"></p>
+<p><img src="/CKING.github.io/2020/04/15/RocketMQ-重发机制/%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97.png" alt="死信队列"></p>
 <p>那么我们对死信队列中的消息我们怎么处理？其实这个就看你的使用场景了，比如我们可以专门开一个后台线程，就是订阅 “%DLQ%VoucherConsumerGroup” 这个队列，对死信队列中的消息，还是一直不停地重试。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这一次我们搞清楚了另外一个生产环境下的问题，就是消费者底层的一些依赖可能有故障，比如数据库宕机，缓存宕机之类的，此时就就没办法完成消息的处理了，那么可以通过一些返回状态去让消息进入 RocketMQ 自带的重试队列，如果反复重试还是不行，可以让消息进入 RocketMQ 自带的死信队列，后续针对死信队列中的消息进行单独的处理就可以了。</p>
 
@@ -579,7 +581,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -654,7 +656,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

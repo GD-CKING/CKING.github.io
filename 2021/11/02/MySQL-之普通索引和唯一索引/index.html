@@ -90,7 +90,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/%E7%B4%A2%E5%BC%95.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/%E6%9B%B4%E6%96%B0%E8%BF%87%E7%A8%8B.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/%E8%AF%BB%E8%BF%87%E7%A8%8B.png">
-<meta property="og:updated_time" content="2021-12-14T00:45:31.334Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.141Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL 之普通索引和唯一索引">
 <meta name="twitter:description" content="假设你在维护一个市民系统，每个人都有一个唯一的身份证号，而且业务代码已经保证不会写入两个重复的身份证号。如果市民系统需要按照身份证号查姓名，就会执行类似下面的语句： 1select name from CUser where id_card = &amp;apos;xxxxyyyzzz&amp;apos;  所以，一般都要在 id_card 字段上建索引 由于身份证号字段比较大，所以不建议把身份证号当做主键。那么">
@@ -392,7 +392,7 @@
 </ul>
 <p>那么，这个不同带来的性能差距会有多少呢？答案是，<strong>微乎其微</strong></p>
 <p>其实，InnoDB 的数据是按数据页为单位来读写的。即，当需要读一条记录的时候，并不是将这个记录本身从磁盘读出来，而是以页为单位，将其整体读入内存。在 InnoDB 中，每个数据页的大小默认是 16KB</p>
-<p>因为引擎是按页读写的，所以，当找到 k = 5 的记录的时候，它所在的数据页就都在内存里了。那么，对于普通索引来说，要多做的那一次「查找和判断下一天记录」的操作，就只需要一次指针寻找和一次计算</p>
+<p>因为引擎是按页读写的，所以，当找到 k = 5 的记录的时候，它所在的数据页就都在内存里了。那么，对于普通索引来说，要多做的那一次「查找和判断下一条记录」的操作，就只需要一次指针寻找和一次计算</p>
 <p>当然，如果 k = 5 这个记录刚好是这个数据页的最后一个记录，那么要取下一个记录，必须读取下一个数据页，这个操作会稍微复杂一些</p>
 <p>但是，我们之前计算过，对于整型字段，一个数据页可以放近千个 key，因此出现这种情况的概率会很低。所以，我们计算平均性能差异时，仍可以认为这个操作成本对于现在的 CPU 来说可以忽略不计</p>
 <h3 id="更新过程"><a href="#更新过程" class="headerlink" title="更新过程"></a>更新过程</h3><p>为了说明普通索引和唯一索引对更新语句性能的影响，需要先介绍一下 <strong>change buffer</strong></p>
@@ -589,7 +589,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -664,7 +664,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

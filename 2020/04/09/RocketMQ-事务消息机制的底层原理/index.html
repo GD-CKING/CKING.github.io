@@ -95,7 +95,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/09/RocketMQ-事务消息机制的底层原理/%E5%90%8C%E6%AD%A5%E5%88%B7%E7%9B%98.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/09/RocketMQ-事务消息机制的底层原理/%E4%B8%BB%E4%BB%8E%E6%A8%A1%E5%BC%8F.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/04/09/RocketMQ-事务消息机制的底层原理/%E6%8F%90%E4%BA%A4%E6%B6%88%E6%81%AF.png">
-<meta property="og:updated_time" content="2020-04-11T13:43:07.196Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.219Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RocketMQ - 事务消息机制的底层原理">
 <meta name="twitter:description" content="half 消息的实现我们之前已经说过了 RocketMQ 事务消息的全流程。在这个流程中，第一步就是要由订单系统去支付一个 half 消息给 MQ。当时我们说过，对于这个 half 消息，红包系统这个时候是看不到它的，没法消费这条消息去处理，那这个 half 消息是如何做到的？ 其实 RocketMQ 底层采取了一个巧妙的设计。举个例子，订单系统发送了一个 half 状态的订单支付消息到 “Ord">
@@ -424,7 +424,7 @@
 
 <p>RocketMQ 的消费者中会注册一个监听器，就是上面小块代码中的 MessageListen而Concurrently 这个东西，当你的消费者获取到一批消息之后，就会回调你的这个监听器函数，让你来处理一批消息。当你处理完毕之后，你才会返回 <code>ConsumeConcurrentlyStatus.CONSUME_SUCCESS</code> 作为消费成功的示意，告诉 RocketMQ，这批消息我已经处理完毕了。</p>
 <p>所以对于 RocketMQ 而言，其实只要你的红包系统是在这个监听器的函数中先处理一批消息，基于这批消息都派发完了红包，然后返回了这个消费成功的状态，接着才会去提交这批消息的 offset 到 Broker 去。所以这这个情况下，如果你对一批消息都处理完毕了，然后再提交消息的 offset 给 Broker，接着红包系统崩溃了，此时是不会丢失消息的。</p>
-<p>如果是红包系统获取到一批消息之后，还没处理完，也没返回 ConsumeConcurrentlyStatus.CONSUME_SUCCESS 这个状态，自然美提交这批消息的 offset 给 Broker，此时红包系统突然挂了，会怎么样？</p>
+<p>如果是红包系统获取到一批消息之后，还没处理完，也没返回 ConsumeConcurrentlyStatus.CONSUME_SUCCESS 这个状态，自然没提交这批消息的 offset 给 Broker，此时红包系统突然挂了，会怎么样？</p>
 <p>其实在这种情况下，你对一批消息都没提交它的 offset 给 Broker 的话，Broker 不会认为你已经处理完了这批消息，此时你突然红包系统的一台机器宕机了，它其实会感知到你的红包系统的一台机器作为一个 Consume 挂了。接着它会把还没处理完的那批消息交给红包系统的其他机器去进行处理。所以这种情况下，消息也是不会丢失的。</p>
 <h3 id="需要警惕的地方：不能异步消费消息"><a href="#需要警惕的地方：不能异步消费消息" class="headerlink" title="需要警惕的地方：不能异步消费消息"></a>需要警惕的地方：不能异步消费消息</h3><p>在默认的 Consumer 的消费模式之下，必须是你处理完一批消息之后，才会返回 ConsumeConcurrentlyStatus.CONSUME_SUCCESS 这个状态标识消息都处理结束了，才提交 offset 到 Broker 去。在这种情况下，正常来说是不会丢失消息的，即使你一个 Consumer 宕机了，它会把你还没处理完的消息交给其他 Consumer 去处理。</p>
 <p>但是我们要警惕一点，就是我们<strong>不能再代码中对消息进行异步的处理</strong>。如下错误的示范，我们开启了一个子线程去处理这笔消息，然后启动线程之后，就直接返回 ConsumeConcurrentlyStatus.CONSUME_SUCCESS 状态了。</p>
@@ -571,7 +571,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -646,7 +646,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

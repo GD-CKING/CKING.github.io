@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/01/初步了解-MySQL-的存储模型和数据读写机制/%E6%95%B0%E6%8D%AE%E5%8C%BA.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/01/初步了解-MySQL-的存储模型和数据读写机制/%E5%8A%A0%E8%BD%BD%E6%95%B0%E6%8D%AE.png">
-<meta property="og:updated_time" content="2020-06-06T14:18:14.957Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.256Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初步了解 MySQL 的存储模型和数据读写机制">
 <meta name="twitter:description" content="我们都清楚，最终 MySQL 的数据都是放在磁盘文件里的，那么数据在磁盘文件是怎么存放的呢？我们知道我们平时数据都是插入一个一个的表中的，而表是个逻辑概念，其实在物理层面，它对应的是表空间这个概念。 所以其实在 MySQL 的磁盘上，表空间就对应着磁盘文件，在磁盘文件里就存放着数据。那么在这个表空间的磁盘文件里，数据是如何组织的？ 这个就非常复杂了。假如让你把数据一行一行地写入一个磁盘文件，当然很">
@@ -374,7 +374,7 @@
       
         <p>我们都清楚，最终 MySQL 的数据都是放在磁盘文件里的，那么数据在磁盘文件是怎么存放的呢？我们知道我们平时数据都是插入一个一个的表中的，而表是个逻辑概念，其实在物理层面，它对应的是<strong>表空间</strong>这个概念。</p>
 <p>所以其实在 MySQL 的磁盘上，表空间就对应着磁盘文件，在磁盘文件里就存放着数据。那么在这个表空间的磁盘文件里，数据是如何组织的？</p>
-<p>这个就非常复杂了。假如让你把数据一行一行地写入一个磁盘文件，当然很简单。但你现在要存储的是数据库里如此复杂的数据，它里面有各种字段类型的，还有索引这个概念。所以其实在磁盘文件里存放的数据，它从最基本的角度来看，就是被拆分为一个一个数据区（extent）分组，每个 extent 组中包含了 256 个 extent，然后每个 extent 里包含了 64 个数据区。然后每个数据区里都包含了一行一行的数据。如图：</p>
+<p>这个就非常复杂了。假如让你把数据一行一行地写入一个磁盘文件，当然很简单。但你现在要存储的是数据库里如此复杂的数据，它里面有各种字段类型的，还有索引这个概念。所以其实在磁盘文件里存放的数据，它从最基本的角度来看，就是被拆分为一个一个数据区（extent）分组，每个 extent 组中包含了 256 个 extent，然后每个 extent 里包含了 64 个数据页。然后每个数据页里都包含了一行一行的数据。如图：</p>
 <p><img src="/CKING.github.io/2020/06/01/初步了解-MySQL-的存储模型和数据读写机制/%E6%95%B0%E6%8D%AE%E5%8C%BA.png" alt="数据区"></p>
 <p>听到这里，是不是觉得很简单？其实不是的，在实际存储的时候，在数据行里有很多附加的信息，在数据页、数据区里，都有很多附加的特殊信息。各种各样的特殊信息，就可以让我们在简简单单的磁盘文件里实现 B+ 树索引、事务之类的非常复杂的机制。</p>
 <p>那么问题来了，我们都知道，当我们在数据库中执行 CRUD 的时候，你必须先把磁盘文件里的一个数据页加载到内存的 Buffer Pool 的一个缓存页里去，然后当我们增删改查都是针对缓存页里的数据来执行的。所以假设此时我们要插入一条数据，那么是选择磁盘文件里的哪个数据页加载到缓存里去呢？</p>
@@ -524,7 +524,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -583,7 +583,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

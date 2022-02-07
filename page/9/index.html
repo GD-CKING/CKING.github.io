@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/" itemprop="url">写入数据库的一行数据在磁盘上是怎么存储的</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/" itemprop="url">MySQL 之 redo log buffer</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-07T15:45:56+08:00">
-                2020-05-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-16T10:53:23+08:00">
+                2020-06-16
               </time>
             
 
@@ -367,13 +367,12 @@
       
         
           
-          引入数据页当我们要执行 update 之类的 SQL 语句的时候，必然涉及到对数据的更新操作。那么此时对数据是在哪里更新的？此时并不是直接去更新磁盘文件，而是要把磁盘上的一些数据加载到内存里来，然后对内存里的数据进行更新，同时写 redo log 到磁盘上去。如图：
-
-这里就有一个问题，难道我们每次都是把磁盘里的一条数据加载到内存里去进行更新，然后下次要更新别的数据的时候，再从磁盘里加载另外一条数
+          redo log buffer之前说了一下 redo log block 这个概念，现在都知道平时我们执行完增删改之后，要写入磁盘的 redo log，其实应该是先进入到 redo log block 这个数据结构里去的，然后再进入到磁盘文件里。
+那么 redo log 是如何通过内存缓冲之后，再进入磁盘文件里去的？这就涉及到了一个新的组件，redo log buffer，它就是 MySQL 专门
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/05/07/写入数据库的一行数据在磁盘上是怎么存储的/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -424,7 +423,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/05/06/MySQL-之存储过程与存储函数/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/11/MySQL-之-redo-日志/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -443,7 +442,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/05/06/MySQL-之存储过程与存储函数/" itemprop="url">MySQL 之存储过程与存储函数</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/11/MySQL-之-redo-日志/" itemprop="url">MySQL 之 redo 日志</a></h1>
         
 
         <div class="post-meta">
@@ -455,8 +454,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-06T16:12:47+08:00">
-                2020-05-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-11T15:13:56+08:00">
+                2020-06-11
               </time>
             
 
@@ -517,13 +516,11 @@
       
         
           
-          存储过程什么是存储过程存储过程是一组为了完成某项特定功能的 SQL 语句集，其实质上就是一段存储在数据库中的代码，它可以有声明式的 SQL 语句（如 CREATE，UPDATGE，SELETE 等语句）和过程式 SQL 语句（如 IF…THEN…ELSE… 控制结构语句）组成。存储过程思想上很简单，就是数据库 SQL 语言层面的代码封装和重用。
-存储过程的优缺点优点
-可增强 SQL 语言的功能和灵
+          之前我们说过，在我们执行增删改操作的时候，首先会在 Buffer Pool 中更新缓存页。而在更新完 Buffer Pool 中的缓存页之后，必须要写一条 redo log，这样才能记录下来我们对数据库做的修改。redo log 可以保证我们事务提交之后，如果事务中的增删改 SQL 语句更新的缓存页还没刷到磁盘上去，此时 MySQL 宕机了，那么 MySQL 重启之后，就可以把 redo log 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/05/06/MySQL-之存储过程与存储函数/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/11/MySQL-之-redo-日志/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -574,7 +571,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/05/04/回溯算法/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/11/MySQL-的一些生产案例/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -593,7 +590,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/05/04/回溯算法/" itemprop="url">回溯算法</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/11/MySQL-的一些生产案例/" itemprop="url">MySQL 的一些生产案例</a></h1>
         
 
         <div class="post-meta">
@@ -605,8 +602,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-04T21:38:56+08:00">
-                2020-05-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-11T14:26:16+08:00">
+                2020-06-11
               </time>
             
 
@@ -628,8 +625,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -667,22 +664,12 @@
       
         
           
-          解决一个回溯问题，实际上就是一个决策树的遍历过程，你只需要思考三个问题：
-
-路径：也就是已经做出的选择
-
-选择列表：也就是你当前可以做的选择
-
-结束条件：也就是到达决策树底层，无法再做选择的条件
-
-
-如果你不理解这三个词语的解释，没关系，我们后面会用几个经典的回溯算法问题来帮你理解这些词语是什么意思。现在你先留着隐形。
-代码方面，回溯算的的框架：
-12345678910111213result =
+          RAID 锂电池充放电导致的 MySQL 性能抖动曾经有一个业务，它的数据库是部署在高配置服务器上的，磁盘就是用 RAID10 的阵列技术，用了 6 块磁盘组成了 RAID10 磁盘阵列架构。那么 RAID10 是什么？
+在知道 RAID10 之前，我们先看一下什么是 RAID0。RAID0，就是你有很多磁盘组成了一个阵列，然后你所有的数据都是分散写入不同磁盘的。因为有多块磁盘，所以你的磁盘阵列的
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/05/04/回溯算法/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/11/MySQL-的一些生产案例/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -733,7 +720,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/06/ZooKeeper-的一些知识点/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -752,7 +739,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/" itemprop="url">Jetty 服务器的 NIO 机制导致堆外内存溢出</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/06/ZooKeeper-的一些知识点/" itemprop="url">ZooKeeper 的一些知识点</a></h1>
         
 
         <div class="post-meta">
@@ -764,8 +751,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-26T11:01:36+08:00">
-                2020-04-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-06T23:06:40+08:00">
+                2020-06-06
               </time>
             
 
@@ -787,8 +774,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/ZooKeeper/" itemprop="url" rel="index">
+                    <span itemprop="name">ZooKeeper</span>
                   </a>
                 </span>
 
@@ -826,13 +813,17 @@
       
         
           
-          背景引入这是一个使用 Jetty 作为 Web 服务器的时候在某个非常罕见的场景下发生的一次堆外内存溢出的场景。这种场景其实并不多见，只是给大家介绍一下这种场景的排查方法
-案例发生有一天收到线上的一个报警：某台机器部署的一个服务突然之间就不可以访问了。此时第一反应就是登陆机器去看日志，这个时候在机器的日志中发现了如下的一些信息：
-1234nio handle failed java.lang.Ou
+          ZooKeeper 的应用ZooKeeper 是一个分布式协调系统，封装了分布式架构中所有核心和主流的需求和功能。主要有如下作用：
+
+分布式锁：运用于分布式的 Java 业务系统中
+
+元数据管理：Kafka、Canal，本身都是分布式架构，分布式集群在运行，它需要一个地方集中式地存储和管理分布式集群的核心元数据，所以它们都选择把核心元数据放在 ZooKeeper 中
+
+分布式协调：如果有人对 ZK
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/26/Jetty-服务器的-NIO-机制导致堆外内存溢出/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/06/ZooKeeper-的一些知识点/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -883,7 +874,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/24/RocketMQ-的一些特殊场景解决方案/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/02/MySQL-杂记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -902,7 +893,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/24/RocketMQ-的一些特殊场景解决方案/" itemprop="url">RocketMQ 的一些特殊场景解决方案</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/02/MySQL-杂记/" itemprop="url">MySQL 杂记</a></h1>
         
 
         <div class="post-meta">
@@ -914,8 +905,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-24T14:41:50+08:00">
-                2020-04-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-02T11:39:35+08:00">
+                2020-06-02
               </time>
             
 
@@ -937,8 +928,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -976,11 +967,12 @@
       
         
           
-          RocketMQ 百万消息积压问题有一个系统，它是由生产者系统和消费者系统两个环节组成的，生产者系统会负责不停地把消息写入 RocketMQ 里去，然后消费者系统就是负责从 RocketMQ 里消费消息。这个系统是有高峰和低谷的，在晚上几个小时的高峰期内，大概会有 100 多万条消息进入 RocketMQ，然后消费者系统从 RocketMQ 里获取到消息之后，会依赖一些 NoSQL 数据库去进行一
+          Linux 操作系统的存储系统软件层原理今天我们讲讲 MySQL 数据库在执行底层磁盘读写 IO 操作的原理，这其实就涉及到了 Linux 操作系统的磁盘 IO 原理了，不管是 MySQL 执行磁盘随机读写，还是磁盘顺序读写，其实在底层的 Linux 层面，原理几乎是一致的。
+所谓的操作系统，无论是 Linux ，还是 Windows，本质上它们自己也是软件系统，之所以需要操作系统，是因为我们不可
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/24/RocketMQ-的一些特殊场景解决方案/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/02/MySQL-杂记/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1031,7 +1023,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/22/RocketMQ-实践经验/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/02/MySQL-数据库的日志顺序读写以及数据文件随机读写的原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1050,7 +1042,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/22/RocketMQ-实践经验/" itemprop="url">RocketMQ 实践经验</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/02/MySQL-数据库的日志顺序读写以及数据文件随机读写的原理/" itemprop="url">MySQL 数据库的日志顺序读写以及数据文件随机读写的原理</a></h1>
         
 
         <div class="post-meta">
@@ -1062,8 +1054,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-22T17:44:26+08:00">
-                2020-04-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-02T09:50:21+08:00">
+                2020-06-02
               </time>
             
 
@@ -1085,8 +1077,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1124,12 +1116,12 @@
       
         
           
-          灵活地运用 tags 来过滤数据之前我们讲解过基于 tags 来过滤数据的功能，其实在真正的生产项目中，建议大家合理地规划 Topic 和里面的 tags。一个 Topic 代表了一类业务消息数据，然后对于这类业务消息数据，如果你希望继续划分一些类别的话，可以在发送消息的时候设置 tags
-例如，我们知道现在常见的外卖平台有美团外卖。饿了么和其他一些外卖，假设你现在一个系统要发送外卖订单数据到 M
+          今天给大家剖析一下 MySQL 在实际工作的时候两种数据读写机制，一种是对 redo log、binlog 这种日志进行的磁盘顺序读写，一种是对表空间的磁盘文件里的数据页进行的磁盘随机读写。
+磁盘随机读简单来说，MySQL 在工作的时候，尤其是执行增删改操作的时候，肯定会先从表空间的磁盘文件里读取数据页出来，这个过程其实就是典型的磁盘随机读操作。如图，图里有一个磁盘文件的示意，里面有很多数据页，然
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/22/RocketMQ-实践经验/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/02/MySQL-数据库的日志顺序读写以及数据文件随机读写的原理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1180,7 +1172,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/21/记一次系统-OOM/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/06/01/初步了解-MySQL-的存储模型和数据读写机制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1199,7 +1191,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/21/记一次系统-OOM/" itemprop="url">记一次系统 OOM</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/06/01/初步了解-MySQL-的存储模型和数据读写机制/" itemprop="url">初步了解 MySQL 的存储模型和数据读写机制</a></h1>
         
 
         <div class="post-meta">
@@ -1211,8 +1203,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-21T14:17:28+08:00">
-                2020-04-21
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-01T10:26:05+08:00">
+                2020-06-01
               </time>
             
 
@@ -1234,8 +1226,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1273,14 +1265,13 @@
       
         
           
-          由此系统因为 OOM 问题而挂掉了，当时我们就登录到线上系统去下载日志，并在日志中发现类似这么一句话：
-1Exception in thread "http-nio-8080-exec-1089" java.lang.OutOfMemoryError: Java heap space
-
-日志中，http-nio-8080-exec 1089 说的其实是 Tomcat 的工作线程，而后面的 java
+          我们都清楚，最终 MySQL 的数据都是放在磁盘文件里的，那么数据在磁盘文件是怎么存放的呢？我们知道我们平时数据都是插入一个一个的表中的，而表是个逻辑概念，其实在物理层面，它对应的是表空间这个概念。
+所以其实在 MySQL 的磁盘上，表空间就对应着磁盘文件，在磁盘文件里就存放着数据。那么在这个表空间的磁盘文件里，数据是如何组织的？
+这个就非常复杂了。假如让你把数据一行一行地写入一个磁盘文件，当然很
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/21/记一次系统-OOM/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/06/01/初步了解-MySQL-的存储模型和数据读写机制/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1331,7 +1322,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/20/JVM-内存溢出的解决方案/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/05/26/MySQL-的数据页、表空间和数据区/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1350,7 +1341,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/20/JVM-内存溢出的解决方案/" itemprop="url">JVM 内存溢出的解决方案</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/05/26/MySQL-的数据页、表空间和数据区/" itemprop="url">MySQL 的数据页、表空间和数据区</a></h1>
         
 
         <div class="post-meta">
@@ -1362,8 +1353,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-20T16:45:06+08:00">
-                2020-04-20
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-26T11:18:23+08:00">
+                2020-05-26
               </time>
             
 
@@ -1385,8 +1376,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1424,13 +1415,12 @@
       
         
           
-          对于内存溢出，我们需要生成并分析一下 GC 日志，然后再让 JVM 自动 dump 出来内存快照，最后用 MAT 来分析一下这份内存快照，从内存快照里去找到内存溢出的原因。
-Metaspace 内存区域溢出首先我们先看下面的代码：
-12345678910111213141516171819202122232425262728293031323334353637383940414243public 
+          数据页的结构之前一直提到的一个概念，就是「数据页」。我们平时执行 CRUD 的时候，都会从磁盘上加载数据页到 Buffer Pool 的缓存页里去，然后更新了缓存页后，又会刷新回磁盘上的数据页里去。所以其实 MySQL 中进行数据操作的最小单位应该是数据页。
+每个数据页，实际上是默认有 16KB 的大小，那么这 16KB 的大小就是存放大量的数据行吗？明显不是的，其实一个数据页拆分成了很多个部分。
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/20/JVM-内存溢出的解决方案/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/05/26/MySQL-的数据页、表空间和数据区/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1481,7 +1471,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/18/RocketMQ-基于延迟消息机制的大量订单的定时退款扫描/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/05/14/MySQL-的慢查询优化方式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1500,7 +1490,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/18/RocketMQ-基于延迟消息机制的大量订单的定时退款扫描/" itemprop="url">RocketMQ - 基于延迟消息机制的大量订单的定时退款扫描</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/05/14/MySQL-的慢查询优化方式/" itemprop="url">MySQL 的慢查询优化方式</a></h1>
         
 
         <div class="post-meta">
@@ -1512,8 +1502,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-18T11:47:26+08:00">
-                2020-04-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-14T17:42:14+08:00">
+                2020-05-14
               </time>
             
 
@@ -1535,8 +1525,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1574,13 +1564,12 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
       
         
           
-          我们来看一个订单退款扫描的问题。一个正常的电商购物流程，一般来说我们现在作为用户在一个电商 APP 上都会选择一些商品加入购物车，然后对购物车里选择的一些商品统一下一个订单，此时后台的订单系统会在订单数据库中创建一个订单。
-但是我们下了一个订单之后，虽然订单数据库里会有一个订单，订单的状态却是 “待支付” 状态，因此此时你还没有支付这个订单，我们的订单系统其实也在等待用户完成这个订单的支付
-这里就
+          慢查询日志概念MySQL 的慢查询日志是 MySQL 提供的一种日志记录，它用来记录在 MySQL 中相应时间超过阈值的语句，具体指运行时间超过 long_query_time 值的 SQL。则会被记录到慢查询日志中。long_query_time 的默认值是 10，意思是运行 10s 以上的语句。
+默认情况下，MySQL 数据库并不启动慢查询日志，需要我们手动来设置这个参数。当然，如果不是调优需
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/18/RocketMQ-基于延迟消息机制的大量订单的定时退款扫描/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/05/14/MySQL-的慢查询优化方式/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1631,7 +1620,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/04/16/RocketMQ-消息乱序/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2020/05/12/MySQL-的一些优化策略/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1650,7 +1639,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2020/04/16/RocketMQ-消息乱序/" itemprop="url">RocketMQ - 消息乱序</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2020/05/12/MySQL-的一些优化策略/" itemprop="url">MySQL 的一些优化策略</a></h1>
         
 
         <div class="post-meta">
@@ -1662,8 +1651,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-16T22:21:36+08:00">
-                2020-04-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-12T10:15:33+08:00">
+                2020-05-12
               </time>
             
 
@@ -1685,8 +1674,8 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1724,12 +1713,37 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
       
         
           
-          案例分析大数据团队需要获取订单数据库中的全部数据，然后将订单数据保存一份在自己的大数据存储系统中，比如 HDFS、Hive、HBASE 等。接着基于大数据技术对这些数据进行计算。
-如果让大数据系统自己跑负责的大 SQL 在订单系统的数据库上来出一些数据报表，是会严重影响订单系统的性能的，所有采用了基于 canal 这样的中间件去监听订单数据库的 binlog，就是一些增删改查的日志，然后把这些 b
+          MySQL 性能最大数据量抛开数据量和并发数，谈性能都是耍流氓。MySQL 没有限制单表最大记录数，它取决于操作系统对文件大小的限制。
+
+
+
+文件系统
+单文件大小限制
+
+
+
+FAT32
+最大 4G
+
+
+NTFS
+最大 64G
+
+
+NTFS5.0
+最大 2TB
+
+
+EXT2
+块大小为 1024 字节，文件最大容量 16GB；块大小为 4096 字节，文件最大容量 2TB
+
+
+EXT3
+块大小为 4K
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2020/04/16/RocketMQ-消息乱序/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2020/05/12/MySQL-的一些优化策略/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1771,7 +1785,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/8/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/CKING.github.io/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/10/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/8/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/CKING.github.io/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/20/">20</a><a class="extend next" rel="next" href="/CKING.github.io/page/10/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1819,7 +1833,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1878,7 +1892,7 @@ Metaspace 内存区域溢出首先我们先看下面的代码：
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/30/生产者压缩算法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/" itemprop="url">MySQL 之普通索引和唯一索引</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/30/生产者压缩算法/" itemprop="url">生产者压缩算法</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,310 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-02T20:38:19+08:00">
-                2021-11-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-30T15:28:15+08:00">
+                2021-11-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          
+Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社区分别称之为 V1 版本和 V2 版本。V2 版本是 Kafka 0.11.0.0 中正式引入的
+无论是哪个版本，Kafka 的消息层次都分为两层：消息集合（message set）和消息（message）。一个消息集合中包含若干条日志项，而日志项才是真正封装消息的地方。Kafka 底层的消息日志由一系列消息集合日志项组成。K
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2021/11/30/生产者压缩算法/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/30/生产者消息分区机制原理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2021/11/30/生产者消息分区机制原理/" itemprop="url">生产者消息分区机制原理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-30T10:28:14+08:00">
+                2021-11-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          ![Kafka 分区机制](生产者消息分区机制原理/Kafka 分区机制.png)
+为什么分区kafka 有主题（Topic）的概念，它是承载真实数据的逻辑容器，而在主题之下还分为若干个分区，也就是说 Kafka 的消息组织方式实际上是三级结构：主题 - 分区 - 消息。主题下的每条消息只会保存在某一个分区中，而不会在多个分区中被保存多份。如图：
+
+为什么使用分区的概念而不是直接使用多个主题呢？
+
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/CKING.github.io/2021/11/30/生产者消息分区机制原理/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/" itemprop="url">MySQL 之说说 join 连接</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-25T16:51:31+08:00">
+                2021-11-25
               </time>
             
 
@@ -367,15 +669,12 @@
       
         
           
-          假设你在维护一个市民系统，每个人都有一个唯一的身份证号，而且业务代码已经保证不会写入两个重复的身份证号。如果市民系统需要按照身份证号查姓名，就会执行类似下面的语句：
-1select name from CUser where id_card = &apos;xxxxyyyzzz&apos;
-
-所以，一般都要在 id_card 字段上建索引
-由于身份证号字段比较大，所以不建议把身份证号当做主键。那么
+          今天我们说说 join 语句是怎么执行的。为了方便分析，我们先创建两个表 t1 和 t2
+1234567891011121314151617181920212223CREATE TABLE `t2` (  `id` int(11) NOT NULL,  `a` int(11) DEFAULT NULL,  `b` int(11) DEFAULT NULL,  PRIMARY KEY (`id`),
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/02/MySQL-之普通索引和唯一索引/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -426,7 +725,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/01/SQL-更新语句是如何执行的/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -445,7 +744,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/01/SQL-更新语句是如何执行的/" itemprop="url">SQL 更新语句是如何执行的</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/" itemprop="url">MySQL 之怎么保证高可用</a></h1>
         
 
         <div class="post-meta">
@@ -457,8 +756,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-01T15:03:58+08:00">
-                2021-11-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-23T16:08:48+08:00">
+                2021-11-23
               </time>
             
 
@@ -520,16 +819,16 @@
         
           
           
-MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的？
-我们从一个表的一条更新语句说起，下面是这个表的创建语句，这个表有一个主键 ID 和一个整型字段 c
-1create table T(ID int primary key, c int);
+主备延迟主备延迟可能是一个主动运维动作，比如软件升级、主库所在机器按计划下线等，也可能是被动操作，比如主库所在机器掉电
+在介绍主动切换流程的详细步骤之前，要先跟你说明一个概念，即「同步延迟」。与数据同步有关的时间点主要包括以下三个：
 
-如果要将 ID  = 2 这一行的值加 1，SQL 语句就会这么写：
-1update T set c = c + 1 where ID = 2;
+主库 A 执行完成一个事务，写入 binlog，我们把这个时刻记为 T1
+之后传给备库 B，我们把备库 B 接收完这个 binlog 的时刻记为 T2
+备库 B 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/01/SQL-更新语句是如何执行的/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -580,7 +879,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -599,7 +898,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/" itemprop="url">Synchronized 锁升级优化的全流程</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/" itemprop="url">MySQL 之主备如何保证一致</a></h1>
         
 
         <div class="post-meta">
@@ -611,8 +910,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-30T15:49:20+08:00">
-                2021-09-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-22T16:58:14+08:00">
+                2021-11-22
               </time>
             
 
@@ -634,8 +933,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -673,13 +972,16 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
       
         
           
-          本文主要谈一下 Synchronized 锁的各种优化：包括偏向锁、轻量级锁、重量级锁，以及它们之间是如何获取和释放锁、锁之间是如何进行升级和膨胀的
-偏向锁从 JDK 1.6 开始，JVM 对比较重的 Synchronized 就引入了各种锁优化的机制，偏向锁算是最轻的一种锁，应用的场景也是最简单的，即偏向锁是专门为了优化线程多次获取同一把锁的场景量身打造的
-比如说方式 A 是被 Synchron
+          
+MySQL 主备的基本原理下图是基本的主备切换流程
+
+在状态 1 中，客户端的读写都直接访问节点 A，而节点 B 是 A 的备库，只是将 A 的更新都同步过来，到本地执行。这样可以保持节点 B 和 A 的数据都是相同的
+当需要切换的时候，就切成状态 2。这时候客户端读写访问的都是节点 B，而节点 A 是 B 的备库
+在状态 1 中，虽然节点 B 没有被直接访问，但是依然建议把节点 B（也就是备库
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/30/Synchronized-锁升级优化的全流程/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -730,7 +1032,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/26/Spring-事务失效情况/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -749,7 +1051,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/26/Spring-事务失效情况/" itemprop="url">Spring 事务失效情况</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/" itemprop="url">MySQL 之怎么保证数据不丢</a></h1>
         
 
         <div class="post-meta">
@@ -761,8 +1063,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-26T19:16:19+08:00">
-                2021-09-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-15T14:03:46+08:00">
+                2021-11-15
               </time>
             
 
@@ -784,8 +1086,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -823,12 +1125,12 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
       
         
           
-          没有被 Spring 管理没有被 Spring 管理的 Bean，如果其中出现了方法需要进行事务处理的情况，此时的事务不会执行。如下，在 OrderServiceImpl 类中如果将 @Service 注释掉，那么此类对应的 bean 也就不会被 Spring IOC 容器管理。即使 updateOrder 上面注释了 @Transactional，这个方法也不会执行事务
-12345678//@S
+          
+MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指的是 MySQL 的写操作并不是立刻更新到磁盘上，而是先记录在日志上，然后在合适的时间更新到磁盘上。日志主要分为 undo log、redo log 和 binlog，作用分别是「完成 MVCC 从而实现 MySQL 的隔离级别」「降低随机写的性能消耗（转成顺序写），同时防止写操作因为宕机而丢失」「写操
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/26/Spring-事务失效情况/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -879,7 +1181,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/26/Spring-事务框架源码初探/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -898,7 +1200,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/26/Spring-事务框架源码初探/" itemprop="url">Spring 事务框架源码初探</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/" itemprop="url">MySQL 之全局锁和表锁</a></h1>
         
 
         <div class="post-meta">
@@ -910,8 +1212,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-26T11:47:18+08:00">
-                2021-09-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-12T13:51:45+08:00">
+                2021-11-12
               </time>
             
 
@@ -933,8 +1235,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -972,13 +1274,12 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
       
         
           
-          事务开启分析Spring声明式事务是通过 AOP 增强实现的，所以现在分析 Spring 事务执行过程的时候离不开 AOP 拦截器执行链的描述，其中比较重要的拦截器就是 TransactionInterceptor 了
-
-如下，在 TransactionInterceptor 中有一个重要的方法 invoke，其中会获取带来对象的类型，同时会调用父类 TransactionAspectSuppor
+          数据库锁设计的初衷是处理并发问题。作为多用户共享的资源，当出现并发访问的时候，数据库需要合理地控制资源的访问规则，而锁就是用来实现这些访问规则的重要数据结构。而根据加锁的范围，MySQL 里面的锁大致可以分成全局锁、表级锁和行锁三类
+全局锁全局锁就是对整个数据库实例加锁。MySQL 提供了一个加全局读锁的方法，命令是 Flush tables with read lock (FTWRL)。当需要让
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/26/Spring-事务框架源码初探/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1029,7 +1330,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1048,7 +1349,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/" itemprop="url">Spring 同步和异步事件的使用场景</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/" itemprop="url">MySQL 之 order by 是怎么工作的</a></h1>
         
 
         <div class="post-meta">
@@ -1060,8 +1361,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-25T14:17:39+08:00">
-                2021-09-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-08T10:52:32+08:00">
+                2021-11-08
               </time>
             
 
@@ -1083,8 +1384,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1122,12 +1423,13 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
       
         
           
-          Spring 事件的监听机制可以理解为是一种观察者模式，有数据发布者（事件源）和数据接受者（监听器）。在 Java 中，事件对象都是继承 java.util.EventObject 对象，事件监听器都是 java.util.EventListener 实例
-其中，java.util.EventObject 是事件状态对象的基类，它封装了事件源对象以及和事件相关的信息。所有 java 的事件类都需要
+          
+开发应用的时候，会遇到需要根据指定的字段排序来显示结果的需求。举个例子，假设有个表的定义是这样子的
+123456789CREATE TABLE `t` (  `id` int(11) NOT NULL,  `city` varchar(16) NOT NULL,  `name` varchar(16) NOT NULL,  `age` int(11) NOT NULL,  `addr` varc
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/25/Spring-同步和异步事件的使用场景/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1178,7 +1480,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/05/SQL-变慢的一些场景/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1197,7 +1499,7 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/" itemprop="url">Spring AOP 源码分析 2</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/05/SQL-变慢的一些场景/" itemprop="url">SQL 变慢的一些场景</a></h1>
         
 
         <div class="post-meta">
@@ -1209,8 +1511,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-18T11:08:38+08:00">
-                2021-09-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-05T10:41:09+08:00">
+                2021-11-05
               </time>
             
 
@@ -1232,8 +1534,8 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1271,16 +1573,14 @@ MySQL 可以恢复到半个月内任何一秒的状态，这是怎么做到的�
       
         
           
-          JDK 动态代理源码分析接着我们通过源码分析介绍 Spring AOP JDK 动态代理实现的原理。内容包括：
-
-invoke：实现 AOP 中具体的逻辑
-getProxy：获取产生的代理类
-
-invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lang.reflect 包中 Proxy 和 InvocationHandler 两个接口来实现的。对于 Invoca
+          
+在 MySQL 中，有很多看上去逻辑相同，但性能确差异巨大的 SQL 语句。对这些语句使用不当的话，就会导致这个数据库的压力变大
+条件字段函数操作假设你维护了一个交易系统，其中交易记录表 tradelog 包含交易流水号（tradeid）、交易员 id（opeartor）、交易时间（t_modified）等字段。为了方便描述，我们先忽略其他字段
+123456789CREATE TABLE `tr
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/18/Spring-AOP-源码分析-2/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/05/SQL-变慢的一些场景/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1331,7 +1631,7 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/17/Spring-AOP-源码分析/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/04/MySQL-之-count/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1350,7 +1650,7 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/" itemprop="url">Spring AOP 源码分析</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/04/MySQL-之-count/" itemprop="url">MySQL 之 count(*)</a></h1>
         
 
         <div class="post-meta">
@@ -1362,8 +1662,8 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-17T10:38:19+08:00">
-                2021-09-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-04T19:47:28+08:00">
+                2021-11-04
               </time>
             
 
@@ -1385,8 +1685,8 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
                   </a>
                 </span>
 
@@ -1424,315 +1724,16 @@ invoke：实现 AOP 中具体的逻辑JDK 中的 AOP 的实现是基于 java.lan
       
         
           
-          AOP 框架有很多种，Spring 中的 AOP 是通过动态代理实现的。JDK 动态代理只在运行期，目标类加载后，为借口动态生成代理类，将切面织入代理类中
-这里通过一个例子来讲解 JDK 动态代理的原理。如下，定义一个 Service 接口，其中有一个 help 方法。用 ServiceImpl 去实现 Service 借口，在 help 方法中实现「打印买书」的输出。这个 ServiceImpl
+          Count(*) 的实现方式首先，在不同的 MySQL 引擎中，count(*) 有不同的实现方式
+
+MyISAM 引擎把一个表的总行数存在了磁盘上，因此执行 count(*) 的时候会直接返回这个数，效率很高
+而 InnoDB 引擎，它执行 count(*) 的时候，需要把数据一行一行地从引擎里面读出来，然后累积计数
+
+注意，我们讨论的是没有过滤条件的 count(*)，如果加了 where 条
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/17/Spring-AOP-源码分析/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/" itemprop="url">Spring 动态代理时是如何解决依赖循环的</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-10T15:22:17+08:00">
-                2021-09-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          什么是依赖循环我们先回顾一下 Bean 的创建过程，在此之前，先看一下三级缓存的概念：
-
-singletonObjects：一级缓存。存储单例对象，Bean 已经实例化，初始化完成
-earlySingletonObjects：二级缓存。存储 singletonObject，这个 Bean 已经实例化，还没有初始化
-singletonFactories：三级缓存。存储 singletonFactor
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/10/Spring-动态代理时是如何解决依赖循环的/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/09/09/Spring-依赖循环/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ckin">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ckin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/CKING.github.io/2021/09/09/Spring-依赖循环/" itemprop="url">Spring 依赖循环</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-09T15:37:37+08:00">
-                2021-09-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          什么是依赖循环
-Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，并抛出 BeanCurrentlyInCreationException。所有要避免构造函数注入，可以使用 setter 注入替代
-
-根据官方文档说明，Spring 会自动解决基于 setter 注入的依赖循环，当然我们工作中现在都使用 @Autowired 注解来注入属性。@Autowired 是通过反射进行赋值
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/09/09/Spring-依赖循环/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/04/MySQL-之-count/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1774,7 +1775,7 @@ Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><a class="page-number" href="/CKING.github.io/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/CKING.github.io/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><a class="page-number" href="/CKING.github.io/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/CKING.github.io/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/20/">20</a><a class="extend next" rel="next" href="/CKING.github.io/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1822,7 +1823,7 @@ Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1881,7 +1882,7 @@ Spring IoC 容器会在运行时检测到「构造函数注入」循环依赖，
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

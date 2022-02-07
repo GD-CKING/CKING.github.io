@@ -92,7 +92,7 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/%E5%86%99%E5%85%A5%E5%A4%9A%E4%B8%AAredo-log-block.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/%E5%A4%9A%E7%BB%84redo-log%E5%86%99%E5%88%B0%E4%B8%80%E4%B8%AAblock.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/%E5%88%B7%E6%95%B0%E6%8D%AE%E5%88%B0%E7%A3%81%E7%9B%98.png">
-<meta property="og:updated_time" content="2020-07-25T06:24:26.398Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.135Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL 之 redo log buffer">
 <meta name="twitter:description" content="redo log buffer之前说了一下 redo log block 这个概念，现在都知道平时我们执行完增删改之后，要写入磁盘的 redo log，其实应该是先进入到 redo log block 这个数据结构里去的，然后再进入到磁盘文件里。 那么 redo log 是如何通过内存缓冲之后，再进入磁盘文件里去的？这就涉及到了一个新的组件，redo log buffer，它就是 MySQL 专门">
@@ -376,7 +376,7 @@
 
       
         <h2 id="redo-log-buffer"><a href="#redo-log-buffer" class="headerlink" title="redo log buffer"></a>redo log buffer</h2><p>之前说了一下 redo log block 这个概念，现在都知道平时我们执行完增删改之后，要写入磁盘的 redo log，其实应该是先进入到 redo log block 这个数据结构里去的，然后再进入到磁盘文件里。</p>
-<p>那么 redo log 是如何通过内存缓冲之后，再进入磁盘文件里去的？这就涉及到了一个新的组件，redo log buffer，它就是 MySQL 专门设计了用来缓冲 redo log 写入的。这个 redo log buffer 其实就是 MySQL 在启动的时候，就跟操作系统申请的一块连续内存空间，大概可以认为相当于是 buffer pool 吧。那个 buffer pool 是申请之后划分了 N 多个孔的缓存页和一些链表结构，让你把磁盘上的数据页加载到内存里来的</p>
+<p>那么 redo log 是如何通过内存缓冲之后，再进入磁盘文件里去的？这就涉及到了一个新的组件，redo log buffer，它就是 MySQL 专门设计了用来缓冲 redo log 写入的。这个 redo log buffer 其实就是 MySQL 在启动的时候，就跟操作系统申请的一块连续内存空间，大概可以认为相当于是 buffer pool 吧。那个 buffer pool 是申请之后划分了 N 多个空的缓存页和一些链表结构，让你把磁盘上的数据页加载到内存里来的</p>
 <p>redo log buffer 也是类似的，它是申请出来的一片连续内存，然后里面划分出了 N 个空的 redo log block。通过设置 MySQL 的 <code>innodb_log_buffer_size</code> 可以指定这个 redo log buffer 的大小，默认的值就是 16MB。其实已经够大了，毕竟一个 redo log block 才 512 字节而已，每条 redo log 其实也就几个字节到几十个字节罢了</p>
 <p>所以到这里就清楚了，上面我们说过，redo log 都是先写入内存里的 redo log block 数据结构里去的，然后完事了才会把 redo log block 写入到磁盘文件里去。所以当你要写一条 redo log 的时候，就会从第一个 redo log block 开始写入，如图：</p>
 <p><img src="/CKING.github.io/2020/06/16/MySQL-之-redo-log-buffer/redo-log-buffer.png" alt="redo-log-buffer"></p>
@@ -550,7 +550,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -625,7 +625,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

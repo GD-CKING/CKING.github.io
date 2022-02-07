@@ -79,14 +79,15 @@
 
 
 
-<meta name="description" content="MQ 集群化部署以支撑高并发访问假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。  MQ 存">
+<meta name="description" content="MQ 集群化部署以支撑高并发访问 假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。  MQ">
 <meta name="keywords" content="消息队列">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RocketMQ详解">
 <meta property="og:url" content="https://github.com/2019/12/10/RocketMQ详解/index.html">
 <meta property="og:site_name" content="Ckin&#39;s Blog">
-<meta property="og:description" content="MQ 集群化部署以支撑高并发访问假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。  MQ 存">
+<meta property="og:description" content="MQ 集群化部署以支撑高并发访问 假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。  MQ">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/QPS.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/%E5%AD%98%E5%82%A8%E6%B6%88%E6%81%AF.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/%E5%89%AF%E6%9C%AC.png">
@@ -98,11 +99,11 @@
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/%E9%95%BF%E8%BF%9E%E6%8E%A5.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/%E7%94%9F%E4%BA%A7%E8%80%85%E6%8A%95%E9%80%92%E6%B6%88%E6%81%AF.png">
 <meta property="og:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/%E6%B6%88%E8%B4%B9%E8%80%85%E8%8E%B7%E5%8F%96%E6%B6%88%E6%81%AF.png">
-<meta property="og:updated_time" content="2020-02-02T12:37:35.831Z">
+<meta property="og:updated_time" content="2022-02-07T03:33:31.226Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RocketMQ详解">
-<meta name="twitter:description" content="MQ 集群化部署以支撑高并发访问假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。  MQ 存">
-<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/QPS.png">
+<meta name="twitter:description" content="MQ 集群化部署以支撑高并发访问 假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。  MQ">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2019/12/10/RocketMQ详解/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png">
 
 
 
@@ -381,7 +382,8 @@
       
 
       
-        <h2 id="MQ-集群化部署以支撑高并发访问"><a href="#MQ-集群化部署以支撑高并发访问" class="headerlink" title="MQ 集群化部署以支撑高并发访问"></a>MQ 集群化部署以支撑高并发访问</h2><p>假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。</p>
+        <h2 id="MQ-集群化部署以支撑高并发访问"><a href="#MQ-集群化部署以支撑高并发访问" class="headerlink" title="MQ 集群化部署以支撑高并发访问"></a>MQ 集群化部署以支撑高并发访问</h2><p><img src="/CKING.github.io/2019/12/10/RocketMQ详解/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.png" alt="思维导图"></p>
+<p>假设 RocketMQ 部署在一台机器上，即使这个机器的配置很高，但一般来说一台机器也就是支撑 10万+ 的并发访问。如果这个时候，有大量的系统都要往 RocketMQ 里高并发的写入消息，可能达到每秒几十万请求，这个时候就要将 RocketMQ 进行集群化部署，部署在多台机器上。假设每台机器能抗 10 万并发，只要让几十万请求分散到多台机器上接可以了。</p>
 <p><img src="/CKING.github.io/2019/12/10/RocketMQ详解/QPS.png" alt="QPS"></p>
 <h3 id="MQ-存储海量消息"><a href="#MQ-存储海量消息" class="headerlink" title="MQ 存储海量消息"></a>MQ 存储海量消息</h3><p>一般情况下，MQ 收到的大量消息并不是立马会被所有的消费方获取过去消费，所以 MQ 一般都得把消息在自己本地磁盘存储起来，然后等到消费方去处理。这样，MQ 就得存储大量的消息，可能是几百万条，甚至几亿条，这么多的消息在一台机器上是没法存储的，那 RocketMQ 是如何处理的？</p>
 <p>其实发送消息到 MQ 的系统会把消息分散发送给多台不同的机器，假设有一万条消息，分散发送给 10 台机器，可能每台机器就是接收到 1000 条消息。</p>
@@ -576,7 +578,7 @@
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -651,7 +653,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

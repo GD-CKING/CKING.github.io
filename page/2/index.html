@@ -274,7 +274,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/30/生产者压缩算法/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/12/Kafka-之位移主题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/30/生产者压缩算法/" itemprop="url">生产者压缩算法</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/12/Kafka-之位移主题/" itemprop="url">Kafka 之位移主题</a></h1>
         
 
         <div class="post-meta">
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-30T15:28:15+08:00">
-                2021-11-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-12T16:25:24+08:00">
+                2021-12-12
               </time>
             
 
@@ -368,12 +368,13 @@
         
           
           
-Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社区分别称之为 V1 版本和 V2 版本。V2 版本是 Kafka 0.11.0.0 中正式引入的
-无论是哪个版本，Kafka 的消息层次都分为两层：消息集合（message set）和消息（message）。一个消息集合中包含若干条日志项，而日志项才是真正封装消息的地方。Kafka 底层的消息日志由一系列消息集合日志项组成。K
+Kafka 内部有一个位移主题：__consumer_offsets，它的主要作用就是用来保存 Kafka 消费者的位移信息
+位移主题可以看做是一个普通的 Kafka 主题，但它的消息格式却是 Kafka 自己定义的，用户不能修改，即你不能随意地向这个主题写消息，因为一旦你写入的消息不满足 Kafka 规定的格式，那么 Kafka 内部就无法解析成功
+那这个主题存的到底是什么格式的消息呢？你可以
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/30/生产者压缩算法/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/12/Kafka-之位移主题/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -424,7 +425,7 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/30/生产者消息分区机制原理/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/12/Kafka-之消费者组/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -443,7 +444,7 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/30/生产者消息分区机制原理/" itemprop="url">生产者消息分区机制原理</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/12/Kafka-之消费者组/" itemprop="url">Kafka 之消费者组</a></h1>
         
 
         <div class="post-meta">
@@ -455,8 +456,8 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-30T10:28:14+08:00">
-                2021-11-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-12T14:49:31+08:00">
+                2021-12-12
               </time>
             
 
@@ -517,15 +518,13 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
       
         
           
-          ![Kafka 分区机制](生产者消息分区机制原理/Kafka 分区机制.png)
-为什么分区kafka 有主题（Topic）的概念，它是承载真实数据的逻辑容器，而在主题之下还分为若干个分区，也就是说 Kafka 的消息组织方式实际上是三级结构：主题 - 分区 - 消息。主题下的每条消息只会保存在某一个分区中，而不会在多个分区中被保存多份。如图：
-
-为什么使用分区的概念而不是直接使用多个主题呢？
-
+          
+Consumer Group 是 Kafka 提供的可扩展且具有容错性的消费者实例。组内有多个消费者或消费者实例，他们共享一个公共的 ID，这个 ID 被称为 Group ID。组内的所有消费者协调在一起来消费订阅主题（Subscribed Topics）的所有分区（Partition）。当然，每个分区只能由同一个消费组内的一个 Consumer 实例来消费
+理解 Consumer Group，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/30/生产者消息分区机制原理/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/12/Kafka-之消费者组/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -576,7 +575,7 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/11/Redis-之-String/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -595,7 +594,7 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/" itemprop="url">MySQL 之说说 join 连接</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/11/Redis-之-String/" itemprop="url">Redis 之 String</a></h1>
         
 
         <div class="post-meta">
@@ -607,8 +606,8 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-25T16:51:31+08:00">
-                2021-11-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-11T17:33:55+08:00">
+                2021-12-11
               </time>
             
 
@@ -630,8 +629,8 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -669,12 +668,14 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
       
         
           
-          今天我们说说 join 语句是怎么执行的。为了方便分析，我们先创建两个表 t1 和 t2
-1234567891011121314151617181920212223CREATE TABLE `t2` (  `id` int(11) NOT NULL,  `a` int(11) DEFAULT NULL,  `b` int(11) DEFAULT NULL,  PRIMARY KEY (`id`),
+          
+我们要开发一个图片存储系统，要求这个系统能快速地记录图片 ID 和图片再存储系统中保存的 ID。同时，还要能够根据图片 ID 快速查找到图片存储对象 ID
+因为图片数量巨大，所以我们用 10 位数来表示图片 ID 和图片存储对象 ID。例如，图片 ID 为 1101000051，它在存储系统中对应的 ID 号是 3301000051
+12photo_id: 1101000051photo_obj
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/25/MySQL-之说说-join-连接/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/11/Redis-之-String/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -725,7 +726,7 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/11/Redis-之切片集群/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -744,7 +745,7 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/" itemprop="url">MySQL 之怎么保证高可用</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/11/Redis-之切片集群/" itemprop="url">Redis 之切片集群</a></h1>
         
 
         <div class="post-meta">
@@ -756,8 +757,8 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-23T16:08:48+08:00">
-                2021-11-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-11T12:29:42+08:00">
+                2021-12-11
               </time>
             
 
@@ -779,8 +780,8 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -819,16 +820,12 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
         
           
           
-主备延迟主备延迟可能是一个主动运维动作，比如软件升级、主库所在机器按计划下线等，也可能是被动操作，比如主库所在机器掉电
-在介绍主动切换流程的详细步骤之前，要先跟你说明一个概念，即「同步延迟」。与数据同步有关的时间点主要包括以下三个：
-
-主库 A 执行完成一个事务，写入 binlog，我们把这个时刻记为 T1
-之后传给备库 B，我们把备库 B 接收完这个 binlog 的时刻记为 T2
-备库 B 
+切片集群，也叫分片集群，就是指启动多个 Redis 实例组成一个集群，然后按照一定的规则，把收到的数据分成多份，每一份用一个实例来保存。在实际应用 Redis 时，随着用户或业务规模的扩展，保存大量数据的情况通常是无法避免的。而切片集群，就是一个非常好的解决方案
+数据切片和实例的对应分布关系在切片集群中，数据需要分布在不同实例上，那么，数据和实例之间如何对应呢？这就和 Redis Cluster
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/23/MySQL-之怎么保证高可用/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/11/Redis-之切片集群/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -879,7 +876,7 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/09/Redis-之-RDB-快照/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -898,7 +895,7 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/" itemprop="url">MySQL 之主备如何保证一致</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/09/Redis-之-RDB-快照/" itemprop="url">Redis 之 RDB 快照</a></h1>
         
 
         <div class="post-meta">
@@ -910,8 +907,8 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-22T16:58:14+08:00">
-                2021-11-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-09T17:11:07+08:00">
+                2021-12-09
               </time>
             
 
@@ -933,8 +930,8 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -972,16 +969,12 @@ Kafka 是如何压缩算法的？目前 Kafka 共有两大类消息格式，社�
       
         
           
-          
-MySQL 主备的基本原理下图是基本的主备切换流程
-
-在状态 1 中，客户端的读写都直接访问节点 A，而节点 B 是 A 的备库，只是将 A 的更新都同步过来，到本地执行。这样可以保持节点 B 和 A 的数据都是相同的
-当需要切换的时候，就切成状态 2。这时候客户端读写访问的都是节点 B，而节点 A 是 B 的备库
-在状态 1 中，虽然节点 B 没有被直接访问，但是依然建议把节点 B（也就是备库
+          Redis 持久化除了 AOF 之外，还有另外一种方式：内存快照。对 Redis 来说，它实现类似于照片记录效果的方式，就是把某一时刻的状态以文件的形式写到磁盘上，也就是快照。这样一来，即使宕机，快照文件也不会丢失，数据的可靠性也就得到了保证。这个快照文件被称为 RDB 文件。其中，RDB 就是 Redis DataBase  的缩写
+和 AOF 相比，RDB 记录的是某一时刻的记录，并不是操作，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/22/MySQL-之主备如何保证一致/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/09/Redis-之-RDB-快照/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1032,7 +1025,7 @@ MySQL 主备的基本原理下图是基本的主备切换流程
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/06/Kafka-之幂等生产者和事务生产者/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1051,7 +1044,7 @@ MySQL 主备的基本原理下图是基本的主备切换流程
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/" itemprop="url">MySQL 之怎么保证数据不丢</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/06/Kafka-之幂等生产者和事务生产者/" itemprop="url">Kafka 之幂等生产者和事务生产者</a></h1>
         
 
         <div class="post-meta">
@@ -1063,8 +1056,8 @@ MySQL 主备的基本原理下图是基本的主备切换流程
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-15T14:03:46+08:00">
-                2021-11-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-06T18:18:45+08:00">
+                2021-12-06
               </time>
             
 
@@ -1086,8 +1079,8 @@ MySQL 主备的基本原理下图是基本的主备切换流程
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
                   </a>
                 </span>
 
@@ -1125,12 +1118,11 @@ MySQL 主备的基本原理下图是基本的主备切换流程
       
         
           
-          
-MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指的是 MySQL 的写操作并不是立刻更新到磁盘上，而是先记录在日志上，然后在合适的时间更新到磁盘上。日志主要分为 undo log、redo log 和 binlog，作用分别是「完成 MVCC 从而实现 MySQL 的隔离级别」「降低随机写的性能消耗（转成顺序写），同时防止写操作因为宕机而丢失」「写操
+          幂等性 Producer在 Kafka 中，Producer 默认不是幂等的，但我们可以创建幂等性 Producer。它是 0.11.0.0 版本引入的新功能。指定 Producer 幂等性的方法很简单，仅需要设置一个参数即可，即 props.put(“enable.idempotence”, true) 或 props.put(ProducerConfig.ENABLE_IDEMPOTENCE_
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/15/MySQL-之怎么保证数据不丢/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/06/Kafka-之幂等生产者和事务生产者/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1181,7 +1173,7 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/05/kafka-之无消息丢失配置/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1200,7 +1192,7 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/" itemprop="url">MySQL 之全局锁和表锁</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/05/kafka-之无消息丢失配置/" itemprop="url">kafka 之无消息丢失配置</a></h1>
         
 
         <div class="post-meta">
@@ -1212,8 +1204,8 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-12T13:51:45+08:00">
-                2021-11-12
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-05T19:54:37+08:00">
+                2021-12-05
               </time>
             
 
@@ -1235,8 +1227,8 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Kafka/" itemprop="url" rel="index">
+                    <span itemprop="name">Kafka</span>
                   </a>
                 </span>
 
@@ -1274,12 +1266,15 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
       
         
           
-          数据库锁设计的初衷是处理并发问题。作为多用户共享的资源，当出现并发访问的时候，数据库需要合理地控制资源的访问规则，而锁就是用来实现这些访问规则的重要数据结构。而根据加锁的范围，MySQL 里面的锁大致可以分成全局锁、表级锁和行锁三类
-全局锁全局锁就是对整个数据库实例加锁。MySQL 提供了一个加全局读锁的方法，命令是 Flush tables with read lock (FTWRL)。当需要让
+          
+Kafka 什么情况下能保证消息不丢失呢？
+一句话概括，Kafka 只对「已提交」的消息做有限度的持久化保证
+第一个核心要素是「已提交的消息」。什么是已提交的消息？当 Kafka 的若干个 Broker 成功地接收到一条消息并写入到日志文件后，它们会告诉生产者程序这条消息已成功提交。此时，这条消息在 Kafka 看来就正式变成了「已提交」消息了
+那为什么是若干个 Broker 呢？这取决于你对「
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/12/MySQL-之全局锁和表锁/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/05/kafka-之无消息丢失配置/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1330,7 +1325,7 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/05/Redis-之-AOF-日志/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1349,7 +1344,7 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/" itemprop="url">MySQL 之 order by 是怎么工作的</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/05/Redis-之-AOF-日志/" itemprop="url">Redis 之 AOF 日志</a></h1>
         
 
         <div class="post-meta">
@@ -1361,8 +1356,8 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-08T10:52:32+08:00">
-                2021-11-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-05T17:34:38+08:00">
+                2021-12-05
               </time>
             
 
@@ -1384,8 +1379,8 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -1424,12 +1419,12 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
         
           
           
-开发应用的时候，会遇到需要根据指定的字段排序来显示结果的需求。举个例子，假设有个表的定义是这样子的
-123456789CREATE TABLE `t` (  `id` int(11) NOT NULL,  `city` varchar(16) NOT NULL,  `name` varchar(16) NOT NULL,  `age` int(11) NOT NULL,  `addr` varc
+目前，Redis 的持久化主要有两大机制：AOF 日志和 RDB 快照。我们先看一下 AOF 日志
+AOF 日志是怎么实现的说到日志，我们比较熟悉的是数据库的写前日志（Write Ahead Log，WAL），即，在实际写日志前，先把修改的数据记到日志文件中，以便故障时进行恢复。不过，AOF 日志正好相反，它是写后日志。「写后」的意思是 Redis 先执行命令，把数据写入内存，然后才记录日志。如
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/08/MySQL-之-order-by-是怎么工作的/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/05/Redis-之-AOF-日志/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1480,7 +1475,7 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/05/SQL-变慢的一些场景/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/12/05/Redis-单线程为什么这么快/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1499,7 +1494,7 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/05/SQL-变慢的一些场景/" itemprop="url">SQL 变慢的一些场景</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/12/05/Redis-单线程为什么这么快/" itemprop="url">Redis 单线程为什么这么快</a></h1>
         
 
         <div class="post-meta">
@@ -1511,8 +1506,8 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-05T10:41:09+08:00">
-                2021-11-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-05T14:53:02+08:00">
+                2021-12-05
               </time>
             
 
@@ -1534,8 +1529,8 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -1574,13 +1569,12 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
         
           
           
-在 MySQL 中，有很多看上去逻辑相同，但性能确差异巨大的 SQL 语句。对这些语句使用不当的话，就会导致这个数据库的压力变大
-条件字段函数操作假设你维护了一个交易系统，其中交易记录表 tradelog 包含交易流水号（tradeid）、交易员 id（opeartor）、交易时间（t_modified）等字段。为了方便描述，我们先忽略其他字段
-123456789CREATE TABLE `tr
+我们通常说，Redis 是单线程，主要是值 Redis 的网络 IO 和键值对读写是由一个线程来完成的，这也是 Redis 对外提供键值存储服务的主要流程。但 Redis 的其他功能，比如持久化、异步删除、集群数据同步等，是由额外的线程执行的
+多线程的开销在我们平时使用的系统中，会存在被多线程同时访问的共享资源，比如一个共享的数据结构。当有多个线程要修改这个共享资源时，为了保证共享资源的正确性，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/05/SQL-变慢的一些场景/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/12/05/Redis-单线程为什么这么快/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1631,7 +1625,7 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/04/MySQL-之-count/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2021/11/30/Redis-数据结构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ckin">
@@ -1650,7 +1644,7 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/CKING.github.io/2021/11/04/MySQL-之-count/" itemprop="url">MySQL 之 count(*)</a></h1>
+                <a class="post-title-link" href="/CKING.github.io/2021/11/30/Redis-数据结构/" itemprop="url">Redis 数据结构</a></h1>
         
 
         <div class="post-meta">
@@ -1662,8 +1656,8 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-04T19:47:28+08:00">
-                2021-11-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-11-30T17:55:04+08:00">
+                2021-11-30
               </time>
             
 
@@ -1685,8 +1679,8 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/CKING.github.io/categories/MySQL/" itemprop="url" rel="index">
-                    <span itemprop="name">MySQL</span>
+                  <a href="/CKING.github.io/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -1724,16 +1718,12 @@ MySQL 的 WAL 机制，全程是 Write-Ahead Logging，预写日志系统。指�
       
         
           
-          Count(*) 的实现方式首先，在不同的 MySQL 引擎中，count(*) 有不同的实现方式
-
-MyISAM 引擎把一个表的总行数存在了磁盘上，因此执行 count(*) 的时候会直接返回这个数，效率很高
-而 InnoDB 引擎，它执行 count(*) 的时候，需要把数据一行一行地从引擎里面读出来，然后累积计数
-
-注意，我们讨论的是没有过滤条件的 count(*)，如果加了 where 条
+          Redis 为什么能那么快？一方面是因为它是内存数据库，所有操作都在内存上完成，内存的访问速度本身就很快。另一方面，这要归功于它的数据结构。这是因为，键值对是按一定的数据结构来组织的，操作键值对最终就是对数据结构进行增删改查操作，所以高效的数据结构是 Redis 快速处理数据的基础
+Redis 的数据结构有哪些呢？你可能会说，是 String、List、Hash、Set 和 Sorted Set 
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/CKING.github.io/2021/11/04/MySQL-之-count/#more" rel="contents">
+            <a class="btn" href="/CKING.github.io/2021/11/30/Redis-数据结构/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1775,7 +1765,7 @@ MyISAM 引擎把一个表的总行数存在了磁盘上，因此执行 count(*) 
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/CKING.github.io/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="page-number current">2</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/19/">19</a><a class="extend next" rel="next" href="/CKING.github.io/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/CKING.github.io/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/CKING.github.io/">1</a><span class="page-number current">2</span><a class="page-number" href="/CKING.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/CKING.github.io/page/20/">20</a><a class="extend next" rel="next" href="/CKING.github.io/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1823,7 +1813,7 @@ MyISAM 引擎把一个表的总行数存在了磁盘上，因此执行 count(*) 
               
                 <a href="/CKING.github.io/archives/">
               
-                  <span class="site-state-item-count">183</span>
+                  <span class="site-state-item-count">193</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1882,7 +1872,7 @@ MyISAM 引擎把一个表的总行数存在了磁盘上，因此执行 count(*) 
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
