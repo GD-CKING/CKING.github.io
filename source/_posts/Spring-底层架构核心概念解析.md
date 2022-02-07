@@ -26,7 +26,7 @@ BeanDefinition 表示 Bean 定义，BeanDefinition 中存在很多属性用来�
 
 
 
-1. <bean />
+1. XML 配置 Bean
 2. @Bean
 3. @Component（@Service，@Controller）
 
