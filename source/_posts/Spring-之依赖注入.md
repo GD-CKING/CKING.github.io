@@ -187,6 +187,10 @@ XML 中的 autowire 控制的是整个 bean 的所有属性，而 @Autowired 注
 
 
 
+![流程](Spring-之依赖注入/流程.png)
+
+
+
 @Autowired 注解，是 byType 和 byName 的结合。@Autowired 注解可以写在：
 
 
@@ -435,3 +439,33 @@ Spring 在 AutowiredAnnotationBeanPostProcessor 的 **postProcessProperties()** 
 
 
 ![resolveDependency](Spring-之依赖注入/resolveDependency.png)
+
+
+
+#### findAutowireCandidates() 实现
+
+
+
+1. 找出 BeanFactory 中类型为 type 的所有的 Bean 的名字，注意是名字，而不是 Bean 对象，因为我们可以根据 BeanDefinition 就能判断当前 type 是不是匹配，不用生成 Bean 对象
+2. 把 resolvableDependencies 中 key 为 type 的对象找出来并添加到 result 中。resolvableDependencies 中存放的类型是 Bean 对象。比如 <BeanFactory.class : BeanFactory 对象>，在 Spring 启动时设置
+3. 遍历根据 type 找出的 beanName，判断当前 beanName 对应的 Bean 是不是能够被自动注入
+4. 先判断 beanName 对应的 BeanDefinition 中的 autowireCandidate 属性，如果为 false，表示不能用来进行自动注入，如果为 true 则继续进行判断
+5. 判断当前 type 是不是泛型，如果是泛型是会把容器中所有的 beanName 找出来。如果是这种情况，那么在这一步就要获取到泛型的真正类型，然后进行匹配，如果当前 beanName 和当前泛型对应的真实类型匹配，那么则继续判断
+6. 如果当前 DependencyDescriptor 上存在 @Qualifier 注解，那么则要判断当前 beanName 上是否定义了 Qualifer，并且是否和当前 DependencyDescriptor 上的 Qualifer 相等，相等则匹配
+7. 经过上述验证之后，当前 beanName才能成为一个可注入的，添加到 result 中
+
+
+
+底层流程图如下：
+
+
+
+![findAutowireCandidates](Spring-之依赖注入/findAutowireCandidates.png)
+
+
+
+对应的执行图为：
+
+
+
+![执行图](Spring-之依赖注入/执行图.png)
