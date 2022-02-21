@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Spring 的依赖注入方式Spring 中主要有两种注入方式：  手动注入 自动注入  手动注入在 XML 中定义 Bean 时，就是手动注入，因为是程序员手动给某个属性指定了值，如下： 12345&amp;lt;bean name=&quot;orderService&quot; class=&quot;com.zhouyu.service.OrderService&quot;/&amp;gt;&amp;lt;bean name=&quot;userService&quot;">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring 之依赖注入">
+<meta property="og:url" content="https://github.com/2022/02/07/Spring-之依赖注入/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="Spring 的依赖注入方式Spring 中主要有两种注入方式：  手动注入 自动注入  手动注入在 XML 中定义 Bean 时，就是手动注入，因为是程序员手动给某个属性指定了值，如下： 12345&amp;lt;bean name=&quot;orderService&quot; class=&quot;com.zhouyu.service.OrderService&quot;/&amp;gt;&amp;lt;bean name=&quot;userService&quot;">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2022/02/07/Spring-之依赖注入/%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2022/02/07/Spring-之依赖注入/resolveDependency.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2022/02/07/Spring-之依赖注入/findAutowireCandidates.png">
+<meta property="og:image" content="https://github.com/CKING.github.io/2022/02/07/Spring-之依赖注入/%E6%89%A7%E8%A1%8C%E5%9B%BE.png">
+<meta property="og:updated_time" content="2022-02-21T15:27:22.463Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring 之依赖注入">
+<meta name="twitter:description" content="Spring 的依赖注入方式Spring 中主要有两种注入方式：  手动注入 自动注入  手动注入在 XML 中定义 Bean 时，就是手动注入，因为是程序员手动给某个属性指定了值，如下： 12345&amp;lt;bean name=&quot;orderService&quot; class=&quot;com.zhouyu.service.OrderService&quot;/&amp;gt;&amp;lt;bean name=&quot;userService&quot;">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2022/02/07/Spring-之依赖注入/%E6%B5%81%E7%A8%8B.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2022/02/07/Spring-之依赖注入/">
+
+
+
+
+
+  <title>Spring 之依赖注入 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2022/02/07/Spring-之依赖注入/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring 之依赖注入</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-02-07T11:57:11+08:00">
+                2022-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Spring-的依赖注入方式"><a href="#Spring-的依赖注入方式" class="headerlink" title="Spring 的依赖注入方式"></a>Spring 的依赖注入方式</h2><p>Spring 中主要有两种注入方式：</p>
+<ol>
+<li>手动注入</li>
+<li>自动注入</li>
+</ol>
+<h3 id="手动注入"><a href="#手动注入" class="headerlink" title="手动注入"></a>手动注入</h3><p>在 XML 中定义 Bean 时，就是手动注入，因为是<strong>程序员手动给某个属性指定了值</strong>，如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"orderService"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.OrderService"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"userService"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.UserService"</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"orderService"</span> <span class="attr">ref</span>=<span class="string">"orderService"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面是通过 <strong>set 方法</strong>进行注入的</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"orderService"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.OrderService"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"userService"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.UserService"</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">index</span>=<span class="string">"0"</span> <span class="attr">ref</span>=<span class="string">"orderService"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面这种底层是通过<strong>构造方法</strong>进行注入</p>
+<p>所以手动注入的底层也就是分为两种：</p>
+<ol>
+<li>set 方法注入</li>
+<li>构造方法注入</li>
+</ol>
+<h3 id="自动注入"><a href="#自动注入" class="headerlink" title="自动注入"></a>自动注入</h3><p>自动注入又分为两种：</p>
+<ol>
+<li>XML 的 autowire 自动注入</li>
+<li>@Autowired 注解的自动注入</li>
+</ol>
+<h4 id="XML-的-autowire-自动注入"><a href="#XML-的-autowire-自动注入" class="headerlink" title="XML 的 autowire 自动注入"></a>XML 的 autowire 自动注入</h4><p>在 XML 中，我们可以定义一个 Bean 时去指定这个 Bean 的自动注入模式：</p>
+<ol>
+<li>byType</li>
+<li>byName</li>
+<li>constructor</li>
+<li>default</li>
+<li>no</li>
+</ol>
+<p>比如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"userService"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.UserService"</span> <span class="attr">autowire</span>=<span class="string">"byType"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这么写，表示 Spring 会自动的给 userService 中所有属性自动赋值（<strong>不需要</strong>这个属性上有 @Autowired 注解，但需要这个属性有对应的 <strong>set 方法</strong>）</p>
+<p>在创建 Bean 的过程中，在填充属性时，Spring 会去解析当前类，把当前类的所有方法都解析出来，Spring 会去解析每个方法得到对应的 PropertyDescriptor 对象，PropertyDescriptor 中有几个属性</p>
+<ol>
+<li><strong>name：这个 name 并不是方法的名字，而是哪方法名字进行处理后的名字</strong><ul>
+<li><strong>如果方法名字以 “get” 开头，比如 “getXXX”，那么 name = XXX</strong></li>
+<li><strong>如果方法名字以 “is” 开头，比如 “isXXX”，那么 name = XXX</strong></li>
+<li><strong>如果方法名字以 “set” 开头，比如 “setXXX”，那么 name = XXX</strong></li>
+</ul>
+</li>
+<li><strong>readMethodRef：表示 get 方法的 Method 对象的引用</strong></li>
+<li><strong>readMethodName：表示 get 方法的名字</strong></li>
+<li><strong>writeMethodRef：表示 set 方法的 Method 对象的引用</strong></li>
+<li><strong>writeMethodName：表示 set 方法的名字</strong></li>
+<li><strong>propertyTypeRef：如果有 get 方法，那么对应的就是返回值的类型；如果是 set 方法，那么对应的就是 set 方法中唯一参数的类型</strong> </li>
+</ol>
+<p><strong>get 方法的定义是</strong>：方法参数个数为 0 个，并且方法名字以 “get” 开头或者名字以 “is” 开头并且方法的返回类型为 boolean</p>
+<p><strong>set 方法的定义是</strong>：方法参数个数为 1 个，并且方法名字以 “set” 开头并且方法返回类型为 void</p>
+<p>所以，Spring 通过 byName 的自动填充属性时流程是：</p>
+<ol>
+<li>找到所有 set 方法所对应的 XXX 部分的名字</li>
+<li>根据 XXX 部分的名字去获取 bean</li>
+</ol>
+<p>而 Spring 通过 byType 的自动填充属性时流程是：</p>
+<ol>
+<li>获取到 set 方法中的唯一参数的类型参数，并且根据该类型去容器中获取 bean</li>
+<li>如果找到多个，会报错</li>
+</ol>
+<p>constructor 表示通过构造方法注入。如果是 constructor，那么久流可以不写 set 方法，当某个 bean 是通过构造方法注入时，Spring 利用构造方法的参数信息从 Spring 容器中去找 bean，找到 bean 之后作为参数传给构造方法，从而实例化得到一个 bean 对象，并完成属性赋值（属性赋值的代码得程序员来写）</p>
+<p>另外两个：</p>
+<ol>
+<li>no，表示关闭 autowire</li>
+<li>default，表示默认值。我们演示的是某个 bean 的 autowire，但是也可以直接在 <code>&lt;beans&gt;</code> 标签中设置 autowire。如果设置了，那么 <code>&lt;bean&gt;</code> 标签中设置的 autowire 如果为 default，那么则会用 <code>&lt;beans&gt;</code> 标签中设置的 autowire</li>
+</ol>
+<p>@Autowired 注解则相当于 XML 中的 autowire 属性的注解方式的替代。它提供了与 autowire 相同的功能，但是拥有更细粒度的控制和更广泛的适用性</p>
+<p>XML 中的 autowire 控制的是整个 bean 的所有属性，而 @Autowired 注解是直接写在某个属性、某个 set 方法、某个构造方法。同时，@Autowired 注解还可以控制，哪些属性想被自动注入，哪些属性不想，这也是细粒度的控制</p>
+<p>但是 @Autowired 无法区分 byType 和 byName，@Autowired 是先 byType，如果找到多个则 byName</p>
+<p>所以 XML 的自动注入底层其实也就是：</p>
+<ol>
+<li>set 方法注入</li>
+<li>构造方法注入</li>
+</ol>
+<h2 id="Autowired-注解的自动注入"><a href="#Autowired-注解的自动注入" class="headerlink" title="@Autowired 注解的自动注入"></a>@Autowired 注解的自动注入</h2><p><img src="/CKING.github.io/2022/02/07/Spring-之依赖注入/%E6%B5%81%E7%A8%8B.png" alt="流程"></p>
+<p>@Autowired 注解，是 byType 和 byName 的结合。@Autowired 注解可以写在：</p>
+<ol>
+<li>属性上：先根据<strong>属性类型</strong>去找 Bean，如果找到多个再根据<strong>属性名</strong>确定一个</li>
+<li>构造方法上：先根据方法<strong>参数类型</strong>去找 Bean，如果找到多个再根据<strong>参数名</strong>确定一个</li>
+<li>set 方法上：先根据方法<strong>参数类型</strong>去找 Bean，如果找到多个再根据<strong>参数名</strong>确定一个</li>
+</ol>
+<h3 id="寻找注入点"><a href="#寻找注入点" class="headerlink" title="寻找注入点"></a>寻找注入点</h3><p>在创建一个 Bean 的过程中，Spring 会利用 AutowiredAnnotationBeanPostProcessor 的 <code>postProcessMergeBeanDefinition()</code> 找出注入点并缓存，找注入点的流程为：</p>
+<ol>
+<li>遍历当前类的所有属性字段 Field</li>
+<li>查看字段上是否存在 @Autowired、@Value、@Inject 中的其中任意一个，存在则认为该字段是一个注入点</li>
+<li>如果字段是 static，则不进行注入</li>
+<li>获取 @Autowired 的 required 属性的值</li>
+<li>将字段信息构造成一个 <strong>AutowiredFieldElement 对象</strong>，作为一个<strong>注入点对象</strong>添加到 currElements 集合中</li>
+<li>遍历当前类中所有 Method</li>
+<li>判断当前 Method 是否是<strong>桥接方法</strong>，如果是找到原方法</li>
+<li>查看方法上是否存在 @Autowired、@Value、@Inject 中的其中任意一个，存在则认为该字段是一个注入点</li>
+<li>如果方法是 static，则不进行注入</li>
+<li>获取 @Autowired 的 required 属性的值</li>
+<li>将方法信息构造成一个 <strong>AutowiredMethodElement 对象</strong>，作为一个<strong>注入点对象</strong>添加到 currElements 集合中</li>
+<li>遍历完当前类的字段和方法后，将<strong>遍历父类</strong>，直到没有父类</li>
+<li>最后将 currElements 集合封装成一个 InjectMetadata 对象，作为当前 Bean 对应的注入点集合对象，并缓存</li>
+</ol>
+<h3 id="static-字段或方法为什么不支持"><a href="#static-字段或方法为什么不支持" class="headerlink" title="static 字段或方法为什么不支持"></a>static 字段或方法为什么不支持</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope</span>(<span class="string">"prototype"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderService</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope</span>(<span class="string">"prototype"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> OrderService orderService;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      System.out.println(<span class="string">"test123"</span>);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如上代码，UserService 和 OrderService 都是原型 Bean，假设 Spring 支持 static 字段进行自动注入，那么现在调用两次</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UserService userService1 = (UserService) applicationContext.getBean(<span class="string">"userService"</span>);</span><br><span class="line">UserService userService2 = (UserService) applicationContext.getBean(<span class="string">"userService"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>此时 userService1 的 orderService 值还是它自己注入的值吗？不是。一旦 userService2 创建好了之后，static orderService 字段的值就发生了修改，从而出现 bug</p>
+<h3 id="桥接方法"><a href="#桥接方法" class="headerlink" title="桥接方法"></a>桥接方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserInterface</span> &lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setOrderService</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> <span class="keyword">implements</span> <span class="title">UserInterface</span>&lt;<span class="title">OrderService</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> OrderService orderService;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      System.out.println(<span class="string">"test123"</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOrderService</span><span class="params">(OrderService orderService)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.orderService = orderService;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>UserService 对应的字节码为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// class version 52.0 (52)</span></span><br><span class="line"><span class="comment">// access flags 0x21</span></span><br><span class="line"><span class="comment">// signature Ljava/lang/Object;Lcom/test/service/UserInterface&lt;Lcom/test/service/OrderService;&gt;;</span></span><br><span class="line"><span class="comment">// declaration: com/test/service/UserService implements com.test.service.UserInterface&lt;com.test.service.OrderService&gt;</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">com</span>/<span class="title">test</span>/<span class="title">service</span>/<span class="title">UserService</span> <span class="keyword">implements</span> <span class="title">com</span>/<span class="title">test</span>/<span class="title">service</span>/<span class="title">UserInterface</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// compiled from: UserService.java</span></span><br><span class="line"></span><br><span class="line">  <span class="meta">@Lorg</span>/springframework/stereotype/Component;()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// access flags 0x2</span></span><br><span class="line">  <span class="keyword">private</span> Lcom/test/service/OrderService; orderService</span><br><span class="line"></span><br><span class="line">  <span class="comment">// access flags 0x1</span></span><br><span class="line">  <span class="keyword">public</span> &lt;init&gt;()V</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER <span class="number">11</span> L0</span><br><span class="line">    ALOAD <span class="number">0</span></span><br><span class="line">    INVOKESPECIAL java/lang/Object.&lt;init&gt; ()V</span><br><span class="line">    RETURN</span><br><span class="line">   L1</span><br><span class="line">    LOCALVARIABLE <span class="keyword">this</span> Lcom/test/service/UserService; L0 L1 <span class="number">0</span></span><br><span class="line">    MAXSTACK = <span class="number">1</span></span><br><span class="line">    MAXLOCALS = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// access flags 0x1</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">test</span><span class="params">()</span>V</span></span><br><span class="line"><span class="function">   L0</span></span><br><span class="line"><span class="function">    LINENUMBER 16 L0</span></span><br><span class="line"><span class="function">    GETSTATIC java/lang/System.out : Ljava/io/PrintStream</span>;</span><br><span class="line">    LDC <span class="string">"test123"</span></span><br><span class="line">    INVOKEVIRTUAL java/io/PrintStream.println (Ljava/lang/String;)V</span><br><span class="line">   L1</span><br><span class="line">    LINENUMBER <span class="number">17</span> L1</span><br><span class="line">    RETURN</span><br><span class="line">   L2</span><br><span class="line">    LOCALVARIABLE <span class="keyword">this</span> Lcom/test/service/UserService; L0 L2 <span class="number">0</span></span><br><span class="line">    MAXSTACK = <span class="number">2</span></span><br><span class="line">    MAXLOCALS = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// access flags 0x1</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">setOrderService</span><span class="params">(Lcom/test/service/OrderService;)</span>V</span></span><br><span class="line"><span class="function">  @Lorg/springframework/beans/factory/annotation/Autowired</span>;()</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER <span class="number">22</span> L0</span><br><span class="line">    ALOAD <span class="number">0</span></span><br><span class="line">    ALOAD <span class="number">1</span></span><br><span class="line">    PUTFIELD com/test/service/UserService.orderService : Lcom/test/service/OrderService;</span><br><span class="line">   L1</span><br><span class="line">    LINENUMBER <span class="number">23</span> L1</span><br><span class="line">    RETURN</span><br><span class="line">   L2</span><br><span class="line">    LOCALVARIABLE <span class="keyword">this</span> Lcom/test/service/UserService; L0 L2 <span class="number">0</span></span><br><span class="line">    LOCALVARIABLE orderService Lcom/test/service/OrderService; L0 L2 <span class="number">1</span></span><br><span class="line">    MAXSTACK = <span class="number">2</span></span><br><span class="line">    MAXLOCALS = <span class="number">2</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// access flags 0x1041</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> synthetic bridge <span class="title">setOrderService</span><span class="params">(Ljava/lang/Object;)</span>V</span></span><br><span class="line"><span class="function">  @Lorg/springframework/beans/factory/annotation/Autowired</span>;()</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER <span class="number">10</span> L0</span><br><span class="line">    ALOAD <span class="number">0</span></span><br><span class="line">    ALOAD <span class="number">1</span></span><br><span class="line">    CHECKCAST com/test/service/OrderService</span><br><span class="line">    INVOKEVIRTUAL com/test/service/UserService.setOrderService (Lcom/test/service/OrderService;)V</span><br><span class="line">    RETURN</span><br><span class="line">   L1</span><br><span class="line">    LOCALVARIABLE <span class="keyword">this</span> Lcom/test/service/UserService; L0 L1 <span class="number">0</span></span><br><span class="line">    MAXSTACK = <span class="number">2</span></span><br><span class="line">    MAXLOCALS = <span class="number">2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到在 UserService 的字节码中有两个 setOrderService 方法：</p>
+<ul>
+<li>public setOrderService(Lcom/test/service/OrderService;)V</li>
+<li>public synthetic bridge setOrderService(Ljava/lang/Object;)V</li>
+</ul>
+<p>并且都是存在 @Autowired 注解的。所以在 Spring 中需要处理这种情况，当遍历到桥接方法时，得找到原方法</p>
+<h3 id="注入点进行注入"><a href="#注入点进行注入" class="headerlink" title="注入点进行注入"></a>注入点进行注入</h3><p>Spring 在 AutowiredAnnotationBeanPostProcessor 的 <strong>postProcessProperties()</strong> 方法中，会遍历所找到的注入点依次进行注入</p>
+<h4 id="字段注入"><a href="#字段注入" class="headerlink" title="字段注入"></a>字段注入</h4><ol>
+<li>遍历所有的 <strong>AutowiredFieldElement 对象</strong></li>
+<li>将对应的字段封装为 <strong>DependencyDescriptor 对象</strong></li>
+<li>调用 BeanFactory 的 resolveDependency() 方法，传入 <strong>DependencyDescriptor 对象</strong>，进行依赖查找，找到当前字段所匹配的 Bean 对象</li>
+<li>将 <strong>DependencyDescriptor 对象</strong>和所找到的<strong>结果对象 beanName</strong> 封装成一个 <strong>ShortcutDependencyDescriptor 对象</strong>作为缓存。例如如果当前 Bean 是原型 Bean，那么下次再来创建该 Bean 时，就可以直接拿缓存的结果对象 beanName 去 BeanFactory 中去拿 Bean 对象了，不用再次进行查找了</li>
+<li>利用反射将结果对象赋值给字段</li>
+</ol>
+<h4 id="Set-方法注入"><a href="#Set-方法注入" class="headerlink" title="Set 方法注入"></a>Set 方法注入</h4><ol>
+<li>遍历所有的 <strong>AutowiredMethodElement 对象</strong></li>
+<li>遍历将对应的方法的参数，将每个参数都封装成 <strong>MethodParameter 对象</strong></li>
+<li>将 MethodParameter 对象封装为 DependencyDescriptor 对象</li>
+<li>调用 BeanFactory 的 resolveDependency() 方法，传入 <strong>DependencyDescriptor 对象</strong>，进行依赖查找，找到当前方法参数所匹配的 Bean 对象</li>
+<li>将 <strong>DependencyDescriptor 对象</strong>和所找到的<strong>结果对象 beanName</strong> 封装成一个 <strong>ShortcutDependencyDescriptor 对象</strong>作为缓存。例如如果当前 Bean 是原型 Bean，那么下次再来创建该 Bean 时，就可以直接拿缓存的结果对象 beanName 去 BeanFactory 中去拿 Bean 对象了，不用再次进行查找了</li>
+<li>利用反射将找到的所有结果对象传给当前方法，并执行</li>
+</ol>
+<h4 id="resolveDependency"><a href="#resolveDependency" class="headerlink" title="resolveDependency"></a>resolveDependency</h4><p>该方法表示，传入一个依赖描述（DependencyDescriptor），该方法会根据该依赖描述从 BeanFactory 中找出对应的唯一的一个 Bean 对象。具体流程图如下：</p>
+<p><img src="/CKING.github.io/2022/02/07/Spring-之依赖注入/resolveDependency.png" alt="resolveDependency"></p>
+<h4 id="findAutowireCandidates-实现"><a href="#findAutowireCandidates-实现" class="headerlink" title="findAutowireCandidates() 实现"></a>findAutowireCandidates() 实现</h4><ol>
+<li>找出 BeanFactory 中类型为 type 的所有的 Bean 的名字，注意是名字，而不是 Bean 对象，因为我们可以根据 BeanDefinition 就能判断当前 type 是不是匹配，不用生成 Bean 对象</li>
+<li>把 resolvableDependencies 中 key 为 type 的对象找出来并添加到 result 中。resolvableDependencies 中存放的类型是 Bean 对象。比如 &lt;BeanFactory.class : BeanFactory 对象&gt;，在 Spring 启动时设置</li>
+<li>遍历根据 type 找出的 beanName，判断当前 beanName 对应的 Bean 是不是能够被自动注入</li>
+<li>先判断 beanName 对应的 BeanDefinition 中的 autowireCandidate 属性，如果为 false，表示不能用来进行自动注入，如果为 true 则继续进行判断</li>
+<li>判断当前 type 是不是泛型，如果是泛型是会把容器中所有的 beanName 找出来。如果是这种情况，那么在这一步就要获取到泛型的真正类型，然后进行匹配，如果当前 beanName 和当前泛型对应的真实类型匹配，那么则继续判断</li>
+<li>如果当前 DependencyDescriptor 上存在 @Qualifier 注解，那么则要判断当前 beanName 上是否定义了 Qualifer，并且是否和当前 DependencyDescriptor 上的 Qualifer 相等，相等则匹配</li>
+<li>经过上述验证之后，当前 beanName才能成为一个可注入的，添加到 result 中</li>
+</ol>
+<p>底层流程图如下：</p>
+<p><img src="/CKING.github.io/2022/02/07/Spring-之依赖注入/findAutowireCandidates.png" alt="findAutowireCandidates"></p>
+<p>对应的执行图为：</p>
+<p><img src="/CKING.github.io/2022/02/07/Spring-之依赖注入/%E6%89%A7%E8%A1%8C%E5%9B%BE.png" alt="执行图"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Spring/" rel="tag"># Spring</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2022/01/28/Bean-的生命周期/" rel="next" title="Bean 的生命周期">
+                <i class="fa fa-chevron-left"></i> Bean 的生命周期
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2022/02/09/Spring-之循环依赖简易版/" rel="prev" title="Spring 之循环依赖简易版">
+                Spring 之循环依赖简易版 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">199</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-的依赖注入方式"><span class="nav-number">1.</span> <span class="nav-text">Spring 的依赖注入方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#手动注入"><span class="nav-number">1.1.</span> <span class="nav-text">手动注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动注入"><span class="nav-number">1.2.</span> <span class="nav-text">自动注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#XML-的-autowire-自动注入"><span class="nav-number">1.2.1.</span> <span class="nav-text">XML 的 autowire 自动注入</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Autowired-注解的自动注入"><span class="nav-number">2.</span> <span class="nav-text">@Autowired 注解的自动注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#寻找注入点"><span class="nav-number">2.1.</span> <span class="nav-text">寻找注入点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#static-字段或方法为什么不支持"><span class="nav-number">2.2.</span> <span class="nav-text">static 字段或方法为什么不支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#桥接方法"><span class="nav-number">2.3.</span> <span class="nav-text">桥接方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注入点进行注入"><span class="nav-number">2.4.</span> <span class="nav-text">注入点进行注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#字段注入"><span class="nav-number">2.4.1.</span> <span class="nav-text">字段注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Set-方法注入"><span class="nav-number">2.4.2.</span> <span class="nav-text">Set 方法注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#resolveDependency"><span class="nav-number">2.4.3.</span> <span class="nav-text">resolveDependency</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#findAutowireCandidates-实现"><span class="nav-number">2.4.4.</span> <span class="nav-text">findAutowireCandidates() 实现</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

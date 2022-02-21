@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/CKING.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/CKING.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/CKING.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/CKING.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/CKING.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/CKING.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/CKING.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Bean 的生成过程生成 BeanDefinitionSpring 启动的时候会进行扫描，会先调用 org.springframework.context.annotation.ClasspathScaningCandidateComponentProvider#scanCandidateComponents(String basePackage) 扫描某个包路径，并得到 BeanDefiniti">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bean 的生命周期">
+<meta property="og:url" content="https://github.com/2022/01/28/Bean-的生命周期/index.html">
+<meta property="og:site_name" content="Ckin&#39;s Blog">
+<meta property="og:description" content="Bean 的生成过程生成 BeanDefinitionSpring 启动的时候会进行扫描，会先调用 org.springframework.context.annotation.ClasspathScaningCandidateComponentProvider#scanCandidateComponents(String basePackage) 扫描某个包路径，并得到 BeanDefiniti">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/CKING.github.io/2022/01/28/Bean-的生命周期/Spring%E6%89%AB%E6%8F%8F%E6%B5%81%E7%A8%8B.png">
+<meta property="og:updated_time" content="2022-02-21T15:27:22.452Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bean 的生命周期">
+<meta name="twitter:description" content="Bean 的生成过程生成 BeanDefinitionSpring 启动的时候会进行扫描，会先调用 org.springframework.context.annotation.ClasspathScaningCandidateComponentProvider#scanCandidateComponents(String basePackage) 扫描某个包路径，并得到 BeanDefiniti">
+<meta name="twitter:image" content="https://github.com/CKING.github.io/2022/01/28/Bean-的生命周期/Spring%E6%89%AB%E6%8F%8F%E6%B5%81%E7%A8%8B.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/CKING.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/2022/01/28/Bean-的生命周期/">
+
+
+
+
+
+  <title>Bean 的生命周期 | Ckin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/CKING.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ckin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/CKING.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/CKING.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/CKING.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/CKING.github.io/2022/01/28/Bean-的生命周期/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ckin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/CKING.github.io/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Bean 的生命周期</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-01-28T18:43:42+08:00">
+                2022-01-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/CKING.github.io/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Bean-的生成过程"><a href="#Bean-的生成过程" class="headerlink" title="Bean 的生成过程"></a>Bean 的生成过程</h2><h3 id="生成-BeanDefinition"><a href="#生成-BeanDefinition" class="headerlink" title="生成 BeanDefinition"></a>生成 BeanDefinition</h3><p>Spring 启动的时候会进行扫描，会先调用 <code>org.springframework.context.annotation.ClasspathScaningCandidateComponentProvider#scanCandidateComponents(String basePackage)</code> 扫描某个包路径，并得到 BeanDefinition 的 Set 集合</p>
+<p>Spring 的扫描流程如下：</p>
+<p><img src="/CKING.github.io/2022/01/28/Bean-的生命周期/Spring%E6%89%AB%E6%8F%8F%E6%B5%81%E7%A8%8B.png" alt="Spring扫描流程"></p>
+<ol>
+<li>首先，通过 ResourcePatternResolver 获得指定包路径下的所有 <code>.class</code> 文件（Spring 源码中将此文件包装成了 Resource 对象）</li>
+<li>遍历每个 Resource 对象</li>
+<li>利用 MetadataReaderFactory 解析 Resource 对象得到 MetadataReader（Spring 源码中MetadataReaderFactory 具体的实现类为 CachingMetadataReaderFactory，MetadataReader 的具体实现类为 SimpleMetadataReader）</li>
+<li>利用 MetaDataReader 进行 ExcludeFilter 和 includeFilter，以及条件注解 @Conditional 的筛选</li>
+<li>筛选通过后，基于 MetadataReader 生成 ScannerGenericBeanDefinition</li>
+<li>在基于 MetadataReader 判断对应的类是不是接口或抽象类</li>
+<li>如果筛选通过，那么就表示扫描到了一个 Bean，将 ScannerGenericBeanDefinition 加入结果集</li>
+</ol>
+<p>MetadataReader表示类的元数据读取器，主要包含了一个AnnotationMetadata，功能有</p>
+<ol>
+<li>获取类的名字、</li>
+<li>获取父类的名字</li>
+<li>获取所实现的所有接口名</li>
+<li>获取所有内部类的名字</li>
+<li>判断是不是抽象类</li>
+<li>判断是不是接口</li>
+<li>判断是不是一个注解</li>
+<li>获取拥有某个注解的方法集合</li>
+<li>获取类上添加的所有注解信息</li>
+<li>获取类上添加的所有注解类型集合</li>
+</ol>
+<p>值得注意的是，CachingMetadataReaderFactory 解析某个 .class 文件得到 MetadataReader 对象是利用的 <strong>ASM</strong> 技术，并没有加载这个类到 JVM。并且，最终得到的 ScannerGenericBeanDefinition 对象，<strong>beanClass 属性存储的是当前类的名字，而不是 class 对象</strong></p>
+<p>最后，上面说的是通过扫描得到的 BeanDefinition 对象，我们还可以通过直接定义 BeanDefinition，或解析 spring.xml 文件的 <bean>，或者 @Bean 注解的 BeanDefinition</bean></p>
+<h3 id="合并-BeanDefinition"><a href="#合并-BeanDefinition" class="headerlink" title="合并 BeanDefinition"></a>合并 BeanDefinition</h3><p>通过扫描得到所有 BeanDefinition 之后，就可以根据 BeanDefinition 创建 Bean 对象了，但是 Spring 中支持父子 BeanDefinition，和 Java 父子类类似，但是完全不是一回事</p>
+<p>父子 BeanDefinition 实际用的比较少，使用如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"parent"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.Parent"</span> <span class="attr">scope</span>=<span class="string">"prototype"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"child"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.Child"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面情况下，child 是单例 Bean</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"parent"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.Parent"</span> <span class="attr">scope</span>=<span class="string">"prototype"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"child"</span> <span class="attr">class</span>=<span class="string">"com.zhouyu.service.Child"</span> <span class="attr">parent</span>=<span class="string">"parent"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面情况下，child 就是原型 Bean</p>
+<p>因为 child 的父 BeanDefinition 是 parent，所以会继承 parent 上所定义的 scope 属性</p>
+<p>而在根据 child 生成 Bean 对象之前，需要进行 BeanDefinition 的合并，得到完整的 child 的 BeanDefinition</p>
+<h3 id="加载类"><a href="#加载类" class="headerlink" title="加载类"></a>加载类</h3><p>BeanDefinition 合并之后，就可以去创建 Bean 对象了，而创建 Bean 对象就必须实例化对象，而实例化就必须先加载当前 BeanDefinition 所对应的 class，在 AbstractAutowireCapableBeanFactory 类的 createBean() 方法中，一开始就会调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class&lt;?&gt; resolvedClass = resolveBeanClass(mbd, beanName);</span><br></pre></td></tr></table></figure>
+
+<p>这行代码就是去加载类的，实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果beanClass被加载了</span></span><br><span class="line"><span class="keyword">if</span> (mbd.hasBeanClass()) &#123;</span><br><span class="line">   <span class="keyword">return</span> mbd.getBeanClass();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果beanClass没有被加载</span></span><br><span class="line"><span class="keyword">if</span> (System.getSecurityManager() != <span class="keyword">null</span>) &#123;</span><br><span class="line">   <span class="keyword">return</span> AccessController.doPrivileged((PrivilegedExceptionAction&lt;Class&lt;?&gt;&gt;)</span><br><span class="line">         () -&gt; doResolveBeanClass(mbd, typesToMatch), getAccessControlContext());</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">   <span class="keyword">return</span> doResolveBeanClass(mbd, typesToMatch);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasBeanClass</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="keyword">return</span> (<span class="keyword">this</span>.beanClass <span class="keyword">instanceof</span> Class);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果 beanClass 属性的类型是 Class，那么就直接返回，如果不是，则会根据类名进行加载</p>
+<h4 id="ClassUtils-getDefaultClassLoader"><a href="#ClassUtils-getDefaultClassLoader" class="headerlink" title="ClassUtils.getDefaultClassLoader()"></a>ClassUtils.getDefaultClassLoader()</h4><ol>
+<li>优先返回当前线程中的 ClassLoader</li>
+<li>线程中类加载器为 null 的情况下，返回 ClassUtils 类的类加载器</li>
+<li>如果 ClassUtils 类的类加载器为空，那么则表示是 Bootstrap 类加载器的 ClassUtils 类，那么则返回系统类加载器</li>
+</ol>
+<h3 id="实例化前"><a href="#实例化前" class="headerlink" title="实例化前"></a>实例化前</h3><p>当前 BeanDefinition 对应的类成功加载后，就可以实例化对象了。但是在 Spring 中，实例化对象之前，Spring 提供了一个扩展点，允许用户来控制是否在某个或某些 Bean 实例化之前做一些启动动作，这个扩展点叫 <code>InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation()</code>，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">InstantiationAwareBeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInstantiation</span><span class="params">(Class&lt;?&gt; beanClass, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="string">"userService"</span>.equals(beanName)) &#123;</span><br><span class="line">         System.out.println(<span class="string">"实例化前"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如上代码会导致，在 UserService 这个 Bean 实例化前，会进行打印</p>
+<p>值得注意的是，postProcessBeforeInstantiation() 是有返回值的，如果这么实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">InstantiationAwareBeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInstantiation</span><span class="params">(Class&lt;?&gt; beanClass, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(<span class="string">"userService"</span>.equals(beanName)) &#123;</span><br><span class="line">			System.out.println(<span class="string">"实例化前"</span>);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">new</span> UserService();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>userService 这个 Bean，在实例化前会直接返回一个由我们所定义的 UserService 对象。如果是这样，表示不需要 Spring 来实例化了，并且后续的 Spring 依赖注入也不会进行了，会跳过一些步骤，直接执行初始化这一步</p>
+<h3 id="实例化"><a href="#实例化" class="headerlink" title="实例化"></a>实例化</h3><p>这个步骤中，会根据 BeanDefinition 去创建一个对象了</p>
+<h4 id="Supplier-创建对象"><a href="#Supplier-创建对象" class="headerlink" title="Supplier 创建对象"></a>Supplier 创建对象</h4><p>首先判断 BeanDefinition 是否设置了 Supplier，如果设置了则调用 Supplier 的 get() 得到对象。我们可以直接使用 BeanDefinition 对象来设置 Supplier，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition().getBeanDefinition();</span><br><span class="line">beanDefinition.setInstanceSupplier(<span class="keyword">new</span> Supplier&lt;Object&gt;() &#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> UserService();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;);</span><br><span class="line">context.registerBeanDefinition(<span class="string">"userService"</span>, beanDefinition);</span><br></pre></td></tr></table></figure>
+
+<h4 id="工厂方法创建对象"><a href="#工厂方法创建对象" class="headerlink" title="工厂方法创建对象"></a>工厂方法创建对象</h4><p>如果没有设置 Supplier，则检查 BeanDefinition 中是否设置了 factoryMethod，也就是工厂方法，有两种方式可以设置 factoryMethod，比如：</p>
+<p>方式一：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"userService"</span> <span class="attr">class</span>=<span class="string">"com.test.service.UserService"</span> <span class="attr">factory-method</span>=<span class="string">"createUserService"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>对应的 UserService 类为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> UserService <span class="title">createUserService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      System.out.println(<span class="string">"执行createUserService()"</span>);</span><br><span class="line">      UserService userService = <span class="keyword">new</span> UserService();</span><br><span class="line">      <span class="keyword">return</span> userService;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方式二：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"commonService"</span> <span class="attr">class</span>=<span class="string">"com.test.service.CommonService"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"userService1"</span> <span class="attr">factory-bean</span>=<span class="string">"commonService"</span> <span class="attr">factory-method</span>=<span class="string">"createUserService"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>对应的 CommonService 的类为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommonService</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">   <span class="function"><span class="keyword">public</span> UserService <span class="title">createUserService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> UserService();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spring 发现当前 BeanDefinition 方法设置了工厂方法后，就会区分这两种方式，然后调用工厂方法得到对象</p>
+<p>另外，我们通过 @Bean 所定义的 BeanDefinition，是存在 factoryMethod 和 FactoryBean 的，也就是和上面的方式二非常类似，@Bean 所注解的方法就是 factoryMethod，AppConfig 对象就是 FactoryBean。如果 @Bean 所注解的方法是 static，那么对应的就是方式一</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ComponentScan</span>(<span class="string">"com.test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppConfig</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   <span class="meta">@Bean</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> UserService <span class="title">userService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> UserService();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="推断构造方法"><a href="#推断构造方法" class="headerlink" title="推断构造方法"></a>推断构造方法</h4><p>这个之前已经讲过原理了。推断完构造方法后，就会使用构造方法来进行实例化了</p>
+<p>另外，在推断构造方法逻辑中除了会去选择构造方法以及查找入参对象外，还会判断是否在对应的类中使用 <code>@Lookup</code> 注解方法。如果存在则把方法封装为 LookupOverride 对象并添加到 BeanDefinition 中</p>
+<p>在实例化时，如果判断出当前 BeanDefinition 中没有 LookupOverride，那就直接用构造方法反射得到一个实例对象。如果存在 LookupOverride 对象，即类中存在 @Lookup 注解的方法，那就会生成一个代理对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      System.out.println(createOrderService());</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Lookup</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> OrderService <span class="title">createOrderService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderService</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="BeanDefinition-的后置处理"><a href="#BeanDefinition-的后置处理" class="headerlink" title="BeanDefinition 的后置处理"></a>BeanDefinition 的后置处理</h3><p>Bean 对象实例化出来后，接下来就要给对象的属性赋值了。在真正给属性赋值之前，Spring 又提供了一个扩展点 <code>MergedBeanDefinitionPostProcessor.postProcessMergedBeanDefinition()</code>，可以对此时的 BeanDefinition 进行加工，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestMergeBeanDefinitionPostProcessor</span> <span class="keyword">implements</span> <span class="title">MergedBeanDefinitionPostProcessor</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postProcessMergedBeanDefinition</span><span class="params">(RootBeanDefinition beanDefinition, Class&lt;?&gt; beanType, String beanName)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="string">"userService"</span>.equals(beanName)) &#123;</span><br><span class="line">         beanDefinition.getPropertyValues().add(<span class="string">"orderService"</span>, <span class="keyword">new</span> OrderService());</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 Spring 源码中，AutowiredAnnotationBeanPostProcessor 就是一个 MergeBeanDefinitionProcessor，它的 postProcessorMergeBeanDefinition() 中会去查找注入点，并缓存再 AutowiredAnnotationBeanPostProcessor 对象的一个 Map 中</p>
+<h3 id="实例化后"><a href="#实例化后" class="headerlink" title="实例化后"></a>实例化后</h3><p>在处理完 BeanDefinition 后，Spring 又设计了一个扩展点：<code>InstantiationAwareBeanPostProcessor.postProcessAfterInstantiation()</code>，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">InstantiationAwareBeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">postProcessAfterInstantiation</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="string">"userService"</span>.equals(beanName)) &#123;</span><br><span class="line">         System.out.println(<span class="string">"实例化后"</span>);</span><br><span class="line">         UserService userService = (UserService) bean;</span><br><span class="line">         userService.test();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码就是对 userService 所实例化出来的对象进行处理。这个扩展点，在 Spring 源码中基本没怎么使用</p>
+<h3 id="自动注入"><a href="#自动注入" class="headerlink" title="自动注入"></a>自动注入</h3><p>这里就是依赖注入，自动注入 bean 中的属性</p>
+<h3 id="处理属性"><a href="#处理属性" class="headerlink" title="处理属性"></a>处理属性</h3><p>这个步骤，就会处理 @Autowired、@Resource、@Value 等注解，也是通过 <code>InstantiationAwareBeanPostProcessor.postProcessProperties()</code> 扩展点来实现的，比如我们可以实现一个自动注入的功能。如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">InstantiationAwareBeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> PropertyValues <span class="title">postProcessProperties</span><span class="params">(PropertyValues pvs, Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="string">"userService"</span>.equals(beanName)) &#123;</span><br><span class="line">         <span class="keyword">for</span>(Field field : bean.getClass().getFields()) &#123;</span><br><span class="line">            <span class="keyword">if</span>(field.isAnnotationPresent(TestInject.class)) &#123;</span><br><span class="line">               field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">               <span class="keyword">try</span> &#123;</span><br><span class="line">                  field.set(bean, <span class="string">"123"</span>);</span><br><span class="line">               &#125;<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                  e.printStackTrace();</span><br><span class="line">               &#125;</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      </span><br><span class="line">      <span class="keyword">return</span> pvs;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="执行-Aware"><a href="#执行-Aware" class="headerlink" title="执行 Aware"></a>执行 Aware</h3><p>完成属性赋值之后，Spring 就会执行一些回调，包括：</p>
+<ol>
+<li>BeanNameAware：回传 beanName 给 bean 对象</li>
+<li>beanClassLoaderAware：回传 ClassLoader 给 bean 对象</li>
+<li>BeanFactoryAware：回传 BeanFactory 给对象</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">invokeAwareMethods</span><span class="params">(String beanName, Object bean)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> Aware) &#123;</span><br><span class="line">      <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> BeanNameAware) &#123;</span><br><span class="line">         ((BeanNameAware) bean).setBeanName(beanName);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> BeanClassLoaderAware) &#123;</span><br><span class="line">         ClassLoader bcl = getBeanClassLoader();</span><br><span class="line">         <span class="keyword">if</span> (bcl != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ((BeanClassLoaderAware) bean).setBeanClassLoader(bcl);</span><br><span class="line">         &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> BeanFactoryAware) &#123;</span><br><span class="line">         ((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.<span class="keyword">this</span>);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化前"><a href="#初始化前" class="headerlink" title="初始化前"></a>初始化前</h3><p>初始化前，也是 Spring 提供的一个扩展点：<code>BeanPostProcessor.postProcessBeforeInitialization()</code>，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">BeanPostProcessor</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="string">"userService"</span>.equals(beanName)) &#123;</span><br><span class="line">         System.out.println(<span class="string">"初始化前"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> bean;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用初始化前，可以对进行了依赖注入的 Bean 进行处理</p>
+<p>在 spring 源码中，InitDestroyAnnotationBeanPostProcessor 会在初始化前这个步骤中执行 <code>@PostConstruct</code> 方法；而 ApplicationContextAwareProcessor 会在初始化前这个步骤中进行其他 Aware 的回调</p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>初始化主要进行以下行为：</p>
+<ol>
+<li>查看当前 bean 对象是否实现了 InitializingBean 接口，如果实现了就调用其 afterPropertiesSet() 方法</li>
+<li>执行 BeanDefinition 中指定的初始化方法</li>
+</ol>
+<h3 id="初始化后"><a href="#初始化后" class="headerlink" title="初始化后"></a>初始化后</h3><p>这是 Bean 创建生命周期的最后一个步骤，也是 Spring 提供的一个扩展点：<code>BeanPostProcessor.postProcessAfterInitialization()</code>，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">BeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">      <span class="keyword">if</span>(<span class="string">"userService"</span>.equals(beanName)) &#123;</span><br><span class="line">         System.out.println(<span class="string">"初始化后"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> bean;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以在这个步骤中，对 Bean 进行最终处理，<strong>Spring 中的 AOP 就是基于初始化后实现的，初始化后返回的对象才是最终的 Bean 对象</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/CKING.github.io/tags/Spring/" rel="tag"># Spring</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/CKING.github.io/2022/01/27/Kafka-之请求处理/" rel="next" title="Kafka 之请求处理">
+                <i class="fa fa-chevron-left"></i> Kafka 之请求处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/CKING.github.io/2022/02/07/Spring-之依赖注入/" rel="prev" title="Spring 之依赖注入">
+                Spring 之依赖注入 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+ <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/CKING.github.io/images/avatar.png" alt="Ckin">
+            
+              <p class="site-author-name" itemprop="name">Ckin</p>
+              <p class="site-description motion-element" itemprop="description">一步一步往上走</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/CKING.github.io/archives/">
+              
+                  <span class="site-state-item-count">199</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/CKING.github.io/categories/index.html">
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bean-的生成过程"><span class="nav-number">1.</span> <span class="nav-text">Bean 的生成过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成-BeanDefinition"><span class="nav-number">1.1.</span> <span class="nav-text">生成 BeanDefinition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#合并-BeanDefinition"><span class="nav-number">1.2.</span> <span class="nav-text">合并 BeanDefinition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载类"><span class="nav-number">1.3.</span> <span class="nav-text">加载类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ClassUtils-getDefaultClassLoader"><span class="nav-number">1.3.1.</span> <span class="nav-text">ClassUtils.getDefaultClassLoader()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例化前"><span class="nav-number">1.4.</span> <span class="nav-text">实例化前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例化"><span class="nav-number">1.5.</span> <span class="nav-text">实例化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Supplier-创建对象"><span class="nav-number">1.5.1.</span> <span class="nav-text">Supplier 创建对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#工厂方法创建对象"><span class="nav-number">1.5.2.</span> <span class="nav-text">工厂方法创建对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#推断构造方法"><span class="nav-number">1.5.3.</span> <span class="nav-text">推断构造方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BeanDefinition-的后置处理"><span class="nav-number">1.6.</span> <span class="nav-text">BeanDefinition 的后置处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例化后"><span class="nav-number">1.7.</span> <span class="nav-text">实例化后</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动注入"><span class="nav-number">1.8.</span> <span class="nav-text">自动注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理属性"><span class="nav-number">1.9.</span> <span class="nav-text">处理属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行-Aware"><span class="nav-number">1.10.</span> <span class="nav-text">执行 Aware</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化前"><span class="nav-number">1.11.</span> <span class="nav-text">初始化前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">1.12.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化后"><span class="nav-number">1.13.</span> <span class="nav-text">初始化后</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ckin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/CKING.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/CKING.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/CKING.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/CKING.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '88b295af414c49207f46',
+          clientSecret: 'af50af237649811069f83f09664724b046f6ad22',
+          repo: 'CKING.github.io',
+          owner: 'GD-CKING',
+          admin: ['GD-CKING'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/CKING.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/CKING.github.io/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/CKING.github.io/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
