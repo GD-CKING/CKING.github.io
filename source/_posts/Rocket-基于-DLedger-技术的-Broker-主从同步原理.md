@@ -1,5 +1,5 @@
 ---
-title: RocketMQ - 基于 DLedger 技术的 Broker 主从同步班原理
+title: RocketMQ - 基于DLedger技术的Broker主从同步原理
 date: 2020-04-02 11:40:02
 tags: 消息队列
 categories: 消息队列
@@ -11,7 +11,7 @@ categories: 消息队列
 
 首先，我们回顾一下，producer 写入消息到 broker 之后，broker 会将消息写入本地 CommitLog 磁盘文件中，然后还有一些 ConsumeQueue 会存储 Topic 下各个 MessageQueue 的消息的物理位置。而且，要让 Broker 实现高可用，那么必须有一个 Broker 组，里面有一个是 Leader Broker 可以写入数据，然后让 Leader Broker 接收到数据之后，直接把数据同步给其他的 Follower Broker。如图：
 
-![主从复制](RocketMQ-基于-DLedger-技术的-Broker-主从同步班原理/主从复制.png)
+![主从复制](RocketMQ-基于DLedger技术的Broker主从同步原理/主从复制.png)
 
 
 
@@ -27,7 +27,7 @@ categories: 消息队列
 
 DLedger 技术实际上它自己就有一个 CommitLog 机制，你把数据交给它，它会写入 CommitLog 磁盘文件里去，这是它干的第一件事。如图，如果基于 DLedger 技术来实现 Broker 高可用架构，实际上就是用 DLedger 先替换原来 Broker 自己管理的 CommitLog，由 DLedger 来管理 CommitLog。
 
-![DLedgerlog](RocketMQ-基于-DLedger-技术的-Broker-主从同步班原理/DLedgerlog.png)
+![DLedgerlog](RocketMQ-基于DLedger技术的Broker主从同步原理/DLedgerlog.png)
 
 
 
@@ -89,7 +89,7 @@ DLedger 技术实际上它自己就有一个 CommitLog 机制，你把数据交�
 
 首先 Leader Broker 上的 DLedger 收到一条数据之后，会标记为 `uncommitted` 状态，然后它会通过自己的 DLedgerServer 组件把这个 `uncommitted` 数据发送给 Follower Broker 的 DLedgerServer。如图：
 
-![数据同步](RocketMQ-基于-DLedger-技术的-Broker-主从同步班原理/数据同步.png)
+![数据同步](RocketMQ-基于DLedger技术的Broker主从同步原理/数据同步.png)
 
 
 
@@ -113,7 +113,7 @@ DLedger 技术实际上它自己就有一个 CommitLog 机制，你把数据交�
 
 如下图就是示意 Leader Broker 挂了之后，Follower Broker 称为了新的 Leader Broker，然后生产者吸入新的 Leader Broker 的一个过程。新选举出来的 Leader 会把数据通过 DLedger 同步给剩下的一个 Follower Broker。
 
-![leader故障](RocketMQ-基于-DLedger-技术的-Broker-主从同步班原理/leader故障.png)
+![leader故障](RocketMQ-基于DLedger技术的Broker主从同步原理/leader故障.png)
 
 
 

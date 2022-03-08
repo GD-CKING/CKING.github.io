@@ -7,7 +7,7 @@ categories: Redis
 
 ## fork耗时操作导致高并发请求延时
 
-​		Redis在开启RDB和AOF持久化机制的时候，会有生成RDB快照，AOF rewrite等耗费磁盘IO的操作，此时主进程会fork子进程去执行。fork的时候，子进程需要拷贝父进程的空间内存页表的，这个也会耗费一定的时间。一般来说，如果父进程内存有1个G的数据，那么fork可能会耗费20ms左右，如果是10G~30G，那么就会耗费200~600ms，也就是几百毫秒的时间。可以在redis中执行`info stats`，其中的latest_fork_usec，可以看到最近一次form的时长。
+​		Redis在开启RDB和AOF持久化机制的时候，会有生成RDB快照，AOF rewrite等耗费磁盘IO的操作，此时主进程会fork子进程去执行。fork的时候，子进程需要拷贝父进程的空间内存页表的，这个也会耗费一定的时间。一般来说，如果父进程内存有1个G的数据，那么fork可能会耗费20ms左右，如果是 10G ~ 30G，那么就会耗费 200 ~ 600ms，也就是几百毫秒的时间。可以在redis中执行`info stats`，其中的latest_fork_usec，可以看到最近一次form的时长。
 
 ​		如果redis单机QPS是几万，fork可能一下子就会拖慢几万条操作的请求时长。
 
@@ -25,7 +25,7 @@ categories: Redis
 
 ## 主从复制延迟问题
 
-​		主从复制可能会超时严重，这个时候需要良好的监控和报警机制，在redis中执行`info replication`，可以见到master和slave复制的offset，做一个差值就可以看到对应的延迟量，如果延迟过多，那么久进行报警。
+​		主从复制可能会超时严重，这个时候需要良好的监控和报警机制，在redis中执行`info replication`，可以见到master和slave复制的offset，做一个差值就可以看到对应的延迟量，如果延迟过多，那么就进行报警。
 
 ## 主从复制风暴问题
 

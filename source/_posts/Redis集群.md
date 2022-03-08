@@ -7,7 +7,7 @@ categories: Redis
 
 > 本节思维导图
 
-![Redis Cluster](Redis集群/Redis Cluster.png)
+![Redis Cluster](Redis集群/RedisCluster.png)
 
 ​		Redis cluster，主要是针对海量数据 + 高并发 + 高可用的场景。Redis cluster支撑N个redis master node，每个master node都可以挂载多个slave node。这样整个redis就可以横向扩容了。如果要支撑更大数据量的缓存，那就横向扩容更多的master节点。
 
@@ -97,7 +97,7 @@ redis-trib.rb add-node
 
 ​		任何一台机器宕机，redis的寻址都不受影响。因为key找的是hash slot，不是机器。
 
-![hash slot](Redis集群/hash slot.png)
+![hash slot](Redis集群/hashslot.png)
 
 ## Redis Cluster的高可用与主备切换原理
 
